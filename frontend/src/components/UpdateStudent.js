@@ -10,6 +10,18 @@ const UpadateStudent = () => {
   const [searchQuery, setSearchQuery] = useState('');
   const [sortColumn, setSortColumn] = useState(null);
   const [sortDirection, setSortDirection] = useState('asc');
+  const [modalOpen, setModalOpen] = useState(false);
+  const [currentStudent, setCurrentStudent] = useState(null);
+
+  const handleUploadClick = (student) => {
+    setCurrentStudent(student);
+    setModalOpen(true);
+  };
+
+  const closeModal = () => {
+    setModalOpen(false);
+  };
+
 
   useEffect(() => {
     fetchStudents();
@@ -266,25 +278,69 @@ const UpadateStudent = () => {
                     <td className="px-4 py-2 border-b border-gray-600 border-r">{student.batch}</td>
                     <td className="px-4 py-2 border-b border-gray-600 border-r">{student.primaryContact}</td>
                     <td className="px-4 py-2 border-b border-gray-600 text-center">
-                    <button className="btn btn-sm text-white" style={{ backgroundColor: '#00A0E3' }}>
+                    <button 
+                        className="btn btn-sm text-white" style={{ backgroundColor: '#00A0E3' }}
+                        onClick={() => handleUploadClick(student)}  // Pass the student object correctly
+                    >    
                         Upload Photo
                     </button>
+
                     </td>
                 </tr>
                 ))}
             </tbody>
             </table>
-        </div>
-        <div className="mt-4">
-          <div className="text-center">
-            <div className="flex justify-center">{getPageButtons()}</div>
           </div>
-        </div>
+          <div className="mt-4">
+            <div className="text-center">
+              <div className="flex justify-center">{getPageButtons()}</div>
+            </div>
+          </div>
+          {modalOpen && <UploadModal student={currentStudent} closeModal={closeModal} />}
         </div>
     </div>
     
   );
 };
+
+const UploadModal = ({ student, closeModal }) => {
+  return (
+    <div className="fixed inset-0 bg-black bg-opacity-50 flex justify-center items-center">
+      <div className="bg-white p-8 rounded-3xl relative">
+        {/* Close Icon at top right */}
+        <button onClick={closeModal} className="absolute top-3 right-3 text-lg text-gray-700 hover:text-red-700">
+          <span><strong>x</strong></span>
+        </button>
+
+        <h2 className="text-lg">Upload Photo for <strong>{student.surName} {student.firstName}</strong></h2>
+        <div>
+          <p className='m-2'>Application Number: <strong>{student.applicationNumber}</strong> </p>
+          <p className='m-2'>Parent Name: <strong>{student.parentName}</strong> </p>
+          <p className='m-2'>Phone Number: <strong>{student.primaryContact}</strong> </p>
+          <p className='m-2'>Batch: <strong>{student.batch}</strong> </p>
+        </div>
+        <div className="mt-4">
+          <button
+            className="bg-[#00A0E3] text-white px-4 py-2 mr-2 hover:bg-[#008EC3] rounded-2xl"
+            onClick={() => {}}>
+            Open Camera
+          </button>
+          <button
+            className="bg-[#00A0E3] text-white px-4 py-2 hover:bg-[#008EC3] rounded-2xl"
+            onClick={() => {}}>
+            Upload File
+          </button>
+        </div>
+        <button
+          className="mt-4 px-4 py-2 bg-red-500 text-white hover:bg-red-700 rounded-2xl"
+          onClick={closeModal}>
+          Close
+        </button>
+      </div>
+    </div>
+  );
+};
+
 
 export default UpadateStudent;
 
