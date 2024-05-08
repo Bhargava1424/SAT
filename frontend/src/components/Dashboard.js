@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from 'react';
-
+import Navbar from './Navbar';
 const Dashboard = () => {
   const [students, setStudents] = useState([]);
   const [selectedRow, setSelectedRow] = useState(null);
@@ -183,7 +183,8 @@ const Dashboard = () => {
   if (error) return <div>{error}</div>;
 
   return (
-
+    <div>
+<Navbar/>
     <div className="bg-gray-400 rounded-3xl mx-6">
         <div className="px-32 py-6">
         <div className="relative flex items-center justify-between mb-4">
@@ -281,6 +282,7 @@ const Dashboard = () => {
           </div>
         </div>
         </div>
+    </div>
     </div>
     
   );
