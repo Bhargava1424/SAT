@@ -13,13 +13,22 @@ function Navbar() {
     };
 
     const isLoggedIn = sessionStorage.getItem('username') && sessionStorage.getItem('role');
+    const role = sessionStorage.getItem('role');
+
+    // Define navigation items based on user roles
     const navItems = [
-        { name: 'Dashboard', path: '/dashboard' },
-        { name: 'Update Student', path: '/updateStudent' },
-        { name: 'Add Teacher', path: '/add-teacher' },
-        { name: 'View Sessions', path: '/view-sessions' },
-        { name: 'View Allotments', path: '/view-allotments' }
+        { name: 'Dashboard', path: '/dashboard', roles: ['admin', 'teacher'] },
+        { name: 'Update Student', path: '/updateStudent', roles: ['admin'] },
+        { name: 'Add Teacher', path: '/add-teacher', roles: ['admin'] },
+        { name: 'View Sessions', path: '/view-sessions', roles: ['admin'] },
+        { name: 'View Allotments', path: '/view-allotments', roles: ['admin'] },
+        { name: 'Pending Sessions', path: '/pendingSessions', roles: ['teacher'] },
+        { name: 'Completed Sessions', path: '/completedSessions', roles: ['teacher'] },
+        { name: 'Upcoming Sessions', path:'/upcomingSessions', roles: ['teacher']}
     ];
+
+    // Filter nav items based on the user's role
+    const filteredNavItems = navItems.filter(item => item.roles.includes(role));
 
     return (
         <div>
@@ -48,7 +57,7 @@ function Navbar() {
             </div>
             {isLoggedIn && (
                 <div className="flex justify-center space-x-4 p-4">
-                    {navItems.map((item, index) => (
+                    {filteredNavItems.map((item, index) => (
                         <button
                             key={index}
                             onClick={() => navigate(item.path)}
