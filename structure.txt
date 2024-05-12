@@ -1,0 +1,48 @@
+SAT/
+└── server/
+    ├── config/
+    │   └── db.js
+    ├── models/
+    ├── routes/
+    ├── .gitignore
+    ├── .gitattributes
+    ├── package-lock.json
+    ├── package.json
+    └── server.js
+SAT/
+└── frontend/
+    ├── node_modules/
+    ├── public/
+    ├── src/
+    │   ├── components/
+    │   │   ├── Dashboard.js
+    │   │   ├── LoginPage.js
+    │   │   ├── Navbar.js
+    │   │   └── UpdateStudent.js
+    │   ├── App.css
+    │   ├── App.js
+    │   ├── App.test.js
+    │   ├── index.css
+    │   ├── index.js
+    │   ├── reportWebVitals.js
+    │   └── setupTests.js
+    ├── .gitignore
+    ├── package-lock.json
+    ├── package.json
+    ├── postcss.config.js
+    ├── README.md
+    └── tailwind.config.js
+
+ OAuth 2.0 Credentials:
+
+{"web":{"client_id":"660495865700-eub3k43pf368cv6e3ul0j4mdsutgak1p.apps.googleusercontent.com","project_id":"edu-422717","auth_uri":"https://accounts.google.com/o/oauth2/auth","token_uri":"https://oauth2.googleapis.com/token","auth_provider_x509_cert_url":"https://www.googleapis.com/oauth2/v1/certs","client_secret":"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","javascript_origins":["http://localhost:3000"]}}
+
+
+
+
+"name": "bhargava"
+"email": "sribhargava@gmail.com"
+"password": "a"
+"phoneNumber": "8977228597"
+"branch": "VDN"
+"teacherID": "001"

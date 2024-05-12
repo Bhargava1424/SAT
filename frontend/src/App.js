@@ -4,6 +4,9 @@ import './App.css';
 import Dashboard from './components/Dashboard';
 import UpdateStudent from './components/UpdateStudent';
 import LoginPage from './components/LoginPage';
+import AddTeachers from './components/AddTeachers';
+
+
 
 function App() {
   const isLoggedIn = () => {
@@ -18,6 +21,7 @@ function App() {
           <Route path="/" element={isLoggedIn() ? <Navigate replace to="/dashboard" /> : <LoginPage />} />
           <Route path="/dashboard" element={isLoggedIn() ? <Dashboard /> : <Navigate replace to="/" />} />
           <Route path="/updateStudent" element={isLoggedIn() ? <UpdateStudent /> : <Navigate replace to="/" />} />
+          <Route path="/add-teacher" element={isLoggedIn() ? <AddTeachers /> : <Navigate replace to="/" />} />
           <Route path="/login" element={<LoginPage />} />
         </Routes>
       </div>
