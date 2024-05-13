@@ -7,6 +7,7 @@ import UpdateStudent from './components/UpdateStudent';
 import AddTeachers from './components/AddTeachers';
 import PendingSessions from './components/pendingSessions';
 import CompletedSessions from './components/completedSessions';
+import UpcomingSessions from './components/upcomingSessions';
 
 function App() {
   const { user } = useAuth();
@@ -21,6 +22,7 @@ function App() {
           <Route path="/add-teacher" element={user ? <AddTeachers /> : <Navigate replace to="/" />} />
           <Route path="/pendingSessions" element={user ? <PendingSessions /> : <Navigate replace to="/" />} />
           <Route path="/completedSessions" element={user ? <CompletedSessions /> : <Navigate replace to="/" />} />
+          <Route path="/upcomingSessions" element={user ? <UpcomingSessions /> : <Navigate replace to="/" />} />
           <Route path="/login" element={<LoginPage />} />
         </Routes>
       </div>
