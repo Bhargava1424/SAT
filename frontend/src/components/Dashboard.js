@@ -214,7 +214,7 @@ const Dashboard = () => {
 
             
         <div className="overflow-x-auto">
-            <table className="w-full table-auto bg-white border-collapse border border-gray-600">
+            <table className="w-full table-auto bg-white border-collapse border border-gray-500">
             <thead className="bg-[#2D5990] text-white">
                 <tr>
                 <th

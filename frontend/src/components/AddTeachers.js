@@ -8,7 +8,8 @@ const AddTeachers = () => {
         password: '',
         phoneNumber: '',
         branch: '',
-        teacherID: ''
+        teacherID: '',
+        role:''
     });
     const [teachers, setTeachers] = useState([]);
     const [selectedRow, setSelectedRow] = useState(null);
@@ -23,7 +24,7 @@ useEffect(() => {
 
     fetchBranches();
     console.log(branches);
-}, []);
+},[]);
 
 
     // Function to fetch all teachers
@@ -70,7 +71,7 @@ useEffect(() => {
             const newTeacher = await response.json();
             if (response.ok) {
                 setTeachers([...teachers, newTeacher]);
-                setForm({ name: '', email: '', password: '', phoneNumber: '', branch: '', teacherID: '' }); // Clear form
+                setForm({ name: '', email: '', password: '', phoneNumber: '', branch: '', teacherID: '', role:'' }); // Clear form
                 alert('Teacher added successfully!');
             } else {
                 throw new Error(newTeacher.error || 'Failed to add teacher');
@@ -97,10 +98,38 @@ useEffect(() => {
                     <h2 className="text-2xl font-bold mb-4">Add Teachers</h2>
                     <form onSubmit={handleSubmit}>
                         <div className="grid grid-cols-2 gap-4">
-                            <input type="text" name="name" placeholder="Name" value={form.name} onChange={handleChange} className="input input-bordered w-full bg-white my-2 rounded-xl rounded-3xl" />
-                            <input type="email" name="email" placeholder="Email" value={form.email} onChange={handleChange} className="input input-bordered w-full bg-white my-2 rounded-xl" />
-                            <input type="password" name="password" placeholder="Password" value={form.password} onChange={handleChange} className="input input-bordered w-full bg-white my-2 rounded-xl" />
-                            <input type="text" name="phoneNumber" placeholder="Phone Number" value={form.phoneNumber} onChange={handleChange} className="input input-bordered w-full bg-white my-2 rounded-xl" />
+                            <input 
+                                type="text" 
+                                name="name" 
+                                placeholder="Name" 
+                                value={form.name} 
+                                onChange={handleChange} 
+                                className="input input-bordered w-full bg-white my-2 rounded-xl" 
+                            />
+                            <input 
+                                type="email" 
+                                name="email" 
+                                placeholder="Email" 
+                                value={form.email} 
+                                onChange={handleChange} 
+                                className="input input-bordered w-full bg-white my-2 rounded-xl" 
+                            />
+                            <input 
+                                type="password" 
+                                name="password" 
+                                placeholder="Password" 
+                                value={form.password} 
+                                onChange={handleChange} 
+                                className="input input-bordered w-full bg-white my-2 rounded-xl" 
+                            />
+                            <input 
+                                type="text" 
+                                name="phoneNumber" 
+                                placeholder="Phone Number" 
+                                value={form.phoneNumber} 
+                                onChange={handleChange} 
+                                className="input input-bordered w-full bg-white my-2 rounded-xl" 
+                            />
                             <select
                                 name="branch"
                                 value={form.branch}
@@ -114,18 +143,37 @@ useEffect(() => {
                                     </option>
                                 ))}
                             </select>
-                            <input type="text" name="teacherID" placeholder="Teacher ID" value={form.teacherID} onChange={handleChange} className="input input-bordered w-full bg-white my-2 rounded-xl" />
+                            <input 
+                                type="text" 
+                                name="teacherID" 
+                                placeholder="Teacher ID" 
+                                value={form.teacherID} 
+                                onChange={handleChange} 
+                                className="input input-bordered w-full bg-white my-2 rounded-xl" 
+                            />
+                            <select
+                                name="role"
+                                value={form.role}
+                                onChange={handleChange}
+                                className="input input-bordered w-full bg-white text-black my-2 rounded-xl"
+                            >
+                                <option value="">Select Role</option>
+                                <option value="teacher">Teacher</option>
+                                <option value="admin">Admin</option>
+                            </select>
                         </div>
                         <button type="submit" className="btn btn-primary mt-4 bg-[#2D5990] text-white">Add Teacher</button>
                     </form>
+
                 </div>
 
                 <div className="w-3/4 mt-8">
                     <h2 className="text-2xl font-bold mb-2">Teachers List</h2>
-                    <table className="w-full table-auto bg-white border-collapse border border-gray-600 m-4">
+                    <table className="w-full table-auto bg-white border-collapse border border-gray-500 m-4">
                         <thead className="bg-[#2D5990] text-white">
                             <tr>
                                 <th className="px-4 py-2 text-center border-b border-gray-600 border-r">Name</th>
+                                <th className="px-4 py-2 text-center border-b border-gray-600 border-r">Role</th>
                                 <th className="px-4 py-2 text-center border-b border-gray-600 border-r">Email</th>
                                 <th className="px-4 py-2 text-center border-b border-gray-600 border-r">Phone Number</th>
                                 <th className="px-4 py-2 text-center border-b border-gray-600 border-r">Branch</th>
@@ -142,6 +190,7 @@ useEffect(() => {
                                     onClick={() => handleRowClick(teacher._id)}
                                 >
                                     <td className="px-4 py-2 border-b border-gray-600 border-r">{teacher.name}</td>
+                                    <td className="px-4 py-2 border-b border-gray-600 border-r">{teacher.role}</td>
                                     <td className="px-4 py-2 border-b border-gray-600 border-r">{teacher.email}</td>
                                     <td className="px-4 py-2 border-b border-gray-600 border-r">{teacher.phoneNumber}</td>
                                     <td className="px-4 py-2 border-b border-gray-600 border-r">{teacher.branch}</td>

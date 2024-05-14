@@ -1,4 +1,5 @@
-import React from 'react';
+// src/App.js
+import React, { useEffect } from 'react';
 import { BrowserRouter as Router, Route, Routes, Navigate } from 'react-router-dom';
 import { useAuth } from './components/AuthContext';
 import Dashboard from './components/Dashboard';
@@ -9,6 +10,8 @@ import PendingSessions from './components/pendingSessions';
 import CompletedSessions from './components/completedSessions';
 import UpcomingSessions from './components/upcomingSessions';
 import ViewFeedbacks from './components/ViewFeedbacks';
+import SessionAndAllotments from './components/SessionsAndAllotments';
+
 
 function App() {
   const { user } = useAuth();
@@ -20,7 +23,8 @@ function App() {
           <Route path="/" element={user ? <Navigate replace to="/dashboard" /> : <LoginPage />} />
           <Route path="/dashboard" element={user ? <Dashboard /> : <Navigate replace to="/" />} />
           <Route path="/updateStudent" element={user ? <UpdateStudent /> : <Navigate replace to="/" />} />
-          <Route path="/add-teacher" element={user ? <AddTeachers /> : <Navigate replace to="/" />} />
+          <Route path="/addTeacher" element={user ? <AddTeachers /> : <Navigate replace to="/" />} />
+          <Route path="/sessions&Allotments" element={user ? <SessionAndAllotments /> : <Navigate replace to="/" />} />
           <Route path="/pendingSessions" element={user ? <PendingSessions /> : <Navigate replace to="/" />} />
           <Route path="/completedSessions" element={user ? <CompletedSessions /> : <Navigate replace to="/" />} />
           <Route path="/upcomingSessions" element={user ? <UpcomingSessions /> : <Navigate replace to="/" />} />

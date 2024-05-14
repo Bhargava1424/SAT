@@ -14,11 +14,24 @@ router.post('/', async (req, res) => {
     }
 });
 
-// GET route to list all teachers
-router.get('/', async (req, res) => {
+// GET route to list all admins
+router.get('/admin', async (req, res) => {
     try {
         const teachers = await Teacher.find();
-        res.status(200).json(teachers);
+        admins = teachers.filter(teacher => teacher.role === 'admin');  
+        res.status(200).json(admins);
+    } catch (error) {
+        console.error('Error fetching teachers:', error);
+        res.status(500).json({ message: 'Error fetching teachers', error: error.message });
+    }
+});
+
+// GET route to list all teachers
+router.get('/teachers', async (req, res) => {
+    try {
+        const teachers = await Teacher.find();
+        admins = teachers.filter(teacher => teacher.role === 'admin');  
+        res.status(200).json(admins);
     } catch (error) {
         console.error('Error fetching teachers:', error);
         res.status(500).json({ message: 'Error fetching teachers', error: error.message });
