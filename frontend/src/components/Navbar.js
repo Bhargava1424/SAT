@@ -37,14 +37,14 @@ function Navbar() {
                 </div>
                 
                 <div className="flex-1 flex justify-center">
-                    <img src='/9logo.jpg' alt="Nine Education IIT Academy" className="h-12 sm:h-16" />
+                    <img src='/9logo.jpg' alt="Nine Education IIT Academy" className="h-8 md:h-16" />
                 </div>
 
                 <div className="flex-1 flex justify-end items-center">
                     {isLoggedIn ? (
                         <>
-                            <img src="/profileicon.jpeg" alt="Profile" className="w-8 h-8 sm:w-10 sm:h-10 rounded-full mr-2 hidden sm:block" />
-                            <button onClick={handleLogout} className="rounded-2xl bg-[#00A0E3] px-3 pb-4 sm:px-3 sm:py-2 h-5 w-16 text-sm sm:h-10 hover:bg-blue-600">Logout</button>
+                            <img src="/profileicon.jpeg" alt="Profile" className="w-12 h-12 rounded-full mr-2 hidden sm:block" />
+                            <button onClick={handleLogout} className="rounded-2xl bg-[#00A0E3] px-3 md:pb-2 h-8 w-20 md:h-12 w-24 text-xs md:text-lg hover:bg-blue-600">Logout</button>
                             <button
                                 onClick={() => setIsMenuOpen(!isMenuOpen)}
                                 className="ml-2 sm:hidden focus:outline-none"

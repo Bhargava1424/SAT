@@ -4,7 +4,11 @@ module.exports = {
   darkMode: false,
   content: [],
   theme: {
-    extend: {},
+    extend: {
+      fontSize: {
+        'xxs': '0.625rem', // Custom text size (10px)
+      }
+    },
   },
   plugins: [require('daisyui')],
 

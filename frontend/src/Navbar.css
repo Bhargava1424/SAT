@@ -15,13 +15,3 @@
   border-right: 10px solid transparent;
   border-top: 10px solid #2D5990;
 }
-
-@media (max-width: 640px) {
-  .active-button {
-      top: 0;
-  }
-
-  .active-button::after {
-      display: none;
-  }
-}

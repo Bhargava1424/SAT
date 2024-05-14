@@ -23,12 +23,12 @@ const UpcomingSessions = () => {
     <div>
         <Navbar/>
         <div className="container mx-auto px-4 bg-gray-400 rounded-3xl">
-        <div className="grid grid-cols-6 gap-4">
+        <div className="grid grid-cols-3 md:grid-cols-6 gap-2">
             {students.map(student => (
-            <div key={student.id} className="h-72 bg-white shadow-md rounded-lg p-4 m-2">
-                <img src={student.imageUrl} alt={student.name} className="rounded-full w-28 h-28 mx-auto"/>
-                <h1 className='text-center'>{student.name}</h1>
-                <p className='text-center bg-gray-300 rounded-2xl p-2'>Next week, this student will be listed in the Pending sessions.</p>
+            <div key={student.id} className="h-46 md:h-72 bg-white shadow-md rounded-lg p-4 m-2">
+                <img src={student.imageUrl} alt={student.name} className="rounded-full w-20 md:w-28 md:h-28 mx-auto"/>
+                <h1 className='text-center text-xs md:text-lg'>{student.name}</h1>
+                <p className='text-justify bg-gray-300 rounded-2xl p-1 md:p-2 text-xs md:text-sm'>Next week, this student will be listed in the Pending sessions.</p>
             </div>
             ))}
         </div>
