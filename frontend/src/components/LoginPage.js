@@ -14,7 +14,8 @@ const LoginPage = () => {
         { username: 'teacher1', password: 'pass1', role: 'teacher' },
         { username: 'teacher2', password: 'pass2', role: 'teacher' },
         { username: 'admin1', password: 'pass3', role: 'admin' },
-        { username: 'a', password: 'a', role: 'admin' }
+        { username: 'a', password: 'a', role: 'admin' },
+        { username: 'vp', password: 'vp', role: 'vicePrincipal' }
     ];
 
     useEffect(() => {

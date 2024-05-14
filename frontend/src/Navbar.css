@@ -1,18 +1,27 @@
 .active-button {
-    position: relative;
-    top: -10px;
+  position: relative;
+  top: -10px;
+}
+
+.active-button::after {
+  content: '';
+  position: absolute;
+  bottom: -10px;
+  left: 50%;
+  transform: translateX(-50%);
+  width: 0;
+  height: 0;
+  border-left: 10px solid transparent;
+  border-right: 10px solid transparent;
+  border-top: 10px solid #2D5990;
+}
+
+@media (max-width: 640px) {
+  .active-button {
+      top: 0;
   }
-  
+
   .active-button::after {
-    content: '';
-    position: absolute;
-    bottom: -10px; /* Adjust based on your design */
-    left: 50%;
-    transform: translateX(-50%);
-    width: 0;
-    height: 0;
-    border-left: 10px solid transparent;
-    border-right: 10px solid transparent;
-    border-top: 10px solid #2D5990; /* Color of the active button */
+      display: none;
   }
-  
+}

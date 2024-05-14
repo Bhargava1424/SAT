@@ -8,6 +8,7 @@ import AddTeachers from './components/AddTeachers';
 import PendingSessions from './components/pendingSessions';
 import CompletedSessions from './components/completedSessions';
 import UpcomingSessions from './components/upcomingSessions';
+import ViewFeedbacks from './components/ViewFeedbacks';
 
 function App() {
   const { user } = useAuth();
@@ -23,6 +24,7 @@ function App() {
           <Route path="/pendingSessions" element={user ? <PendingSessions /> : <Navigate replace to="/" />} />
           <Route path="/completedSessions" element={user ? <CompletedSessions /> : <Navigate replace to="/" />} />
           <Route path="/upcomingSessions" element={user ? <UpcomingSessions /> : <Navigate replace to="/" />} />
+          <Route path="/viewFeedbacks" element={user ? <ViewFeedbacks /> : <Navigate replace to="/" />} />
           <Route path="/login" element={<LoginPage />} />
         </Routes>
       </div>
