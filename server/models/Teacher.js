@@ -6,7 +6,8 @@ const teacherSchema = new mongoose.Schema({
     password: { type: String, required: true },
     phoneNumber: { type: String, required: true },
     branch: { type: String, required: true },
-    teacherID: { type: String, required: true, unique: true }
-});
+    teacherID: { type: String, required: true, unique: true },
+    role: { type: String, required: true }
+}, { strict: true });
 
 module.exports = mongoose.model('Teacher', teacherSchema);

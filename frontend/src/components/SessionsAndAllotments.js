@@ -11,8 +11,9 @@ const SessionAndAllotments = () => {
   // Function to fetch all teachers
   useEffect(() => {
     const fetchTeachers = async () => {
-      const response = await fetch('http://localhost:5000/teachers');
+      const response = await fetch('http://localhost:5000/teachers/teachers');
       const data = await response.json();
+      console.log("User data:",data);
       const filteredTeachers = data.filter(teacher => teacher.role === 'teacher');
       setTeachers(filteredTeachers);
     };

@@ -30,9 +30,10 @@ useEffect(() => {
     // Function to fetch all teachers
     useEffect(() => {
         const fetchTeachers = async () => {
-            const response = await fetch('http://localhost:5000/teachers');
-            const data = await response.json();
-            setTeachers(data);
+            const response = await fetch('http://localhost:5000/teachers/teachers');
+            const datax = await response.json();
+            setTeachers(datax);
+            console.log(datax);
         };
         
         fetchTeachers();
@@ -70,7 +71,7 @@ useEffect(() => {
             });
             const newTeacher = await response.json();
             if (response.ok) {
-                setTeachers([...teachers, newTeacher]);
+                window.location.reload();
                 setForm({ name: '', email: '', password: '', phoneNumber: '', branch: '', teacherID: '', role:'' }); // Clear form
                 alert('Teacher added successfully!');
             } else {

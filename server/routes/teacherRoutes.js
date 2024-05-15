@@ -1,3 +1,4 @@
+// Routes
 const express = require('express');
 const router = express.Router();
 const Teacher = require('../models/Teacher'); // Import the teacher model
@@ -18,11 +19,11 @@ router.post('/', async (req, res) => {
 router.get('/admin', async (req, res) => {
     try {
         const teachers = await Teacher.find();
-        admins = teachers.filter(teacher => teacher.role === 'admin');  
+        const admins = teachers.filter(teacher => teacher.role === 'admin');  
         res.status(200).json(admins);
     } catch (error) {
-        console.error('Error fetching teachers:', error);
-        res.status(500).json({ message: 'Error fetching teachers', error: error.message });
+        console.error('Error fetching admins:', error);
+        res.status(500).json({ message: 'Error fetching admins', error: error.message });
     }
 });
 
@@ -30,8 +31,8 @@ router.get('/admin', async (req, res) => {
 router.get('/teachers', async (req, res) => {
     try {
         const teachers = await Teacher.find();
-        admins = teachers.filter(teacher => teacher.role === 'admin');  
-        res.status(200).json(admins);
+        console.log("Routes data",teachers);
+        res.status(200).json(teachers);
     } catch (error) {
         console.error('Error fetching teachers:', error);
         res.status(500).json({ message: 'Error fetching teachers', error: error.message });
