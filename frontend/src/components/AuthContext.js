@@ -5,17 +5,17 @@ const AuthContext = createContext(null);
 export const AuthProvider = ({ children }) => {
     const [user, setUser] = useState(() => {
         // Attempt to get user data from sessionStorage when the component mounts
-        const savedUser = sessionStorage.getItem('username');
+        const savedUser = sessionStorage.getItem('name');
         const savedRole = sessionStorage.getItem('role');
         if (savedUser && savedRole) {
-            return { username: savedUser, role: savedRole };
+            return { name: savedUser, role: savedRole };
         }
         return null;
     });
 
-    const login = (username, role) => {
-        setUser({ username, role });
-        sessionStorage.setItem('username', username);
+    const login = (name, role) => {
+        setUser({ name, role });
+        sessionStorage.setItem('name', name);
         sessionStorage.setItem('role', role);
     };
 
@@ -27,10 +27,10 @@ export const AuthProvider = ({ children }) => {
     // Optionally, to handle changes in sessionStorage across tabs:
     useEffect(() => {
         const handleStorageChange = () => {
-            const savedUser = sessionStorage.getItem('username');
+            const savedUser = sessionStorage.getItem('name');
             const savedRole = sessionStorage.getItem('role');
             if (savedUser && savedRole) {
-                setUser({ username: savedUser, role: savedRole });
+                setUser({ name: savedUser, role: savedRole });
             } else {
                 setUser(null);
             }

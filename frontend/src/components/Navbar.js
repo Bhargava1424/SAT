@@ -6,6 +6,7 @@ function Navbar() {
     const navigate = useNavigate();
     const location = useLocation();
     const [isMenuOpen, setIsMenuOpen] = useState(false);
+    const [isAccordionOpen, setIsAccordionOpen] = useState(false);  // New state for the accordion
 
     const handleLogout = () => {
         sessionStorage.clear();
@@ -13,21 +14,26 @@ function Navbar() {
         navigate('/login', { replace: true });
     };
 
-    const isLoggedIn = sessionStorage.getItem('username') && sessionStorage.getItem('role');
+    const isLoggedIn = sessionStorage.getItem('name') && sessionStorage.getItem('role');
+    const name = sessionStorage.getItem('name');  // Get user name from session storage
     const role = sessionStorage.getItem('role');
 
     const navItems = [
-        { name: 'Dashboard', path: '/dashboard', roles: ['admin', 'teacher','vicePrincipal'] },
+        { name: 'Dashboard', path: '/dashboard', roles: ['admin', 'teacher', 'vicePrincipal'] },
         { name: 'Update Student', path: '/updateStudent', roles: ['admin'] },
         { name: 'Add User', path: '/addTeacher', roles: ['admin'] },
         { name: 'Sessions & Allotments', path: '/sessions&Allotments', roles: ['admin'] },
         { name: 'Pending Sessions', path: '/pendingSessions', roles: ['teacher'] },
         { name: 'Completed Sessions', path: '/completedSessions', roles: ['teacher'] },
-        { name: 'Upcoming Sessions', path:'/upcomingSessions', roles: ['teacher']},
-        { name: 'View Feedbacks', path:'/viewFeedbacks', roles: ['admin', 'vicePrincipal']},
+        { name: 'Upcoming Sessions', path: '/upcomingSessions', roles: ['teacher'] },
+        { name: 'View Feedbacks', path: '/viewFeedbacks', roles: ['admin', 'vicePrincipal'] },
     ];
 
     const filteredNavItems = navItems.filter(item => item.roles.includes(role));
+
+    const toggleAccordion = () => {
+        setIsAccordionOpen(!isAccordionOpen);  // Toggle accordion state
+    };
 
     return (
         <div>
@@ -35,7 +41,7 @@ function Navbar() {
                 <div className="flex-1 invisible sm:visible">
                     {isLoggedIn && <div className="w-8 h-8 sm:w-10 sm:h-10"></div>}
                 </div>
-                
+
                 <div className="flex-1 flex justify-center">
                     <img src='/9logo.jpg' alt="Nine Education IIT Academy" className="h-8 md:h-16" />
                 </div>
@@ -43,8 +49,7 @@ function Navbar() {
                 <div className="flex-1 flex justify-end items-center">
                     {isLoggedIn ? (
                         <>
-                            <img src="/profileicon.jpeg" alt="Profile" className="w-12 h-12 rounded-full mr-2 hidden sm:block" />
-                            <button onClick={handleLogout} className="rounded-2xl bg-[#00A0E3] px-3 md:pb-2 h-8 w-20 md:h-12 w-24 text-xs md:text-lg hover:bg-blue-600">Logout</button>
+                            <img src="/profileicon.jpeg" alt="Profile" className="w-12 h-12 rounded-full mr-2 cursor-pointer" onClick={toggleAccordion} />
                             <button
                                 onClick={() => setIsMenuOpen(!isMenuOpen)}
                                 className="ml-2 sm:hidden focus:outline-none"
@@ -58,11 +63,19 @@ function Navbar() {
                                     ) : (
                                         <path
                                             fillRule="evenodd"
-                                            d="M4 5h16a1 1 0 0 1 0 2H4a1 1 0 1 1 0-2zm0 6h16a1 1 0 0 1 0 2H4a1 1 0 0 1 0-2zm0 6h16a1 1 0 0 1 0 2H4a1 1 0 0 1 0-2z"
+                                            d="M4 5h16a1 1 0 0 1 0 2H4a1 1 0 1 1 0-2zm0 6h16a1 1 0 0 1 0 2H4a1 1 0 1 1 0-2zm0 6h16a1 1 0 0 1 0 2H4a1 1 0 1 1 0-2z"
                                         />
                                     )}
                                 </svg>
                             </button>
+                            {isAccordionOpen && (
+                                <div className="absolute top-20 right-10 bg-white text-black rounded-lg shadow-xl p-2 w-48 z-50 text-xs md:text-sm">
+                                    <p><strong>Name:</strong> {name}</p>
+                                    <p><strong>Role:</strong> <span className='uppercase'>{role}</span></p>
+                                    <button onClick={handleLogout} className="mt-4 rounded-2xl bg-[#2D5990] md:pb-2 h-8 w-16 md:h-8 text-xs md:text-sm hover:bg-blue-600 text-white font-medium">Logout</button>
+                                </div>
+                            )}
+
                         </>
                     ) : (
                         <div className="w-8 h-8 sm:w-10 sm:h-10 invisible"></div>
@@ -87,7 +100,7 @@ function Navbar() {
                     </div>
                 </div>
             )}
-                    </div>
+        </div>
     );
 }
 
