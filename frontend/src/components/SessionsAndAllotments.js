@@ -11,7 +11,7 @@ const SessionAndAllotments = () => {
   // Function to fetch all teachers
   useEffect(() => {
     const fetchTeachers = async () => {
-      const response = await fetch('http://localhost:5000/teachers/teachers');
+      const response = await fetch('http://localhost:5000/teachers');
       const data = await response.json();
       console.log("User data:",data);
       const filteredTeachers = data.filter(teacher => teacher.role === 'teacher');
@@ -49,10 +49,10 @@ const SessionAndAllotments = () => {
   };
 
   return (
-    <div className="w-full mt-8">
+    <div className="w-full mt-8 bg-white min-h-screen">
       <Navbar />
-      <h2 className="text-2xl font-bold mb-2 text-center">Session & Allotments</h2>
-      <div className="text-center mb-4">
+      <h2 className="text-xl md:text-2xl font-bold m-2 mb-4 text-center">SESSIONS & ALLOTMENTS</h2>
+      <div className="text-center my-2">
         <DatePicker
           selected={selectedMonday}
           onChange={handleDateChange}
@@ -62,45 +62,47 @@ const SessionAndAllotments = () => {
           className="px-4 py-2 bg-white border border-gray-400 rounded cursor-pointer"
         />
       </div>
-      <div className="overflow-auto max-h-screen p-4">
-        <table className="table-auto bg-white border-collapse border border-gray-500 mx-auto">
-          <thead className="bg-[#2D5990] text-white">
-            <tr>
-              <th className="px-4 py-2 text-center border-b border-gray-600 border-r">Session</th>
-              <th className="px-4 py-2 text-center border-b border-gray-600 border-r" colSpan={teachers.length}>
-                Teachers
-              </th>
-            </tr>
-            <tr>
-              <th className="px-4 py-2 text-center border-b border-gray-600 border-r"></th>
-              {teachers.map((teacher) => (
-                <th key={teacher._id} className="px-4 py-2 text-center border-b border-gray-600 border-r">
-                  {teacher.name}
+      <div className="overflow-auto max-h-screen p-2 md:p-4">
+          <table className="table-auto w-full bg-white border-collapse border border-gray-500 mx-auto rounded-xl">
+            <thead className="bg-[#2D5990] text-white">
+              <tr>
+                <th className="px-2 md:px-4 py-2 text-center border-b border-gray-600 border-r text-xs md:text-base">Session</th>
+                <th className="px-2 md:px-4 py-2 text-center border-b border-gray-600 border-r text-xs md:text-base" colSpan={teachers.length}>
+                  Teachers
                 </th>
-              ))}
-            </tr>
-          </thead>
-          <tbody>
-            {sessions.map((session, index) => (
-              <tr
-                key={index}
-                className={`${
-                  isCurrentDate(session) ? 'bg-blue-200 pointer-events-none' : 'even:bg-gray-200 hover:bg-gray-400'
-                }`}
-              >
-                <td className="px-4 py-2 border-b border-gray-600 border-r text-center">{session}</td>
+              </tr>
+              <tr>
+                <th className="px-2 md:px-4 py-2 text-center border-b border-gray-600 border-r"></th>
                 {teachers.map((teacher) => (
-                  <td key={teacher._id} className="px-4 py-2 border-b border-gray-600 border-r text-center">
+                  <th key={teacher._id} className="px-2 md:px-4 py-2 text-center border-b border-gray-600 border-r text-xs md:text-base">
                     {teacher.name}
-                  </td>
+                  </th>
                 ))}
               </tr>
-            ))}
-          </tbody>
-        </table>
+            </thead>
+            <tbody className="rounded-b-xl">
+              {sessions.map((session, index) => (
+                <tr
+                  key={index}
+                  className={`${
+                    isCurrentDate(session) ? 'bg-blue-200 pointer-events-none' : 'even:bg-gray-200 hover:bg-gray-400'
+                  }`}
+                >
+                  <td className="px-2 md:px-4 py-2 border-b border-gray-600 border-r text-center text-xs md:text-base">{session}</td>
+                  {teachers.map((teacher) => (
+                    <td key={teacher._id} className="px-2 md:px-4 py-2 border-b border-gray-600 border-r text-center text-xs md:text-base">
+                      {teacher.name}
+                    </td>
+                  ))}
+                </tr>
+              ))}
+            </tbody>
+          </table>
       </div>
     </div>
   );
+  
+
 };
 
 export default SessionAndAllotments;

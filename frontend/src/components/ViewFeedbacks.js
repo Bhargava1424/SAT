@@ -79,7 +79,7 @@ function ViewFeedbacks() {
   };
 
   return (
-<div>
+<div className='bg-white min-h-screen'>
     <Navbar />
     <div className="bg-gray-400 rounded-3xl mx-2 md:mx-6 px-4 md:px-32 py-6">
         <div className="relative flex flex-col items-center justify-between mb-4 space-y-4">

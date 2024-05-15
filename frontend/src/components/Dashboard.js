@@ -184,108 +184,103 @@ const Dashboard = () => {
 
   return (
     <div>
-<Navbar/>
-    <div className="bg-gray-400 rounded-3xl mx-6">
-        <div className="px-32 py-6">
-        <div className="relative flex items-center justify-between mb-4">
-          {/* Search box on the left */}
-          <div className="flex-none">
-            <input
-              type="text"
-              placeholder="Search..."
-              value={searchQuery}
-              onChange={handleSearch}
-              className="px-4 py-2 bg-white border border-gray-300 rounded-md text-gray-700 focus:outline-none focus:ring-2 focus:ring-blue-500"
-            />
+      <Navbar />
+      <div className="bg-gray-400 rounded-3xl m-1 md:mx-6">
+        <div className="px-4 py-6 md:px-32">
+          <div className="relative flex flex-col md:flex-row items-center justify-between mb-1 md:mb-4 space-y-2 md:space-y-0">
+            {/* Search box on the left */}
+            <div className="flex-none w-full md:w-auto">
+              <input
+                type="text"
+                placeholder="Search..."
+                value={searchQuery}
+                onChange={handleSearch}
+                className="w-full md:w-auto px-4 py-1 md:py-2 bg-white border border-gray-300 rounded-md text-gray-700 focus:outline-none focus:ring-2 focus:ring-blue-500"
+              />
+            </div>
+  
+            {/* Heading in the middle */}
+            <div className="w-full md:absolute md:left-1/2 md:transform md:-translate-x-1/2 md:w-auto">
+              <h2 className=" text-md md:text-2xl font-bold text-center md:text-left">STUDENT DASHBOARD</h2>
+            </div>
+  
+            {/* Pagination controls on the right */}
+            <div className="flex-none w-full md:w-auto">
+              <div className="flex justify-center md:inline-flex md:text-base text-xs">{getPageButtons()}</div>
+            </div>
           </div>
-
-          {/* Heading in the middle */}
-          <div className="absolute left-1/2 transform -translate-x-1/2">
-            <h2 className="text-2xl font-bold">Student Dashboard</h2>
-          </div>
-
-          {/* Pagination controls on the right */}
-          <div className="flex-none">
-            <div className="inline-flex">{getPageButtons()}</div>
-          </div>
-        </div>
-
-
-
-            
-        <div className="overflow-x-auto">
+  
+          <div className="overflow-x-auto">
             <table className="w-full table-auto bg-white border-collapse border border-gray-500">
-            <thead className="bg-[#2D5990] text-white">
+              <thead className="bg-[#2D5990] text-white">
                 <tr>
-                <th
-                    className="px-4 py-2 text-center border-b border-gray-600 border-r cursor-pointer"
+                  <th
+                    className="px-2 py-2 text-center border-b border-gray-600 border-r cursor-pointer text-xs md:text-base"
                     onClick={() => handleSort('surName')}
-                >
+                  >
                     Student Name {sortColumn === 'surName' && <span>{sortDirection === 'asc' ? '▲' : '▼'}</span>}
-                </th>
-                <th
-                    className="px-4 py-2 text-center border-b border-gray-600 border-r cursor-pointer"
+                  </th>
+                  <th
+                    className="px-2 py-2 text-center border-b border-gray-600 border-r cursor-pointer text-xs md:text-base"
                     onClick={() => handleSort('parentName')}
-                >
+                  >
                     Parent Name {sortColumn === 'parentName' && <span>{sortDirection === 'asc' ? '▲' : '▼'}</span>}
-                </th>
-                <th
-                    className="px-4 py-2 text-center border-b border-gray-600 border-r cursor-pointer"
+                  </th>
+                  <th
+                    className="px-2 py-2 text-center border-b border-gray-600 border-r cursor-pointer text-xs md:text-base"
                     onClick={() => handleSort('applicationNumber')}
-                >
+                  >
                     Application Number {sortColumn === 'applicationNumber' && <span>{sortDirection === 'asc' ? '▲' : '▼'}</span>}
-                </th>
-                <th
-                    className="px-4 py-2 text-center border-b border-gray-600 border-r cursor-pointer"
+                  </th>
+                  <th
+                    className="px-2 py-2 text-center border-b border-gray-600 border-r cursor-pointer text-xs md:text-base"
                     onClick={() => handleSort('batch')}
-                >
+                  >
                     Batch {sortColumn === 'batch' && <span>{sortDirection === 'asc' ? '▲' : '▼'}</span>}
-                </th>
-                <th
-                    className="px-4 py-2 text-center border-b border-gray-600 border-r cursor-pointer"
+                  </th>
+                  <th
+                    className="px-2 py-2 text-center border-b border-gray-600 border-r cursor-pointer text-xs md:text-base"
                     onClick={() => handleSort('primaryContact')}
-                >
+                  >
                     Primary Contact {sortColumn === 'primaryContact' && <span>{sortDirection === 'asc' ? '▲' : '▼'}</span>}
-                </th>
-                <th className="px-4 py-2 text-center border-b border-gray-600">Generate Report</th>
+                  </th>
+                  <th className="px-2 py-2 text-center border-b border-gray-600 border-r cursor-pointer text-xs md:text-base">Generate Report</th>
                 </tr>
-            </thead>
-            <tbody>
+              </thead>
+              <tbody>
                 {currentStudents.map((student) => (
-                <tr
+                  <tr
                     key={student._id}
                     className={`cursor-pointer ${
-                    selectedRow === student._id ? 'bg-gray-700 text-white' : 'even:bg-gray-200 hover:bg-gray-400'
+                      selectedRow === student._id ? 'bg-gray-700 text-white' : 'even:bg-gray-200 hover:bg-gray-400'
                     }`}
                     onClick={() => handleRowClick(student._id)}
-                >
-                    <td className="px-4 py-2 border-b border-gray-600 border-r">
-                    {student.surName} {student.firstName}
-                    </td>
-                    <td className="px-4 py-2 border-b border-gray-600 border-r">{student.parentName}</td>
-                    <td className="px-4 py-2 border-b border-gray-600 border-r">{student.applicationNumber}</td>
-                    <td className="px-4 py-2 border-b border-gray-600 border-r">{student.batch}</td>
-                    <td className="px-4 py-2 border-b border-gray-600 border-r">{student.primaryContact}</td>
-                    <td className="px-4 py-2 border-b border-gray-600 text-center">
-                    <button className="btn btn-sm text-white" style={{ backgroundColor: '#00A0E3' }}>
+                  >
+                    <td className="px-2 py-1 md:py-2 border-b border-gray-600 border-r md:text-base text-xs">{student.surName} {student.firstName}</td>
+                    <td className="px-2 py-1 md:py-2 border-b border-gray-600 border-r md:text-base text-xs">{student.parentName}</td>
+                    <td className="px-2 py-1 md:py-2 border-b border-gray-600 border-r md:text-base text-xs">{student.applicationNumber}</td>
+                    <td className="px-2 py-1 md:py-2 border-b border-gray-600 border-r md:text-base text-xs">{student.batch}</td>
+                    <td className="px-2 py-1 md:py-2 border-b border-gray-600 border-r md:text-base text-xs">{student.primaryContact}</td>
+                    <td className="px-2 py-1 md:py-2 border-b border-gray-600 text-center">
+                      <button className="btn btn-sm text-white" style={{ backgroundColor: '#00A0E3' }}>
                         Generate Report
-                    </button>
+                      </button>
                     </td>
-                </tr>
+                  </tr>
                 ))}
-            </tbody>
+              </tbody>
             </table>
-        </div>
-        <div className="mt-4">
-          <div className="text-center">
-            <div className="flex justify-center">{getPageButtons()}</div>
+          </div>
+          <div className="mt-4">
+            <div className="text-center">
+              <div className="flex justify-center">{getPageButtons()}</div>
+            </div>
           </div>
         </div>
-        </div>
+      </div>
     </div>
-    </div>
-    
   );
+  
 };
 
 export default Dashboard;
