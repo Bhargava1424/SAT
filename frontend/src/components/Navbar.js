@@ -19,7 +19,7 @@ function Navbar() {
     const navItems = [
         { name: 'Dashboard', path: '/dashboard', roles: ['admin', 'teacher','vicePrincipal'] },
         { name: 'Update Student', path: '/updateStudent', roles: ['admin'] },
-        { name: 'Add Teacher', path: '/addTeacher', roles: ['admin'] },
+        { name: 'Add User', path: '/addTeacher', roles: ['admin'] },
         { name: 'Sessions & Allotments', path: '/sessions&Allotments', roles: ['admin'] },
         { name: 'Pending Sessions', path: '/pendingSessions', roles: ['teacher'] },
         { name: 'Completed Sessions', path: '/completedSessions', roles: ['teacher'] },

@@ -90,13 +90,14 @@ useEffect(() => {
             setSelectedRow(id);
         }
     };
+    const role = sessionStorage.getItem('role');
 
     return (
         <div>
             <Navbar/>
             <div className="flex flex-col items-center justify-center mt-8">
                 <div className="w-2/4 bg-gray-200 p-6 rounded-3xl">
-                    <h2 className="text-2xl font-bold mb-4">Add Teachers</h2>
+                    <h2 className="text-2xl font-bold mb-4">Add Users</h2>
                     <form onSubmit={handleSubmit}>
                         <div className="grid grid-cols-2 gap-4">
                             <input 
@@ -161,15 +162,16 @@ useEffect(() => {
                                 <option value="">Select Role</option>
                                 <option value="teacher">Teacher</option>
                                 <option value="admin">Admin</option>
+                                <option value="vicePresident">Vice President</option>
                             </select>
                         </div>
-                        <button type="submit" className="btn btn-primary mt-4 bg-[#2D5990] text-white">Add Teacher</button>
+                        <button type="submit" className="btn btn-primary mt-4 bg-[#2D5990] text-white">Add User</button>
                     </form>
 
                 </div>
 
                 <div className="w-3/4 mt-8">
-                    <h2 className="text-2xl font-bold mb-2">Teachers List</h2>
+                    <h2 className="text-2xl font-bold mb-2">Users List</h2>
                     <table className="w-full table-auto bg-white border-collapse border border-gray-500 m-4">
                         <thead className="bg-[#2D5990] text-white">
                             <tr>
@@ -178,7 +180,6 @@ useEffect(() => {
                                 <th className="px-4 py-2 text-center border-b border-gray-600 border-r">Email</th>
                                 <th className="px-4 py-2 text-center border-b border-gray-600 border-r">Phone Number</th>
                                 <th className="px-4 py-2 text-center border-b border-gray-600 border-r">Branch</th>
-                                <th className="px-4 py-2 text-center border-b border-gray-600 border-r">Teacher ID</th>
                             </tr>
                         </thead>
                         <tbody>
@@ -190,12 +191,11 @@ useEffect(() => {
                                     }`}
                                     onClick={() => handleRowClick(teacher._id)}
                                 >
-                                    <td className="px-4 py-2 border-b border-gray-600 border-r">{teacher.name}</td>
+                                    <td className="px-4 py-2 border-b border-gray-600 border-r">{teacher.name} ({teacher.teacherID})</td>
                                     <td className="px-4 py-2 border-b border-gray-600 border-r">{teacher.role}</td>
                                     <td className="px-4 py-2 border-b border-gray-600 border-r">{teacher.email}</td>
                                     <td className="px-4 py-2 border-b border-gray-600 border-r">{teacher.phoneNumber}</td>
                                     <td className="px-4 py-2 border-b border-gray-600 border-r">{teacher.branch}</td>
-                                    <td className="px-4 py-2 border-b border-gray-600 border-r">{teacher.teacherID}</td>
                                 </tr>
                             ))}
                         </tbody>
