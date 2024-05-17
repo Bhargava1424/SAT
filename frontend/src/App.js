@@ -6,9 +6,9 @@ import Dashboard from './components/Dashboard';
 import LoginPage from './components/LoginPage';
 import UpdateStudent from './components/UpdateStudent';
 import AddTeachers from './components/AddTeachers';
-import PendingSessions from './components/pendingSessions';
-import CompletedSessions from './components/completedSessions';
-import UpcomingSessions from './components/upcomingSessions';
+import PendingSessions from './components/PendingSessions';
+import CompletedSessions from './components/CompletedSessions';
+import UpcomingSessions from './components/UpcomingSessions';
 import ViewFeedbacks from './components/ViewFeedbacks';
 import SessionAndAllotments from './components/SessionsAndAllotments';
 
