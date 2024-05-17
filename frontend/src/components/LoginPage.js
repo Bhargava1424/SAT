@@ -29,7 +29,7 @@ const LoginPage = () => {
             });
             const data = await response.json();
             if (response.ok) {
-                login(data.teacher.name, data.teacher.role);
+                login(data.teacher.name, data.teacher.role,data.teacher.branch);
                 alert("Logged in Successfully");
                 navigate('/dashboard', { replace: true });
             } else {

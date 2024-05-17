@@ -7,21 +7,24 @@ export const AuthProvider = ({ children }) => {
         // Attempt to get user data from sessionStorage when the component mounts
         const savedUser = sessionStorage.getItem('name');
         const savedRole = sessionStorage.getItem('role');
-        if (savedUser && savedRole) {
-            return { name: savedUser, role: savedRole };
+        const savedBranch = sessionStorage.getItem('branch');
+        if (savedUser && savedRole && savedBranch) {
+            return { name: savedUser, role: savedRole, branch: savedBranch };
         }
         return null;
     });
 
-    const login = (name, role) => {
+    const login = (name, role, branch) => {
         setUser({ name, role });
         sessionStorage.setItem('name', name);
         sessionStorage.setItem('role', role);
+        sessionStorage.setItem('branch', branch);
     };
 
     const logout = () => {
         setUser(null);
         sessionStorage.clear();
+        window.location.reload();
     };
 
     // Optionally, to handle changes in sessionStorage across tabs:
@@ -29,8 +32,9 @@ export const AuthProvider = ({ children }) => {
         const handleStorageChange = () => {
             const savedUser = sessionStorage.getItem('name');
             const savedRole = sessionStorage.getItem('role');
+            const savedBranch = sessionStorage.getItem('branch');
             if (savedUser && savedRole) {
-                setUser({ name: savedUser, role: savedRole });
+                setUser({ name: savedUser, role: savedRole, branch: savedBranch });
             } else {
                 setUser(null);
             }

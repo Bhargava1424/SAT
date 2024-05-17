@@ -19,14 +19,14 @@ function Navbar() {
     const role = sessionStorage.getItem('role');
 
     const navItems = [
-        { name: 'Dashboard', path: '/dashboard', roles: ['admin', 'teacher', 'vicePrincipal'] },
-        { name: 'Update Student', path: '/updateStudent', roles: ['admin'] },
-        { name: 'Add User', path: '/addTeacher', roles: ['admin'] },
-        { name: 'Sessions & Allotments', path: '/sessions&Allotments', roles: ['admin'] },
+        { name: 'Dashboard', path: '/dashboard', roles: ['admin', 'teacher', 'vice president','director'] },
+        { name: 'Update Student', path: '/updateStudent', roles: ['admin','director'] },
+        { name: 'Add User', path: '/addTeacher', roles: ['admin','director','vice president'] },
+        { name: 'Sessions & Allotments', path: '/sessions&Allotments', roles: ['admin','director'] },
         { name: 'Pending Sessions', path: '/pendingSessions', roles: ['teacher'] },
         { name: 'Completed Sessions', path: '/completedSessions', roles: ['teacher'] },
         { name: 'Upcoming Sessions', path: '/upcomingSessions', roles: ['teacher'] },
-        { name: 'View Feedbacks', path: '/viewFeedbacks', roles: ['admin', 'vicePrincipal'] },
+        { name: 'View Feedbacks', path: '/viewFeedbacks', roles: ['admin', 'vice president','director'] },
     ];
 
     const filteredNavItems = navItems.filter(item => item.roles.includes(role));
