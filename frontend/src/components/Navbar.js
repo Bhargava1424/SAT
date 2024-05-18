@@ -22,7 +22,7 @@ function Navbar() {
         { name: 'Dashboard', path: '/dashboard', roles: ['admin', 'teacher', 'vice president','director'] },
         { name: 'Update Student', path: '/updateStudent', roles: ['admin','director'] },
         { name: 'Add User', path: '/addTeacher', roles: ['admin','director','vice president'] },
-        { name: 'Sessions & Allotments', path: '/sessions&Allotments', roles: ['admin','director'] },
+        { name: 'Sessions & Allotments', path: '/sessionsAndAllotments', roles: ['admin','director'] },
         { name: 'Pending Sessions', path: '/pendingSessions', roles: ['teacher'] },
         { name: 'Completed Sessions', path: '/completedSessions', roles: ['teacher'] },
         { name: 'Upcoming Sessions', path: '/upcomingSessions', roles: ['teacher'] },
