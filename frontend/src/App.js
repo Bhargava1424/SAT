@@ -1,5 +1,5 @@
 // src/App.js
-import React, { useEffect } from 'react';
+import React from 'react';
 import { BrowserRouter as Router, Route, Routes, Navigate } from 'react-router-dom';
 import { useAuth } from './components/AuthContext';
 import Dashboard from './components/Dashboard';
@@ -11,25 +11,30 @@ import CompletedSessions from './components/CompletedSessions';
 import UpcomingSessions from './components/UpcomingSessions';
 import ViewFeedbacks from './components/ViewFeedbacks';
 import SessionAndAllotments from './components/SessionsAndAllotments';
-
+import AddAttendance from './components/AddAttendance';
 
 function App() {
   const { user } = useAuth();
+
+  const userHasRequiredRole = (roles) => {
+    return user && roles.includes(user.role);
+  };
 
   return (
     <Router>
       <div className="App">
         <Routes>
-          <Route path="/" element={user ? <Navigate replace to="/dashboard" /> : <LoginPage />} />
-          <Route path="/dashboard" element={user ? <Dashboard /> : <Navigate replace to="/" />} />
-          <Route path="/updateStudent" element={user ? <UpdateStudent /> : <Navigate replace to="/" />} />
-          <Route path="/addTeacher" element={user ? <AddTeachers /> : <Navigate replace to="/" />} />
-          <Route path="/sessions&Allotments" element={user ? <SessionAndAllotments /> : <Navigate replace to="/" />} />
-          <Route path="/pendingSessions" element={user ? <PendingSessions /> : <Navigate replace to="/" />} />
-          <Route path="/completedSessions" element={user ? <CompletedSessions /> : <Navigate replace to="/" />} />
-          <Route path="/upcomingSessions" element={user ? <UpcomingSessions /> : <Navigate replace to="/" />} />
-          <Route path="/viewFeedbacks" element={user ? <ViewFeedbacks /> : <Navigate replace to="/" />} />
+          <Route path="/" element={user ? (user.role === 'receptionist' ? <Navigate replace to="/addAttendance" /> : <Navigate replace to="/dashboard" />) : <LoginPage />} />
           <Route path="/login" element={<LoginPage />} />
+          <Route path="/dashboard" element={userHasRequiredRole(['admin', 'teacher', 'vice president', 'director']) ? <Dashboard /> : <Navigate replace to="/" />} />
+          <Route path="/updateStudent" element={userHasRequiredRole(['admin', 'director']) ? <UpdateStudent /> : <Navigate replace to="/" />} />
+          <Route path="/addTeacher" element={userHasRequiredRole(['admin', 'director', 'vice president']) ? <AddTeachers /> : <Navigate replace to="/" />} />
+          <Route path="/sessionsAndAllotments" element={userHasRequiredRole(['admin', 'director']) ? <SessionAndAllotments /> : <Navigate replace to="/" />} />
+          <Route path="/pendingSessions" element={userHasRequiredRole(['teacher']) ? <PendingSessions /> : <Navigate replace to="/" />} />
+          <Route path="/completedSessions" element={userHasRequiredRole(['teacher']) ? <CompletedSessions /> : <Navigate replace to="/" />} />
+          <Route path="/upcomingSessions" element={userHasRequiredRole(['teacher']) ? <UpcomingSessions /> : <Navigate replace to="/" />} />
+          <Route path="/viewFeedbacks" element={userHasRequiredRole(['admin', 'vice president', 'director']) ? <ViewFeedbacks /> : <Navigate replace to="/" />} />
+          <Route path="/addAttendance" element={userHasRequiredRole(['admin', 'receptionist']) ? <AddAttendance /> : <Navigate replace to="/" />} />
         </Routes>
       </div>
     </Router>
