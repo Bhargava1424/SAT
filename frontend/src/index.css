@@ -19,3 +19,7 @@ code {
   font-family: source-code-pro, Menlo, Monaco, Consolas, 'Courier New',
     monospace;
 }
+.text-xxs {
+  font-size: 0.62rem;
+  line-height: 1rem;
+}

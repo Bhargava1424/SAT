@@ -182,6 +182,8 @@ const Dashboard = () => {
   if (isLoading) return <div>Loading...</div>;
   if (error) return <div>{error}</div>;
 
+  const role = sessionStorage.getItem('role');
+
   return (
     <div>
       <Navbar />
@@ -244,7 +246,7 @@ const Dashboard = () => {
                   >
                     Primary Contact {sortColumn === 'primaryContact' && <span>{sortDirection === 'asc' ? '▲' : '▼'}</span>}
                   </th>
-                  <th className="px-2 py-2 text-center border-b border-gray-600 border-r cursor-pointer text-xs md:text-base">Generate Report</th>
+                  {role !== 'teacher' &&(<th className="px-2 py-2 text-center border-b border-gray-600 border-r cursor-pointer text-xs md:text-base">Generate Report</th>)}
                 </tr>
               </thead>
               <tbody>
@@ -261,11 +263,13 @@ const Dashboard = () => {
                     <td className="px-2 py-1 md:py-2 border-b border-gray-600 border-r md:text-base text-xs">{student.applicationNumber}</td>
                     <td className="px-2 py-1 md:py-2 border-b border-gray-600 border-r md:text-base text-xs">{student.batch}</td>
                     <td className="px-2 py-1 md:py-2 border-b border-gray-600 border-r md:text-base text-xs">{student.primaryContact}</td>
+                    {role !== 'teacher' &&(
                     <td className="px-2 py-1 md:py-2 border-b border-gray-600 text-center">
                       <button className="btn btn-sm text-white" style={{ backgroundColor: '#00A0E3' }}>
                         Generate Report
                       </button>
                     </td>
+                    )}
                   </tr>
                 ))}
               </tbody>

@@ -66,44 +66,44 @@ const AddAttendance = () => {
               <tr>
                 <td className='border border-gray-800 px-2 py-1'>KPL2024900001</td>
                 <td className='border border-gray-800 px-2 py-1'>Ramesh</td>
-                <td className='border border-gray-800 px-2 py-1'>5</td>
-                <td className='border border-gray-800 px-2 py-1'>5</td>
+                <td className='border border-gray-800 px-2 py-1'>5/6</td>
+                <td className='border border-gray-800 px-2 py-1'>5/6</td>
               </tr>
               <tr className='bg-gray-100'>
                 <td className='border border-gray-800 px-2 py-1'>KPL2024900002</td>
                 <td className='border border-gray-800 px-2 py-1'>Suresh</td>
-                <td className='border border-gray-800 px-2 py-1'>4</td>
-                <td className='border border-gray-800 px-2 py-1'>3</td>
+                <td className='border border-gray-800 px-2 py-1'>4/6</td>
+                <td className='border border-gray-800 px-2 py-1'>3/6</td>
               </tr>
               <tr>
                 <td className='border border-gray-800 px-2 py-1'>KPL2024900003</td>
                 <td className='border border-gray-800 px-2 py-1'>Rahul</td>
-                <td className='border border-gray-800 px-2 py-1'>5</td>
-                <td className='border border-gray-800 px-2 py-1'>5</td>
+                <td className='border border-gray-800 px-2 py-1'>5/6</td>
+                <td className='border border-gray-800 px-2 py-1'>5/6</td>
               </tr>
               <tr className='bg-gray-100'>
                 <td className='border border-gray-800 px-2 py-1'>KPL2024900004</td>
                 <td className='border border-gray-800 px-2 py-1'>Shreya</td>
-                <td className='border border-gray-800 px-2 py-1'>2</td>
-                <td className='border border-gray-800 px-2 py-1'>2</td>
+                <td className='border border-gray-800 px-2 py-1'>2/6</td>
+                <td className='border border-gray-800 px-2 py-1'>2/6</td>
               </tr>
               <tr>
                 <td className='border border-gray-800 px-2 py-1'>KPL2024900005</td>
                 <td className='border border-gray-800 px-2 py-1'>Aryan</td>
-                <td className='border border-gray-800 px-2 py-1'>4</td>
-                <td className='border border-gray-800 px-2 py-1'>4</td>
+                <td className='border border-gray-800 px-2 py-1'>4/6</td>
+                <td className='border border-gray-800 px-2 py-1'>4/6</td>
               </tr>
               <tr className='bg-gray-100'>
                 <td className='border border-gray-800 px-2 py-1'>KPL2024900006</td>
                 <td className='border border-gray-800 px-2 py-1'>Vikram</td>
-                <td className='border border-gray-800 px-2 py-1'>6</td>
-                <td className='border border-gray-800 px-2 py-1'>3</td>
+                <td className='border border-gray-800 px-2 py-1'>6/6</td>
+                <td className='border border-gray-800 px-2 py-1'>3/6</td>
               </tr>
               <tr>
                 <td className='border border-gray-800 px-2 py-1'>KPL2024900007</td>
                 <td className='border border-gray-800 px-2 py-1'>Shastri</td>
-                <td className='border border-gray-800 px-2 py-1'>6</td>
-                <td className='border border-gray-800 px-2 py-1'>6</td>
+                <td className='border border-gray-800 px-2 py-1'>6/6</td>
+                <td className='border border-gray-800 px-2 py-1'>6/6</td>
               </tr>
             </tbody>
           </table>
