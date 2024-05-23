@@ -53,10 +53,10 @@ const StudentFeedback = () => {
       <h2 className="text-xl font-bold mb-4">Giving Feedback for {studentName}</h2>
       <form onSubmit={handleSubmit} className="space-y-4">
         <div>
-          <label className="block mb-2 text-xl">
+          <label className="block mb-2 text-sm md:text-xl">
             How well does the student communicate off-topic in and outside the class during activities, debates, quizzes, sports days, etc.?
           </label>
-          <div className="flex space-x-2 text-lg">
+          <div className="flex space-x-2 text-sm md:text-lg">
             {[...Array(10)].map((_, index) => (
               <label key={index}>
                 <input
@@ -72,11 +72,11 @@ const StudentFeedback = () => {
         </div>
 
         <div>
-          <label className="block mb-2 text-xl">Rate the student’s participation in the following areas:</label>
+          <label className="block mb-2 text-sm md:text-xl">Rate the student’s participation in the following areas:</label>
           {Object.keys(participationRatings).map((category, index) => (
             <div key={index} className="mb-2">
               <label className="block mb-1 capitalize">{category.replace(/([A-Z])/g, ' $1').toLowerCase()}:</label>
-              <div className="flex space-x-2 text-lg">
+              <div className="flex space-x-2 text-sm md:text-lg">
                 {[...Array(10)].map((_, index) => (
                   <label key={index}>
                     <input
