@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import { useParams } from 'react-router-dom';
 
 const modules = [
@@ -34,9 +34,21 @@ const modules = [
     }
 ];
 
+// Dummy function to check if assessment already exists for a student
+const checkIfAssessmentExists = (name) => {
+    // Replace this with actual API call logic
+    return name === 'Alice Johnson'; // Example: return true for Alice Johnson
+};
+
 const StudentAssessment = () => {
     const { name } = useParams();
     const [responses, setResponses] = useState(modules.map(module => module.questions.map(() => null)));
+    const [assessmentExists, setAssessmentExists] = useState(false);
+
+    useEffect(() => {
+        const exists = checkIfAssessmentExists(name);
+        setAssessmentExists(exists);
+    }, [name]);
 
     const handleOptionChange = (moduleIndex, questionIndex, value) => {
         const newResponses = [...responses];
@@ -49,6 +61,11 @@ const StudentAssessment = () => {
     };
 
     const handleSubmit = () => {
+        if (assessmentExists) {
+            alert('Assessment has already been submitted.');
+            return;
+        }
+
         if (isAllAnswered()) {
             const payload = modules.map((module, moduleIndex) => ({
                 module: module.title,
@@ -69,6 +86,11 @@ const StudentAssessment = () => {
         <div className='bg-gray-400 rounded-3xl m-1 md:mx-6'>
             <div className="flex flex-col gap-8 p-4 md:p-8">
                 <h1 className="text-xl font-bold text-center">Providing assessment for {name}</h1>
+                {assessmentExists && (
+                    <div className="text-center text-red-500 font-bold mb-4">
+                        Assessment for {name} is Completed and Saved. This is the View & Edit page. Please make sure to submit after making changes!
+                    </div>
+                )}
                 {modules.map((module, moduleIndex) => (
                     <div key={moduleIndex} className="border p-4 rounded-lg w-full md:w-3/4 mx-auto">
                         <h2 className="text-lg md:text-xl font-bold mb-2">{module.title}</h2>
