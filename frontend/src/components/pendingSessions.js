@@ -1,4 +1,5 @@
 import React from 'react';
+import { useNavigate } from 'react-router-dom';
 import Navbar from './Navbar';
 
 // Dummy data for students
@@ -19,25 +20,31 @@ const students = [
 ];
 
 const PendingSessions = () => {
+  const navigate = useNavigate();
+
+  const handleAssessNow = (name) => {
+    navigate(`/assessment/${name}`);
+  };
+
   return (
-<div>
-    <Navbar />
-    <div className="container mx-auto px-4 bg-gray-400 rounded-3xl">
+    <div>
+      <Navbar />
+      <div className="container mx-auto px-4 bg-gray-400 rounded-3xl">
         <div className="grid grid-cols-3 md:grid-cols-6 gap-2">
-            {students.map(student => (
-                <div key={student.id} className="h-46 md:h-72 bg-white shadow-md rounded-lg p-4 m-2">
-                    <img src={student.imageUrl} alt={student.name} className="rounded-full w-20 md:w-28 md:h-28 mx-auto"/>
-                    <h1 className="text-center text-xs md:text-lg md:text-base">{student.name}</h1>
-                    <button className="bg-[#2D5990] hover:bg-[#00A0E3] text-white font-bold md:py-2 px-2 md:px-4 rounded focus:outline-none focus:shadow-outline block w-full text-xs md:text-sm h-8 md:h-12 mt-2 md:mt-4">
-                        Assess Now
-                    </button>
-                </div>
-            ))}
+          {students.map(student => (
+            <div key={student.id} className="h-46 md:h-72 bg-white shadow-md rounded-lg p-4 m-2">
+              <img src={student.imageUrl} alt={student.name} className="rounded-full w-20 md:w-28 md:h-28 mx-auto"/>
+              <h1 className="text-center text-xs md:text-lg md:text-base">{student.name}</h1>
+              <button 
+                onClick={() => handleAssessNow(student.name)}
+                className="bg-[#2D5990] hover:bg-[#00A0E3] text-white font-bold md:py-2 px-2 md:px-4 rounded focus:outline-none focus:shadow-outline block w-full text-xs md:text-sm h-8 md:h-12 mt-2 md:mt-4">
+                Assess Now
+              </button>
+            </div>
+          ))}
         </div>
+      </div>
     </div>
-</div>
-
-
   );
 };
 
