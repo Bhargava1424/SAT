@@ -1,4 +1,5 @@
 import React, { useState } from 'react';
+import { useNavigate } from 'react-router-dom';
 import Navbar from './Navbar';
 
 // Initialize the viewingFeedback state in the dummy data
@@ -55,6 +56,9 @@ function ViewFeedbacks() {
   const [selectedStudentName, setSelectedStudentName] = useState('');
   const [addingFeedback, setAddingFeedback] = useState(false);
   const [newFeedback, setNewFeedback] = useState('');
+  const [addingAssessment, setAddingAssessment] = useState(false);
+
+  const navigate = useNavigate();
 
   const handleSearch = (event) => {
     const value = event.target.value.toLowerCase();
@@ -124,6 +128,11 @@ function ViewFeedbacks() {
     setNewFeedback('');
   };
 
+  const addAssessment = (id) => {
+    const student = data.find(item => item.id === id);
+    navigate(`/feedback/${student.studentName}`);
+  };
+
   const role = sessionStorage.getItem('role');
 
   return (
@@ -142,13 +151,13 @@ function ViewFeedbacks() {
         </div>
 
         <div className="space-y-4 text-xs md:text-sm">
-          <div className={`grid grid-cols-${role === 'vice president' || role === 'admin' ? '7' : '5'} md:grid-cols-${role === 'vice president' || role === 'admin' ? '7' : '5'} gap-4 items-center bg-gray-100 p-3 rounded shadow text-xxs md:text-lg`}>
+          <div className={`grid ${role === 'vice president' ? 'grid-cols-7' : 'grid-cols-5'} gap-4 items-center bg-gray-100 p-3 rounded shadow text-xxs md:text-lg`}>
             <div className="hidden md:flex justify-center">Profile</div>
             <div className="flex justify-center">Student Name</div>
             <div className="flex justify-center">Parent Name</div>
             <div className="flex justify-center">Student ID</div>
             <div className="flex justify-center">View Feedback</div>
-            {(role === 'vice president' || role === 'admin') && (
+            {(role === 'vice president') && (
               <>
                 <div className="flex justify-center">Add Feedback</div>
                 <div className="flex justify-center">Add Assessment</div>
@@ -156,7 +165,7 @@ function ViewFeedbacks() {
             )}
           </div>
           {data.map(item => (
-            <div key={item.id} className={`grid grid-cols-${role === 'vice president' || role === 'admin' ? '7' : '5'} md:grid-cols-${role === 'vice president' || role === 'admin' ? '7' : '5'} gap-6 items-center bg-gray-100 p-3 rounded shadow text-xs md:text-lg`}>
+            <div key={item.id} className={`grid ${role === 'vice president' ? 'grid-cols-7' : 'grid-cols-5'} gap-6 items-center bg-gray-100 p-3 rounded shadow text-xs md:text-lg`}>
               <div className="hidden md:flex justify-center">
                 <img src={item.pictureUrl} alt="Profile" className="w-12 h-12 rounded-full flex items-center justify-center" />
               </div>
@@ -168,7 +177,7 @@ function ViewFeedbacks() {
                   <img src={selectedFeedbacks.length > 0 ? "/open.jpg" : "/close.jpg"} alt="View" className="h-4 w-4 md:w-8 md:h-6" />
                 </button>
               </div>
-              {(role === 'vice president' || role === 'admin') && (
+              {(role === 'vice president') && (
                 <>
                   <div className="flex justify-center">
                     <button
@@ -180,6 +189,7 @@ function ViewFeedbacks() {
                   </div>
                   <div className="flex justify-center">
                     <button
+                      onClick={() => addAssessment(item.id)}
                       className="text-blue-500 hover:text-blue-700"
                     >
                       <img src={'/edit.jpeg'} alt="Edit" className="h-4 w-6 md:h-6 md:w-8" />
@@ -231,7 +241,6 @@ function ViewFeedbacks() {
             </div>
           </Modal>
         )}
-
       </div>
     </div>
   );

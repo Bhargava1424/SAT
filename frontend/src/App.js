@@ -13,6 +13,7 @@ import ViewFeedbacks from './components/ViewFeedbacks';
 import SessionAndAllotments from './components/SessionsAndAllotments';
 import AddAttendance from './components/AddAttendance';
 import StudentAssessment from './components/StudentAssessment';
+import StudentFeedback from './components/StudentFeedback';
 
 function App() {
   const { user } = useAuth();
@@ -34,6 +35,7 @@ function App() {
           <Route path="/pendingSessions" element={userHasRequiredRole(['teacher']) ? <PendingSessions /> : <Navigate replace to="/" />} />
           <Route path="/completedSessions" element={userHasRequiredRole(['teacher']) ? <CompletedSessions /> : <Navigate replace to="/" />} />
           <Route path="/assessment/:name" element={userHasRequiredRole(['teacher']) ? <StudentAssessment /> : <Navigate replace to="/" />} />
+          <Route path="/feedback/:studentName" element={userHasRequiredRole(['vice president']) ? <StudentFeedback /> : <Navigate replace to="/" />} />
           <Route path="/upcomingSessions" element={userHasRequiredRole(['teacher']) ? <UpcomingSessions /> : <Navigate replace to="/" />} />
           <Route path="/viewFeedbacks" element={userHasRequiredRole(['admin', 'vice president', 'director']) ? <ViewFeedbacks /> : <Navigate replace to="/" />} />
           <Route path="/addAttendance" element={userHasRequiredRole(['admin', 'receptionist']) ? <AddAttendance /> : <Navigate replace to="/" />} />
