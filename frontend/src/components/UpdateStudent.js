@@ -2,7 +2,7 @@ import React, { useState, useEffect } from 'react';
 import Navbar from './Navbar';
 import UploadModal from './UploadModal';
 
-const UpadateStudent = () => {
+const UpdateStudent = () => {
   const [students, setStudents] = useState([]);
   const [selectedRow, setSelectedRow] = useState(null);
   const [error, setError] = useState('');
@@ -23,7 +23,6 @@ const UpadateStudent = () => {
   const closeModal = () => {
     setModalOpen(false);
   };
-
 
   useEffect(() => {
     fetchStudents();
@@ -105,29 +104,27 @@ const UpadateStudent = () => {
     const buttons = [];
 
     if (totalPages <= 5) {
-      // If there are 5 or fewer pages, show all buttons
       for (let i = 1; i <= totalPages; i++) {
         buttons.push(
           <button
             key={i}
             onClick={() => paginate(i)}
             className={`px-4 py-2 mr-2 ${
-              currentPage === i ? 'bg-gray-700 text-white' : 'bg-gray-200 hover:bg-gray-400'
-            }`}
+              currentPage === i ? 'bg-[#2D5990] text-white' : 'bg-gray-200 hover:bg-gray-400'
+            } rounded-full transition-all duration-300`}
           >
             {i}
           </button>
         );
       }
     } else {
-      // If there are more than 5 pages, show first 2, current, and last 2 buttons
       buttons.push(
         <button
           key={1}
           onClick={() => paginate(1)}
           className={`px-4 py-2 mr-2 ${
-            currentPage === 1 ? 'bg-gray-700 text-white' : 'bg-gray-200 hover:bg-gray-400'
-          }`}
+            currentPage === 1 ? 'bg-[#2D5990] text-white' : 'bg-gray-200 hover:bg-gray-400'
+          } rounded-full transition-all duration-300`}
         >
           1
         </button>
@@ -142,7 +139,7 @@ const UpadateStudent = () => {
           <button
             key={currentPage - 1}
             onClick={() => paginate(currentPage - 1)}
-            className="px-4 py-2 mr-2 bg-gray-200 hover:bg-gray-400"
+            className="px-4 py-2 mr-2 bg-gray-200 hover:bg-gray-400 rounded-full transition-all duration-300"
           >
             {currentPage - 1}
           </button>
@@ -154,7 +151,7 @@ const UpadateStudent = () => {
           <button
             key={currentPage}
             onClick={() => paginate(currentPage)}
-            className="px-4 py-2 mr-2 bg-gray-700 text-white"
+            className="px-4 py-2 mr-2 bg-[#2D5990] text-white rounded-full transition-all duration-300"
           >
             {currentPage}
           </button>
@@ -166,7 +163,7 @@ const UpadateStudent = () => {
           <button
             key={currentPage + 1}
             onClick={() => paginate(currentPage + 1)}
-            className="px-4 py-2 mr-2 bg-gray-200 hover:bg-gray-400"
+            className="px-4 py-2 mr-2 bg-gray-200 hover:bg-gray-400 rounded-full transition-all duration-300"
           >
             {currentPage + 1}
           </button>
@@ -182,8 +179,8 @@ const UpadateStudent = () => {
           key={totalPages}
           onClick={() => paginate(totalPages)}
           className={`px-4 py-2 mr-2 ${
-            currentPage === totalPages ? 'bg-gray-700 text-white' : 'bg-gray-200 hover:bg-gray-400'
-          }`}
+            currentPage === totalPages ? 'bg-[#2D5990] text-white' : 'bg-gray-200 hover:bg-gray-400'
+          } rounded-full transition-all duration-300`}
         >
           {totalPages}
         </button>
@@ -199,26 +196,23 @@ const UpadateStudent = () => {
   return (
     <div>
       <Navbar />
-      <div className="bg-gray-400 rounded-3xl m-1 md:mx-6">
+      <div className="bg-gradient-to-br from-blue-100 to-blue-200 rounded-3xl m-1 md:mx-6 shadow-lg">
         <div className="px-4 py-6 md:px-32">
           <div className="relative flex flex-col md:flex-row items-center justify-between mb-1 md:mb-4 space-y-2 md:space-y-0">
-            {/* Search box on the left */}
             <div className="flex-none w-full md:w-auto">
               <input
                 type="text"
                 placeholder="Search..."
                 value={searchQuery}
                 onChange={handleSearch}
-                className="w-full md:w-auto px-4 py-1 md:py-2 bg-white border border-gray-300 rounded-md text-gray-700 focus:outline-none focus:ring-2 focus:ring-blue-500"
+                className="w-full md:w-auto px-4 py-1 md:py-2 bg-white border border-gray-300 rounded-full text-gray-700 focus:outline-none focus:ring-2 focus:ring-blue-500 transition-all duration-300"
               />
             </div>
   
-            {/* Heading in the middle */}
             <div className="w-full md:absolute md:left-1/2 md:transform md:-translate-x-1/2 md:w-auto">
-              <h2 className="text-md md:text-2xl font-bold text-center md:text-left">UPDATE STUDENT</h2>
+              <h2 className="text-md md:text-2xl font-bold text-center md:text-left text-[#2D5990]">UPDATE STUDENT</h2>
             </div>
   
-            {/* Pagination controls on the right */}
             <div className="flex-none w-full md:w-auto">
               <div className="flex justify-center md:inline-flex md:text-base text-xs">{getPageButtons()}</div>
             </div>
@@ -267,7 +261,7 @@ const UpadateStudent = () => {
                     key={student._id}
                     className={`cursor-pointer ${
                       selectedRow === student._id ? 'bg-gray-700 text-white' : 'even:bg-gray-200 hover:bg-gray-400'
-                    }`}
+                    } transition-all duration-300`}
                     onClick={() => handleRowClick(student._id)}
                   >
                     <td className="px-2 py-1 md:py-2 border-b border-gray-600 border-r md:text-base text-xs">{student.surName} {student.firstName}</td>
@@ -277,7 +271,7 @@ const UpadateStudent = () => {
                     <td className="px-2 py-1 md:py-2 border-b border-gray-600 border-r md:text-base text-xs">{student.primaryContact}</td>
                     <td className="px-2 py-1 md:py-2 border-b border-gray-600 text-center">
                       <button 
-                        className="btn btn-sm text-white" style={{ backgroundColor: '#00A0E3' }}
+                        className="btn btn-sm text-white rounded-full transition-all duration-300 bg-[#00A0E3] hover:bg-[#2D5990] transform hover:scale-105"
                         onClick={() => handleUploadClick(student)}
                       >
                         Upload Photo
@@ -304,11 +298,6 @@ const UpadateStudent = () => {
       </div>
     </div>
   );
-  
 };
 
-
-
-
-export default UpadateStudent;
-
+export default UpdateStudent;

@@ -16,17 +16,23 @@ const AddTeachers = () => {
     const [branches, setBranches] = useState([]);
 
     const role = sessionStorage.getItem('role');
-    console.log(role);
     const userBranch = sessionStorage.getItem('branch');
-    console.log(userBranch);
 
-    // Function to fetch all teachers
+    useEffect(() => {
+        const fetchBranches = async () => {
+            const response = await fetch('http://localhost:5000/branches');
+            const data = await response.json();
+            setBranches(data);
+        };
+
+        fetchBranches();
+    }, []);
+
     useEffect(() => {
         const fetchTeachers = async () => {
             const response = await fetch('http://localhost:5000/teachers');
             const data = await response.json();
             
-            // Filter teachers if role is 'director'
             if (role === 'director') {
                 const filteredTeachers = data.filter(teacher => teacher.branch === userBranch);
                 setTeachers(filteredTeachers);
@@ -36,14 +42,10 @@ const AddTeachers = () => {
         };
 
         fetchTeachers();
-    }, []);
+    }, [role, userBranch]);
 
-
-
-    // Handle form input changes
     const handleChange = (e) => {
         if (e.target.name === 'phoneNumber') {
-            // Validate phone number to be 10 digits
             const value = e.target.value.replace(/\D/g, '');
             if (value.length <= 10) {
                 setForm({
@@ -59,12 +61,10 @@ const AddTeachers = () => {
         }
     };
 
-    // Handle form submission
     const handleSubmit = async (e) => {
         e.preventDefault();
         const formData = { ...form };
 
-        // Ensure branch is set when the user is not admin
         if (role !== 'admin') {
             formData.branch = userBranch;
         }
@@ -80,7 +80,7 @@ const AddTeachers = () => {
             const newTeacher = await response.json();
             if (response.ok) {
                 window.location.reload();
-                setForm({ name: '', email: '', password: '', phoneNumber: '', branch: '', teacherID: '', role: '' }); // Clear form
+                setForm({ name: '', email: '', password: '', phoneNumber: '', branch: '', teacherID: '', role: '' });
                 alert('Teacher added successfully!');
             } else {
                 throw new Error(newTeacher.error || 'Failed to add teacher');
@@ -90,7 +90,6 @@ const AddTeachers = () => {
         }
     };
 
-    // Handle row click
     const handleRowClick = (id) => {
         if (selectedRow === id) {
             setSelectedRow(null);
@@ -116,8 +115,8 @@ const AddTeachers = () => {
         <div>
             <Navbar />
             <div className="flex flex-col items-center justify-center mt-4 md:mt-8 p-2">
-                <div className="w-full md:w-2/4 bg-slate-300 p-4 md:p-6 rounded-3xl mx-2">
-                    <h2 className="text-xl md:text-2xl font-bold mb-2 md:mb-4 text-center">ADD USER</h2>
+                <div className="w-full md:w-2/4 bg-gradient-to-br from-blue-100 to-blue-200 p-4 md:p-6 rounded-3xl shadow-lg mx-2">
+                    <h2 className="text-xl md:text-2xl font-bold mb-2 md:mb-4 text-center text-[#2D5990]">ADD USER</h2>
                     <form onSubmit={handleSubmit}>
                         <div className="grid grid-cols-1 md:grid-cols-2 gap-2 md:gap-4">
                             <input
@@ -126,7 +125,7 @@ const AddTeachers = () => {
                                 placeholder="Name"
                                 value={form.name}
                                 onChange={handleChange}
-                                className="input input-bordered w-full bg-white my-1 md:my-2 rounded-xl text-xs"
+                                className="input input-bordered w-full bg-white my-1 md:my-2 rounded-xl text-xs md:text-sm focus:ring-2 focus:ring-blue-500"
                             />
                             <input
                                 type="email"
@@ -134,7 +133,7 @@ const AddTeachers = () => {
                                 placeholder="Email"
                                 value={form.email}
                                 onChange={handleChange}
-                                className="input input-bordered w-full bg-white my-1 md:my-2 rounded-xl text-xs"
+                                className="input input-bordered w-full bg-white my-1 md:my-2 rounded-xl text-xs md:text-sm focus:ring-2 focus:ring-blue-500"
                             />
                             <input
                                 type="password"
@@ -142,7 +141,7 @@ const AddTeachers = () => {
                                 placeholder="Password"
                                 value={form.password}
                                 onChange={handleChange}
-                                className="input input-bordered w-full bg-white my-1 md:my-2 rounded-xl text-xs"
+                                className="input input-bordered w-full bg-white my-1 md:my-2 rounded-xl text-xs md:text-sm focus:ring-2 focus:ring-blue-500"
                             />
                             <input
                                 type="text"
@@ -150,13 +149,13 @@ const AddTeachers = () => {
                                 placeholder="Phone Number"
                                 value={form.phoneNumber}
                                 onChange={handleChange}
-                                className="input input-bordered w-full bg-white my-1 md:my-2 rounded-xl text-xs"
+                                className="input input-bordered w-full bg-white my-1 md:my-2 rounded-xl text-xs md:text-sm focus:ring-2 focus:ring-blue-500"
                             />
                             <select
                                 name="role"
                                 value={form.role}
                                 onChange={handleChange}
-                                className="input input-bordered w-full bg-white text-black my-1 md:my-2 rounded-xl text-xs md:text-base"
+                                className="input input-bordered w-full bg-white text-black my-1 md:my-2 rounded-xl text-xs md:text-sm focus:ring-2 focus:ring-blue-500"
                             >
                                 <option value="">Select Role</option>
                                 {getAvailableRoles().map((roleOption) => (
@@ -170,7 +169,7 @@ const AddTeachers = () => {
                                     name="branch"
                                     value={form.branch}
                                     onChange={handleChange}
-                                    className="input input-bordered w-full bg-white text-black my-1 md:my-2 rounded-xl text-xs md:text-base"
+                                    className="input input-bordered w-full bg-white text-black my-1 md:my-2 rounded-xl text-xs md:text-sm focus:ring-2 focus:ring-blue-500"
                                 >
                                     <option value="">Select Branch</option>
                                     {branches.map((branch) => (
@@ -192,19 +191,19 @@ const AddTeachers = () => {
                                 placeholder="User ID"
                                 value={form.teacherID}
                                 onChange={handleChange}
-                                className="input input-bordered w-full bg-white my-1 md:my-2 rounded-xl text-xs"
+                                className="input input-bordered w-full bg-white my-1 md:my-2 rounded-xl text-xs md:text-sm focus:ring-2 focus:ring-blue-500"
                             />
                         </div>
-                        <button type="submit" className="btn btn-primary mt-4 bg-[#2D5990] text-white">
+                        <button type="submit" className="btn btn-primary mt-4 w-full md:w-auto bg-[#2D5990] hover:bg-[#00A0E3] text-white font-bold py-2 px-4 rounded-full transition-all duration-300 transform hover:scale-105">
                             Add User
                         </button>
                     </form>
                 </div>
 
-                <div className="w-full md:w-3/4 mt-4 md:mt-8 md:bg-white bg-slate-300 rounded-2xl md:p-6">
-                    <h2 className="text-xl md:text-2xl font-bold mb-2 text-center">Users List</h2>
-                    <div className="overflow-x-auto ">
-                        <table className="w-full table-auto bg-white border-collapse border border-gray-500 mx-2 mb-4 ">
+                <div className="w-full md:w-3/4 mt-4 md:mt-8 bg-white rounded-3xl shadow-lg p-4 md:p-6">
+                    <h2 className="text-xl md:text-2xl font-bold mb-2 text-center text-[#2D5990]">Users List</h2>
+                    <div className="overflow-x-auto">
+                        <table className="w-full table-auto bg-white border-collapse border border-gray-500 mx-2 mb-4 rounded-lg shadow">
                             <thead className="bg-[#2D5990] text-white">
                                 <tr>
                                     <th className="px-2 md:px-4 py-2 text-center border-b border-gray-600 border-r text-sm md:text-base">Teacher ID</th>
@@ -220,8 +219,8 @@ const AddTeachers = () => {
                                     <tr
                                         key={teacher._id}
                                         className={`cursor-pointer ${
-                                            selectedRow === teacher._id ? 'bg-gray-700 text-white' : 'even:bg-gray-200 hover:bg-gray-400'
-                                        }`}
+                                            selectedRow === teacher._id ? 'bg-[#00A0E3] text-white' : 'even:bg-gray-200 hover:bg-gray-400'
+                                        } transition-all duration-300`}
                                         onClick={() => handleRowClick(teacher._id)}
                                     >
                                         <td className="px-2 md:px-4 py-1 md:py-2 border-b border-gray-600 border-r text-sm md:text-base">{teacher.teacherID}</td>

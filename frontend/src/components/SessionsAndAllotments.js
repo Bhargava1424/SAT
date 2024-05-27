@@ -3,6 +3,7 @@ import Navbar from './Navbar';
 import DatePicker from 'react-datepicker';
 import 'react-datepicker/dist/react-datepicker.css';
 import { addDays, format, isMonday, nextMonday, isSameDay } from 'date-fns';
+import { motion } from 'framer-motion';
 
 const SessionAndAllotments = () => {
   const [teachers, setTeachers] = useState([]);
@@ -13,7 +14,7 @@ const SessionAndAllotments = () => {
     const fetchTeachers = async () => {
       const response = await fetch('http://localhost:5000/teachers');
       const data = await response.json();
-      console.log("User data:",data);
+      console.log("User data:", data);
       const filteredTeachers = data.filter(teacher => teacher.role === 'teacher');
       setTeachers(filteredTeachers);
     };
@@ -49,60 +50,63 @@ const SessionAndAllotments = () => {
   };
 
   return (
-    <div className="w-full mt-8 bg-white min-h-screen">
+    <div className="w-full bg-gray-100 min-h-screen">
       <Navbar />
-      <h2 className="text-xl md:text-2xl font-bold m-2 mb-4 text-center">SESSIONS & ALLOTMENTS</h2>
-      <div className="text-center my-2">
-        <DatePicker
-          selected={selectedMonday}
-          onChange={handleDateChange}
-          dateFormat="MMMM d, yyyy"
-          placeholderText="Select a Monday"
-          filterDate={date => isMonday(date)}
-          className="px-4 py-2 bg-white border border-gray-400 rounded cursor-pointer"
-        />
-      </div>
-      <div className="overflow-auto max-h-screen p-2 md:p-4">
-          <table className="table-auto w-full bg-white border-collapse border border-gray-500 mx-auto rounded-xl">
+      <div className="max-w-7xl mx-auto py-6 px-4 sm:px-6 lg:px-8">
+        <h2 className="text-2xl md:text-3xl font-bold mb-4 text-center text-[#2D5990]">SESSIONS & ALLOTMENTS</h2>
+        <div className="text-center my-4">
+          <DatePicker
+            selected={selectedMonday}
+            onChange={handleDateChange}
+            dateFormat="MMMM d, yyyy"
+            placeholderText="Select a Monday"
+            filterDate={date => isMonday(date)}
+            className="px-4 py-2 bg-white border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-2 focus:ring-[#2D5990]"
+          />
+        </div>
+        <div className="overflow-auto max-h-screen rounded-lg shadow-lg">
+          <table className="table-auto w-full bg-white border-collapse">
             <thead className="bg-[#2D5990] text-white">
               <tr>
-                <th className="px-2 md:px-4 py-2 text-center border-b border-gray-600 border-r text-xs md:text-base">Session</th>
-                <th className="px-2 md:px-4 py-2 text-center border-b border-gray-600 border-r text-xs md:text-base" colSpan={teachers.length}>
+                <th className="px-4 py-3 text-center border-b border-gray-200 text-sm md:text-base">Session</th>
+                <th className="px-4 py-3 text-center border-b border-gray-200 text-sm md:text-base" colSpan={teachers.length}>
                   Teachers
                 </th>
               </tr>
               <tr>
-                <th className="px-2 md:px-4 py-2 text-center border-b border-gray-600 border-r"></th>
+                <th className="px-4 py-3 text-center border-b border-gray-200"></th>
                 {teachers.map((teacher) => (
-                  <th key={teacher._id} className="px-2 md:px-4 py-2 text-center border-b border-gray-600 border-r text-xs md:text-base">
+                  <th key={teacher._id} className="px-4 py-3 text-center border-b border-gray-200 text-sm md:text-base">
                     {teacher.name}
                   </th>
                 ))}
               </tr>
             </thead>
-            <tbody className="rounded-b-xl">
+            <tbody>
               {sessions.map((session, index) => (
-                <tr
+                <motion.tr
                   key={index}
                   className={`${
-                    isCurrentDate(session) ? 'bg-blue-200 pointer-events-none' : 'even:bg-gray-200 hover:bg-gray-400'
+                    isCurrentDate(session) ? 'bg-[#00A0E3] pointer-events-none' : 'even:bg-gray-100 hover:bg-gray-200'
                   }`}
+                  initial={{ opacity: 0, y: 20 }}
+                  animate={{ opacity: 1, y: 0 }}
+                  transition={{ duration: 0.3, delay: index * 0.05 }}
                 >
-                  <td className="px-2 md:px-4 py-2 border-b border-gray-600 border-r text-center text-xs md:text-base">{session}</td>
+                  <td className="px-4 py-3 border-b border-gray-200 text-center text-sm md:text-base">{session}</td>
                   {teachers.map((teacher) => (
-                    <td key={teacher._id} className="px-2 md:px-4 py-2 border-b border-gray-600 border-r text-center text-xs md:text-base">
+                    <td key={teacher._id} className="px-4 py-3 border-b border-gray-200 text-center text-sm md:text-base">
                       {teacher.name}
                     </td>
                   ))}
-                </tr>
+                </motion.tr>
               ))}
             </tbody>
           </table>
+        </div>
       </div>
     </div>
   );
-  
-
 };
 
 export default SessionAndAllotments;
