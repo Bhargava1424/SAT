@@ -16,29 +16,29 @@ const AddTeachers = () => {
     const [branches, setBranches] = useState([]);
 
     const role = sessionStorage.getItem('role');
+    console.log(role);
     const userBranch = sessionStorage.getItem('branch');
-    console.log("add teacher lo", userBranch);
-
-    useEffect(() => {
-        const fetchBranches = async () => {
-            const response = await fetch('http://localhost:5000/branches');
-            const data = await response.json();
-            setBranches(data);
-        };
-
-        fetchBranches();
-    }, []);
+    console.log(userBranch);
 
     // Function to fetch all teachers
     useEffect(() => {
         const fetchTeachers = async () => {
             const response = await fetch('http://localhost:5000/teachers');
             const data = await response.json();
-            setTeachers(data);
+            
+            // Filter teachers if role is 'director'
+            if (role === 'director') {
+                const filteredTeachers = data.filter(teacher => teacher.branch === userBranch);
+                setTeachers(filteredTeachers);
+            } else {
+                setTeachers(data);
+            }
         };
 
         fetchTeachers();
     }, []);
+
+
 
     // Handle form input changes
     const handleChange = (e) => {

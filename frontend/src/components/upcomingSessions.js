@@ -1,4 +1,4 @@
-import React from 'react';
+import React, { useState } from 'react';
 import Navbar from './Navbar';
 
 // Dummy data for students
@@ -19,20 +19,48 @@ const students = [
 ];
 
 const UpcomingSessions = () => {
+  const [hoveredStudent, setHoveredStudent] = useState(null);
+
+  const handleMouseEnter = (student) => {
+    setHoveredStudent(student);
+  };
+
+  const handleMouseLeave = () => {
+    setHoveredStudent(null);
+  };
+
   return (
     <div>
-        <Navbar/>
-        <div className="container mx-auto px-4 bg-gray-400 rounded-3xl">
-        <div className="grid grid-cols-3 md:grid-cols-6 gap-2">
-            {students.map(student => (
-            <div key={student.id} className="h-46 md:h-72 bg-white shadow-md rounded-lg p-4 m-2">
-                <img src={student.imageUrl} alt={student.name} className="rounded-full w-20 md:w-28 md:h-28 mx-auto"/>
-                <h1 className='text-center text-xs md:text-lg'>{student.name}</h1>
-                <p className='text-justify bg-gray-300 rounded-2xl p-1 md:p-2 text-xs md:text-sm'>Next week, this student will be listed in the Pending sessions.</p>
+      <Navbar />
+      <div className="container py-8 px-4 sm:px-6 md:px-8 lg:px-10 xl:px-32 bg-gradient-to-br from-blue-100 to-blue-200 mx-auto my-6 rounded-3xl shadow-lg">
+        <h1 className="text-3xl md:text-4xl lg:text-5xl font-bold mb-8 text-center text-[#2D5990] flex items-center justify-center">
+          Upcoming Assessment Sessions
+        </h1>
+        <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 xl:grid-cols-5 gap-6">
+          {students.map(student => (
+            <div
+              key={student.id}
+              className="bg-white rounded-xl shadow-xl overflow-hidden transition-all duration-300 transform hover:scale-105 hover:shadow-2xl"
+              onMouseEnter={() => handleMouseEnter(student)}
+              onMouseLeave={handleMouseLeave}
+            >
+              <div>
+                <img
+                  src={student.imageUrl}
+                  alt={student.name}
+                  className="w-full h-48 object-cover"
+                />
+              </div>
+              <div className="p-4">
+                <h2 className="text-lg md:text-xl font-bold text-[#2D5990] mb-1">{student.name}</h2>
+                  <p className="text-sm md:text-base text-gray-600 bg-gray-100 rounded-lg p-2">
+                    Next week, this student will be listed in the Pending sessions.
+                  </p>
+              </div>
             </div>
-            ))}
+          ))}
         </div>
-        </div>
+      </div>
     </div>
   );
 };

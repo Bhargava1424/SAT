@@ -25,20 +25,31 @@ const Dashboard = () => {
 
   const fetchStudents = async () => {
     setIsLoading(true);
+    const role = sessionStorage.getItem('role');
+    const userBranch = sessionStorage.getItem('branch');
+
     try {
-      const response = await fetch('http://localhost:5000/students');
-      const data = await response.json();
-      if (response.ok) {
-        setStudents(data);
-      } else {
-        throw new Error(data.error || 'An error occurred while fetching data');
-      }
+        const response = await fetch('http://localhost:5000/students');
+        const data = await response.json();
+        
+        // Filter students based on branch for specific roles
+        if (role === 'director' || role === 'teacher' || role === 'vice president') {
+            const filteredStudents = data.filter(student => student.branch === userBranch);
+            setStudents(filteredStudents);
+        } else {
+            setStudents(data);
+        }
+        
+        if (!response.ok) {
+            throw new Error(data.error || 'An error occurred while fetching data');
+        }
     } catch (error) {
-      setError('Error fetching students: ' + error.message);
+        setError('Error fetching students: ' + error.message);
     } finally {
-      setIsLoading(false);
+        setIsLoading(false);
     }
-  };
+};
+
 
   // Search functionality
   const handleSearch = (event) => {
