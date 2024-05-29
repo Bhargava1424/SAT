@@ -8,17 +8,39 @@ import { motion } from 'framer-motion';
 const SessionAndAllotments = () => {
   const [teachers, setTeachers] = useState([]);
   const [selectedMonday, setSelectedMonday] = useState(null);
+  const [sessions, setSessions] = useState([]);
+  const [clusters, setClusters] = useState([]);
+  const [hoveredCluster, setHoveredCluster] = useState(null);
 
   // Function to fetch all teachers
   useEffect(() => {
     const fetchTeachers = async () => {
       const response = await fetch('http://localhost:5000/teachers');
       const data = await response.json();
-      console.log("User data:", data);
       const filteredTeachers = data.filter(teacher => teacher.role === 'teacher');
       setTeachers(filteredTeachers);
     };
     fetchTeachers();
+  }, []);
+
+  // Function to fetch sessions from the server
+  useEffect(() => {
+    const fetchSessions = async () => {
+      const response = await fetch('http://localhost:5000/sessions');
+      const data = await response.json();
+      setSessions(data);
+    };
+    fetchSessions();
+  }, [selectedMonday]);
+
+  // Function to fetch clusters from the server
+  useEffect(() => {
+    const fetchClusters = async () => {
+      const response = await fetch('http://localhost:5000/clusters');
+      const data = await response.json();
+      setClusters(data);
+    };
+    fetchClusters();
   }, []);
 
   const handleDateChange = (date) => {
@@ -39,70 +61,108 @@ const SessionAndAllotments = () => {
     return sessions;
   };
 
-  const sessions = selectedMonday ? generateSessions(selectedMonday, 8) : [];
+  const filteredSessions = selectedMonday ? generateSessions(selectedMonday, 8) : [];
 
-  const isCurrentDate = (sessionDate) => {
+  const isCurrentDate = (sessionPeriod) => {
     const today = new Date();
-    const [startDateStr, endDateStr] = sessionDate.split(' - ');
+    const [startDateStr, endDateStr] = sessionPeriod.split(' - ');
     const startDate = new Date(startDateStr);
     const endDate = new Date(endDateStr);
     return isSameDay(today, startDate) || (today > startDate && today <= endDate);
   };
 
+  const getTeacherName = (teacherID) => {
+    const teacher = teachers.find(t => t.teacherID === teacherID);
+    return teacher ? teacher.name : teacherID;
+  };
+
+  const getClusterInfo = (clusterID) => {
+    const cluster = clusters.find(c => c.clusterID === clusterID);
+    return cluster ? `Set A: ${cluster.setA.join(', ')}, Set B: ${cluster.setB.join(', ')}` : '';
+  };
+
+  const handleMouseEnter = (clusterID) => {
+    const clusterInfo = getClusterInfo(clusterID);
+    setHoveredCluster(clusterInfo);
+  };
+
+  const handleMouseLeave = () => {
+    setHoveredCluster(null);
+  };
+
   return (
-    <div className="w-full bg-gray-100 min-h-screen">
+    <div className="w-full bg-gradient-to-br from-gray-100 to-gray-200 min-h-screen">
       <Navbar />
-      <div className="max-w-7xl mx-auto py-6 px-4 sm:px-6 lg:px-8">
-        <h2 className="text-2xl md:text-3xl font-bold mb-4 text-center text-[#2D5990]">SESSIONS & ALLOTMENTS</h2>
-        <div className="text-center my-4">
+      <div className="max-w-7xl mx-auto py- px-4 sm:px-6 lg:px-8">
+        <h2 className="text-3xl md:text-4xl font-bold mb-6 text-center text-[#2D5990] animate-pulse">SESSIONS & ALLOTMENTS</h2>
+        <div className="text-center my-6">
           <DatePicker
             selected={selectedMonday}
             onChange={handleDateChange}
             dateFormat="MMMM d, yyyy"
             placeholderText="Select a Monday"
             filterDate={date => isMonday(date)}
-            className="px-4 py-2 bg-white border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-2 focus:ring-[#2D5990]"
+            className="px-6 py-3 text-lg bg-white border-2 border-[#2D5990] rounded-full shadow-lg focus:outline-none focus:ring-4 focus:ring-[#2D5990] transition duration-300 ease-in-out"
           />
         </div>
-        <div className="overflow-auto max-h-screen rounded-lg shadow-lg">
+        <div className="overflow-auto max-h-screen rounded-3xl shadow-2xl bg-white border-4 border-[#2D5990]">
           <table className="table-auto w-full bg-white border-collapse">
-            <thead className="bg-[#2D5990] text-white">
+            <thead className="bg-gradient-to-r from-[#2D5990] to-[#00A0E3] text-white">
               <tr>
-                <th className="px-4 py-3 text-center border-b border-gray-200 text-sm md:text-base">Session</th>
-                <th className="px-4 py-3 text-center border-b border-gray-200 text-sm md:text-base" colSpan={teachers.length}>
+                <th className="px-6 py-2 text-center border-b-4 border-white text-lg md:text-base font-bold">Session</th>
+                <th className="px-6 py-2 text-center border-b-4 border-white text-lg md:text-base font-bold" colSpan={teachers.length}>
                   Teachers
                 </th>
               </tr>
               <tr>
-                <th className="px-4 py-3 text-center border-b border-gray-200"></th>
+                <th className="px-6 text-center border-b-4 border-white"></th>
                 {teachers.map((teacher) => (
-                  <th key={teacher._id} className="px-4 py-3 text-center border-b border-gray-200 text-sm md:text-base">
+                  <th key={teacher._id} className="px-6 py-2 text-center border-b-4 border-white text-lg md:text-base font-semibold">
                     {teacher.name}
                   </th>
                 ))}
               </tr>
             </thead>
             <tbody>
-              {sessions.map((session, index) => (
-                <motion.tr
-                  key={index}
-                  className={`${
-                    isCurrentDate(session) ? 'bg-[#00A0E3] pointer-events-none' : 'even:bg-gray-100 hover:bg-gray-200'
-                  }`}
-                  initial={{ opacity: 0, y: 20 }}
-                  animate={{ opacity: 1, y: 0 }}
-                  transition={{ duration: 0.3, delay: index * 0.05 }}
-                >
-                  <td className="px-4 py-3 border-b border-gray-200 text-center text-sm md:text-base">{session}</td>
-                  {teachers.map((teacher) => (
-                    <td key={teacher._id} className="px-4 py-3 border-b border-gray-200 text-center text-sm md:text-base">
-                      {teacher.name}
-                    </td>
-                  ))}
-                </motion.tr>
-              ))}
+              {filteredSessions.map((sessionPeriod, index) => {
+                const session = sessions.find(s => s.period === sessionPeriod);
+                const currentDateClass = isCurrentDate(sessionPeriod) ? 'bg-gradient-to-r from-[#00A0E3] to-[#2D5990] text-white' : '';
+                return (
+                  <motion.tr
+                    key={index}
+                    className={`even:bg-gray-100 hover:bg-gray-200 ${currentDateClass}`}
+                    initial={{ opacity: 0, y: 20 }}
+                    animate={{ opacity: 1, y: 0 }}
+                    transition={{ duration: 0.3, delay: index * 0.05 }}
+                  >
+                    <td className="px-6 py-4 border-b-2 border-gray-200 text-center text-lg md:text-base font-semibold">{sessionPeriod}</td>
+                    {session ? session.teachers.map((teacher, idx) => (
+                      <td
+                        key={idx}
+                        className={`px-4 py-2 border-b-2 border-gray-200 text-center text-lg md:text-base font-medium`}
+                        onMouseEnter={() => handleMouseEnter(teacher.clusterID)}
+                        onMouseLeave={handleMouseLeave}
+                      >
+                        <div
+                          className={`py-2 border-b-2 border-gray-200 text-center text-lg md:text-base font-medium ${
+                            teacher.status === 'complete' ? 'bg-green-600 text-white' :
+                            teacher.status === 'incomplete' ? 'bg-red-600 text-white' : 'bg-gray-600 text-white'
+                          } rounded-3xl opacity-95 shadow-md transition duration-300 ease-in-out hover:scale-105`}
+                        >
+                          {getTeacherName(teacher.teacherID)}
+                        </div>
+                      </td>
+                    )) : <td colSpan={teachers.length} className="px-6 py-4 border-b-2 border-gray-200 text-center text-lg md:text-base font-medium">No data</td>}
+                  </motion.tr>
+                );
+              })}
             </tbody>
           </table>
+          {hoveredCluster && (
+            <div className="fixed bottom-10 left-1/2 transform -translate-x-1/2 bg-gray-800 text-white text-lg md:text-base font-medium p-6 rounded-2xl shadow-2xl border-4 border-[#2D5990] animate-fade-in">
+              {hoveredCluster}
+            </div>
+          )}
         </div>
       </div>
     </div>
