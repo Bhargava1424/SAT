@@ -53,5 +53,29 @@ router.post('/login', async (req, res) => {
     }
 });
 
+// GET route to fetch the Gmail of the director of a specific branch
+router.get('/director-gmail/:branch', async (req, res) => {
+    const branch = req.params.branch;
+    console.log("Fetching director for branch:", branch); // Debug: Log the branch being searched
+    try {
+        // Use .select() correctly by specifying the field you want to retrieve
+        const director = await Teacher.findOne({ branch: branch, role: 'director' })
+                                      .select('gmail -_id'); // Only select the gmail field, exclude _id
+        console.log("Director found:", director); // Debug: Log the fetched director
+
+        if (director) {
+            res.status(200).json({ gmail: director.gmail });
+        } else {
+            res.status(404).json({ message: 'No director found for this branch' });
+        }
+    } catch (error) {
+        console.error('Error fetching director:', error);
+        res.status(500).json({ message: 'Server error', error: error.message });
+    }
+});
+
+
+
+
 
 module.exports = router;

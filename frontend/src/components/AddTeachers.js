@@ -5,12 +5,14 @@ const AddTeachers = () => {
     const [form, setForm] = useState({
         name: '',
         email: '',
+        gmail: '', // New Gmail state field
         password: '',
         phoneNumber: '',
         branch: '',
         teacherID: '',
         role: ''
     });
+    
     const [teachers, setTeachers] = useState([]);
     const [selectedRow, setSelectedRow] = useState(null);
     const [branches, setBranches] = useState([]);
@@ -151,6 +153,15 @@ const AddTeachers = () => {
                                 onChange={handleChange}
                                 className="input input-bordered w-full bg-white my-1 md:my-2 rounded-xl text-xs md:text-sm focus:ring-2 focus:ring-blue-500"
                             />
+                            <input
+                                type="email"
+                                name="gmail"
+                                placeholder="Gmail"
+                                value={form.gmail}
+                                onChange={handleChange}
+                                className="input input-bordered w-full bg-white my-1 md:my-2 rounded-xl text-xs md:text-sm focus:ring-2 focus:ring-blue-500"
+                            />
+
                             <select
                                 name="role"
                                 value={form.role}

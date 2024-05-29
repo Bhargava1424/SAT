@@ -1,39 +1,6 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect, useCallback } from 'react';
 import { useNavigate } from 'react-router-dom';
 import Navbar from './Navbar';
-
-// Initialize the viewingFeedback state in the dummy data
-const feedbackData = [
-  {
-    id: 1,
-    studentName: "John Doe",
-    parentName: "Jane Doe",
-    branch: "Science",
-    pictureUrl: "/profileicon.jpeg",
-    feedbacks: [
-      { date: "2024-01-10", feedback: "John has shown remarkable improvement in his science subjects." },
-      { date: "2024-03-15", feedback: "John needs to focus more on his assignments." },
-      { date: "2024-05-10", feedback: "John has shown remarkable improvement in his science subjects." },
-      { date: "2024-06-15", feedback: "John needs to focus more on his assignments." },
-      { date: "2024-07-10", feedback: "John has shown remarkable improvement in his science subjects." },
-      { date: "2024-08-15", feedback: "John needs to focus more on his assignments." }
-    ],
-    viewingFeedback: false
-  },
-  {
-    id: 2,
-    studentName: "Emily Rose",
-    parentName: "David Rose",
-    branch: "Arts",
-    pictureUrl: "/profileicon.jpeg",
-    feedbacks: [
-      { date: "2024-02-20", feedback: "Emily is very creative and excels in her artistic projects." },
-      { date: "2024-04-05", feedback: "Emily should participate more in group activities." }
-    ],
-    viewingFeedback: false
-  },
-  // Add more data as needed
-];
 
 function Modal({ children, onClose }) {
   return (
@@ -47,7 +14,7 @@ function Modal({ children, onClose }) {
 }
 
 function ViewFeedbacks() {
-  const [data, setData] = useState(feedbackData);
+  const [students, setStudents] = useState([]);
   const [searchText, setSearchText] = useState('');
   const [editFeedback, setEditFeedback] = useState(null);
   const [editText, setEditText] = useState('');
@@ -57,19 +24,52 @@ function ViewFeedbacks() {
   const [addingFeedback, setAddingFeedback] = useState(false);
   const [newFeedback, setNewFeedback] = useState('');
   const [addingAssessment, setAddingAssessment] = useState(false);
+  const [error, setError] = useState('');
+  const [isLoading, setIsLoading] = useState(false);
 
   const navigate = useNavigate();
 
+  const fetchStudents = useCallback(async () => {
+    setIsLoading(true);
+    const role = sessionStorage.getItem('role');
+    const userBranch = sessionStorage.getItem('branch');
+
+    try {
+        const response = await fetch('http://localhost:5000/students');
+        const data = await response.json();
+
+        // Filter students based on branch for specific roles
+        let filteredStudents = data;
+        if (role === 'director' || role === 'teacher' || role === 'vice president') {
+            filteredStudents = data.filter(student => student.branch === userBranch);
+        }
+
+        setStudents(filteredStudents);
+
+        if (!response.ok) {
+            throw new Error(data.error || 'An error occurred while fetching data');
+        }
+    } catch (error) {
+        setError('Error fetching students: ' + error.message);
+    } finally {
+        setIsLoading(false);
+    }
+  }, []);
+
+  useEffect(() => {
+    fetchStudents();
+  }, [fetchStudents]);
+
   const handleSearch = (event) => {
     const value = event.target.value.toLowerCase();
-    const filteredData = feedbackData.filter(item =>
-      item.studentName.toLowerCase().includes(value) ||
+    const filteredData = students.filter(item =>
+      `${item.firstName} ${item.surName}`.toLowerCase().includes(value) ||
       item.parentName.toLowerCase().includes(value) ||
-      item.id.toString().includes(value) ||
+      item.applicationNumber.toString().includes(value) ||
       item.branch.toLowerCase().includes(value)
     );
     setSearchText(value);
-    setData(filteredData);
+    setStudents(filteredData);
   };
 
   const handleEditChange = (event) => {
@@ -80,58 +80,180 @@ function ViewFeedbacks() {
     setNewFeedback(event.target.value);
   };
 
-  const saveEdit = () => {
-    const updatedData = data.map(item => {
-      if (item.id === editFeedback.id) {
-        return {
-          ...item,
-          feedbacks: item.feedbacks.map(fb => fb.date === viewingDateFeedback.date ? { ...fb, feedback: editText } : fb)
-        };
-      }
-      return item;
-    });
-    setData(updatedData);
-    setEditFeedback(null);
-    setViewingDateFeedback(null);
-  };
+  const saveEdit = async () => {
+    const updatedFeedback = {
+        ...viewingDateFeedback,
+        feedback: editText,
+    };
 
-  const toggleFeedbackView = (id) => {
-    const student = data.find(item => item.id === id);
-    setSelectedFeedbacks(student.feedbacks);
-    setSelectedStudentName(student.studentName);
-    setViewingDateFeedback(null);
+    try {
+        const response = await fetch(`http://localhost:5000/feedbacks/${updatedFeedback._id}`, {
+            method: 'PUT',
+            headers: {
+                'Content-Type': 'application/json',
+            },
+            body: JSON.stringify(updatedFeedback),
+        });
+
+        if (!response.ok) {
+            throw new Error('Failed to update feedback');
+        }
+
+        const updatedStudents = students.map(item => {
+            if (item.applicationNumber === editFeedback.applicationNumber) {
+                return {
+                    ...item,
+                    feedbacks: item.feedbacks.map(fb => fb._id === updatedFeedback._id ? updatedFeedback : fb)
+                };
+            }
+            return item;
+        });
+
+        setStudents(updatedStudents);
+        setEditFeedback(null);
+        setViewingDateFeedback(null);
+    } catch (error) {
+        setError('Error updating feedback: ' + error.message);
+    }
+};
+
+
+  const fetchFeedbacks = async (applicationNumber) => {
+    try {
+      const response = await fetch(`http://localhost:5000/feedbacks/${applicationNumber}`);
+      const data = await response.json();
+  
+      if (!response.ok) {
+        throw new Error(data.error || 'An error occurred while fetching feedback data');
+      }
+  
+      return data;
+    } catch (error) {
+      setError('Error fetching feedbacks: ' + error.message);
+      return [];
+    }
   };
+  
+
+  const toggleFeedbackView = async (applicationNumber) => {
+    const student = students.find(item => item.applicationNumber === applicationNumber);
+    if (student) {
+      const feedbacks = await fetchFeedbacks(applicationNumber);
+      setSelectedFeedbacks(feedbacks);
+      setSelectedStudentName(`${student.firstName} ${student.surName}`);
+      setViewingDateFeedback(null);
+    }
+  };
+  
 
   const viewFeedbackByDate = (feedback) => {
     setViewingDateFeedback(feedback);
     setEditText(feedback.feedback);
   };
 
-  const addFeedback = (id) => {
-    const student = data.find(item => item.id === id);
-    setSelectedStudentName(student.studentName);
-    setAddingFeedback(true);
-  };
-
-  const submitNewFeedback = () => {
-    if (!newFeedback) {
-      alert("Feedback cannot be empty");
-      return;
+  const addFeedback = (applicationNumber) => {
+    const student = students.find(item => item.applicationNumber === applicationNumber);
+    if (student) {
+      setSelectedStudentName(`${student.firstName} ${student.surName}`);
+      setAddingFeedback(true);
+    } else {
+      console.error('Student not found for the provided application number:', applicationNumber);
     }
-    const payload = {
-      studentName: selectedStudentName,
-      feedback: newFeedback,
-      date: new Date().toISOString().split('T')[0] // current date
-    };
-    console.log(payload);
-    setAddingFeedback(false);
-    setNewFeedback('');
   };
+  
+  const submitNewFeedback = async () => {
+    if (!newFeedback) {
+        alert("Feedback cannot be empty");
+        return;
+    }
+    const student = students.find(item => `${item.firstName} ${item.surName}` === selectedStudentName);
+    const applicationNumber = student?.applicationNumber;
+    const name = sessionStorage.getItem('name'); // Ensure this is retrieved correctly
 
-  const addAssessment = (id) => {
-    const student = data.find(item => item.id === id);
-    navigate(`/feedback/${student.studentName}`);
+    if (!applicationNumber) {
+        console.error('Application number not found for student:', selectedStudentName);
+        return;
+    }
+
+    const payload = {
+        studentName: selectedStudentName,
+        feedback: newFeedback,
+        date: new Date().toISOString().split('T')[0], // current date
+        applicationNumber: applicationNumber,
+        reviewer: name
+    };
+
+    console.log('Payload being sent:', payload); // Debugging line to check payload
+
+    try {
+        const response = await fetch('http://localhost:5000/feedbacks', {
+            method: 'POST',
+            headers: {
+                'Content-Type': 'application/json'
+            },
+            body: JSON.stringify(payload)
+        });
+
+        if (!response.ok) {
+            throw new Error('Failed to submit feedback');
+        }
+
+        // Fetch director's Gmail and send an email
+        await fetchAndSendEmail(student.branch);
+
+        setAddingFeedback(false);
+        setNewFeedback('');
+        fetchStudents(); // Refresh the students list to include new feedback
+    } catch (error) {
+        console.error('Error:', error);
+    }
+};
+
+// Fetch director's Gmail and send an email
+const fetchAndSendEmail = async (branch) => {
+    try {
+        const gmailResponse = await fetch(`http://localhost:5000/teachers/director-gmail/${branch}`);
+        const { gmail } = await gmailResponse.json();
+
+        if (gmailResponse.ok) {
+            // Send an email notification to the director's Gmail
+            // await fetch('http://localhost:5000/send-email', {
+            //     method: 'POST',
+            //     headers: {
+            //         'Content-Type': 'application/json'
+            //     },
+            //     body: JSON.stringify({
+            //         to: gmail,
+            //         subject: 'New Feedback Submitted',
+            //         body: `A new feedback has been submitted by for student ${selectedStudentName}.`
+            //     })
+            // });
+            console.log('Email sending triggered: ',{gmail});
+        } else {
+            throw new Error('Failed to fetch director’s Gmail');
+        }
+    } catch (error) {
+        console.error('Error sending email:', error);
+    }
+};
+
+  
+  
+  
+
+  const addAssessment = (applicationNumber) => {
+    const student = students.find(item => item.applicationNumber === applicationNumber);
+    if (student) {
+      const studentName = `${student.firstName} ${student.surName}`;
+      navigate(`/eca/${applicationNumber}/${studentName}`);
+    } else {
+      console.error('Student not found for the provided application number:', applicationNumber);
+    }
   };
+  
+
+  if (isLoading) return <div>Loading...</div>;
+  if (error) return <div>{error}</div>;
 
   const role = sessionStorage.getItem('role');
 
@@ -155,25 +277,25 @@ function ViewFeedbacks() {
             <div className="hidden md:flex justify-center">Profile</div>
             <div className="flex justify-center">Student Name</div>
             <div className="flex justify-center">Parent Name</div>
-            <div className="flex justify-center">Student ID</div>
+            <div className="flex justify-center">Application No.</div>
             <div className="flex justify-center">View Feedback</div>
             {(role === 'vice president') && (
               <>
                 <div className="flex justify-center">Add Feedback</div>
-                <div className="flex justify-center">Add Assessment</div>
+                <div className="flex justify-center">Add & View Assessments</div>
               </>
             )}
           </div>
-          {data.map(item => (
-            <div key={item.id} className={`grid ${role === 'vice president' ? 'grid-cols-7' : 'grid-cols-5'} gap-6 items-center bg-gray-100 p-3 rounded shadow text-xs md:text-lg`}>
+          {students.map(item => (
+            <div key={item.applicationNumber} className={`grid ${role === 'vice president' ? 'grid-cols-7' : 'grid-cols-5'} gap-6 items-center bg-gray-100 p-3 rounded shadow text-xs md:text-lg`}>
               <div className="hidden md:flex justify-center">
-                <img src={item.pictureUrl} alt="Profile" className="w-12 h-12 rounded-full flex items-center justify-center" />
+                <img src={"/profileicon.jpeg"} alt="Profile" className="w-12 h-12 rounded-full flex items-center justify-center" />
               </div>
-              <div className="flex justify-center">{item.studentName}</div>
+              <div className="flex justify-center">{`${item.firstName} ${item.surName}`}</div>
               <div className="flex justify-center">{item.parentName}</div>
-              <div className="flex justify-center">{item.id}</div>
+              <div className="flex justify-center">{item.applicationNumber}</div>
               <div className="flex justify-center">
-                <button onClick={() => toggleFeedbackView(item.id)} className="text-blue-500 hover:text-blue-700">
+                <button onClick={() => toggleFeedbackView(item.applicationNumber)} className="text-blue-500 hover:text-blue-700">
                   <img src={selectedFeedbacks.length > 0 ? "/open.jpg" : "/close.jpg"} alt="View" className="h-4 w-4 md:w-8 md:h-6" />
                 </button>
               </div>
@@ -181,7 +303,7 @@ function ViewFeedbacks() {
                 <>
                   <div className="flex justify-center">
                     <button
-                      onClick={() => addFeedback(item.id)}
+                      onClick={() => addFeedback(item.applicationNumber)}
                       className="text-blue-500 hover:text-blue-700"
                     >
                       <img src={'/plus.jpg'} alt="Add" className="h-3 w-3 md:h-6 md:w-6" />
@@ -189,7 +311,7 @@ function ViewFeedbacks() {
                   </div>
                   <div className="flex justify-center">
                     <button
-                      onClick={() => addAssessment(item.id)}
+                      onClick={() => addAssessment(item.applicationNumber)}
                       className="text-blue-500 hover:text-blue-700"
                     >
                       <img src={'/edit.jpeg'} alt="Edit" className="h-4 w-6 md:h-6 md:w-8" />

@@ -1,8 +1,8 @@
-import React, { useState } from 'react';
-import { useParams } from 'react-router-dom';
+import React, { useState, useEffect } from 'react';
+import { useParams, useNavigate } from 'react-router-dom';
 
-const StudentFeedback = () => {
-  const { studentName } = useParams();
+const StudentECA = () => {
+  const { studentName, applicationNumber } = useParams(); // Including applicationNumber from params
   const [communicationRating, setCommunicationRating] = useState(null);
   const [participationRatings, setParticipationRatings] = useState({
     indoorSports: null,
@@ -14,6 +14,16 @@ const StudentFeedback = () => {
   });
   const [parentFeedback, setParentFeedback] = useState('');
   const [formValid, setFormValid] = useState(false);
+  const [ecas, setEcas] = useState([]); // State to store ECA entries
+  const navigate = useNavigate();
+
+  useEffect(() => {
+    // Fetch ECA entries when the component mounts
+    fetch(`http://localhost:5000/eca/${studentName}`)
+      .then(response => response.json())
+      .then(data => setEcas(data))
+      .catch(error => console.error('Error:', error));
+  }, [studentName]);
 
   const handleRatingChange = (event, category) => {
     const value = parseInt(event.target.value, 10);
@@ -40,11 +50,26 @@ const StudentFeedback = () => {
   const handleSubmit = (event) => {
     event.preventDefault();
     const payload = {
+      studentName,
+      applicationNumber,
       communicationRating,
       participationRatings,
       parentFeedback,
+      date: new Date().toISOString(), // Current date and time
     };
-    console.log(payload);
+  
+    fetch('http://localhost:5000/eca', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify(payload),
+    })
+      .then(response => response.json())
+      .then(data => {
+        console.log(data);
+        setEcas([...ecas, data]); // Append new entry to the list
+        navigate('/viewFeedbacks'); // Navigate to /viewFeedbacks on success
+      })
+      .catch(error => console.error('Error:', error));
   };
 
   const getGradientColor = (value) => {
@@ -52,11 +77,52 @@ const StudentFeedback = () => {
     return `hsl(${hue}, 100%, 50%)`;
   };
 
+  const [expandedId, setExpandedId] = useState(null); // To track which ECA entry is expanded
+
+  const toggleExpand = (id) => {
+    if (expandedId === id) {
+      setExpandedId(null); // Collapse if it's already expanded
+    } else {
+      setExpandedId(id); // Expand the clicked entry
+    }
+  };
+
   return (
     <div className="bg-gray-100 min-h-screen py-8">
       <div className="max-w-3xl mx-auto bg-white shadow-lg rounded-lg p-8">
+
+        {/* ECA Entries List */}
+        <div className="mt-2">
+          <h2 className="text-xl font-bold mb-4">Past ECA Entries:</h2>
+          {ecas.map((eca, index) => (
+            <div key={index} className="mb-4">
+              <div
+                className="p-4 bg-white rounded-lg shadow cursor-pointer"
+                onClick={() => toggleExpand(index)} // Toggle expand/collapse on click
+              >
+                <p>Date: {new Date(eca.date).toLocaleDateString()}</p>
+                {expandedId === index && (
+                  <div>
+                    <p>Communication Rating: {eca.communicationRating}</p>
+                    <p>Parent Feedback: {eca.parentFeedback}</p>
+                    <div>
+                      <h4 className="font-bold">Participation Ratings:</h4>
+                      {Object.entries(eca.participationRatings).map(([key, value]) => (
+                        <p key={key}>{`${key}: ${value}`}</p>
+                      ))}
+                    </div>
+                    <button onClick={() => setExpandedId(null)} className="mt-4 px-4 py-2 bg-red-500 text-white rounded hover:bg-red-700">
+                      Close
+                    </button>
+                  </div>
+                )}
+              </div>
+            </div>
+          ))}
+          </div>
+
         <h1 className="text-3xl font-bold mb-8 text-center">
-          Providing feedback for <span className="text-blue-600">{studentName}</span>
+          Providing ECA feedback for <span className="text-blue-600">{studentName}</span>
         </h1>
         <form onSubmit={handleSubmit} className="space-y-8">
           <div>
@@ -149,4 +215,4 @@ const StudentFeedback = () => {
   );
 };
 
-export default StudentFeedback;
+export default StudentECA;
