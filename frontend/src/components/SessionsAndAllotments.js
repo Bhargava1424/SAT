@@ -91,7 +91,7 @@ const SessionAndAllotments = () => {
   };
 
   return (
-    <div className="w-full bg-gradient-to-br from-gray-100 to-gray-200 min-h-screen">
+    <div className="w-full bg-gradient-to-br from-gray-100 to-gray-200 min-h-screen pb-20">
       <Navbar />
       <div className="max-w-7xl mx-auto py- px-4 sm:px-6 lg:px-8">
         <h2 className="text-3xl md:text-4xl font-bold mb-6 text-center text-[#2D5990] animate-pulse">SESSIONS & ALLOTMENTS</h2>
