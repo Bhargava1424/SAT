@@ -1,5 +1,8 @@
 import React, { useState, useEffect } from 'react';
 import Navbar from './Navbar';
+import profileImage from '../assets/profile.jpg';
+
+
 
 const Dashboard = () => {
   const [students, setStudents] = useState([]);
@@ -11,6 +14,7 @@ const Dashboard = () => {
   const [searchQuery, setSearchQuery] = useState('');
   const [sortColumn, setSortColumn] = useState(null);
   const [sortDirection, setSortDirection] = useState('asc');
+
 
   useEffect(() => {
     fetchStudents();
@@ -223,7 +227,12 @@ const Dashboard = () => {
               <thead className="bg-[#2D5990] text-white">
                 <tr>
                   <th
-                    className="px-2 py-2 text-center border-b border-gray-600 border-r cursor-pointer text-xs md:text-base"
+                    className="px-2 py-3 text-center border-b border-gray-600 border-r cursor-pointer text-xs md:text-base " 
+                  >
+                    Photo
+                  </th>
+                  <th
+                    className="px-2 py-3 text-center border-b border-gray-600 border-r cursor-pointer text-xs md:text-base "
                     onClick={() => handleSort('surName')}
                   >
                     Student Name {sortColumn === 'surName' && <span>{sortDirection === 'asc' ? '▲' : '▼'}</span>}
@@ -268,6 +277,15 @@ const Dashboard = () => {
                     } transition-all duration-300`}
                     onClick={() => handleRowClick(student._id)}
                   >
+                    <td className="px-2 py-1 md:py-2 border-b border-gray-600 border-r md:text-base text-xs">
+                      <div className="flex items-center justify-center">
+                        <img
+                          src={profileImage}
+                          alt="Profile"
+                          className="w-8 h-8 md:w-12 md:h-12 rounded-full transition-transform duration-300 transform hover:scale-110"
+                        />
+                      </div>
+                    </td>
                     <td className="px-2 py-1 md:py-2 border-b border-gray-600 border-r md:text-base text-xs">{student.surName} {student.firstName}</td>
                     <td className="px-2 py-1 md:py-2 border-b border-gray-600 border-r md:text-base text-xs">{student.parentName}</td>
                     <td className="px-2 py-1 md:py-2 border-b border-gray-600 border-r md:text-base text-xs">{student.applicationNumber}</td>
@@ -283,6 +301,7 @@ const Dashboard = () => {
                   </tr>
                 ))}
               </tbody>
+
             </table>
           </div>
           <div className="mt-4">
