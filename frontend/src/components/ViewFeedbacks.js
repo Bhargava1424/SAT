@@ -120,21 +120,25 @@ const saveEdit = async () => {
   
 
 
-  const fetchFeedbacks = async (applicationNumber) => {
-    try {
-      const response = await fetch(`http://localhost:5000/feedbacks/${applicationNumber}`);
-      const data = await response.json();
-  
-      if (!response.ok) {
-        throw new Error(data.error || 'An error occurred while fetching feedback data');
+const fetchFeedbacks = async (applicationNumber) => {
+  try {
+    const response = await fetch(`http://localhost:5000/feedbacks/${applicationNumber}`);
+    const data = await response.json();
+
+    if (response.ok) {
+      if (data.length === 0) { // Assuming 'data' is an array
+        alert("No Feedbacks given for this Student");
       }
-  
       return data;
-    } catch (error) {
-      setError('Error fetching feedbacks: ' + error.message);
-      return [];
+    } else {
+      throw new Error(data.error || 'An error occurred while fetching feedback data');
     }
-  };
+  } catch (error) {
+    setError('Error fetching feedbacks: ' + error.message);
+    return [];
+  }
+};
+
   
 
   const toggleFeedbackView = async (applicationNumber) => {
