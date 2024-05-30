@@ -14,7 +14,9 @@ const StudentECA = () => {
   });
   const [parentFeedback, setParentFeedback] = useState('');
   const [formValid, setFormValid] = useState(false);
-  const [ecas, setEcas] = useState([]); // State to store ECA entries
+  const [ecas, setEcas] = useState([]);
+  const [editMode, setEditMode] = useState(false);
+  const [currentEditingId, setCurrentEditingId] = useState(null);
   const navigate = useNavigate();
 
   useEffect(() => {
@@ -55,22 +57,53 @@ const StudentECA = () => {
       communicationRating,
       participationRatings,
       parentFeedback,
-      date: new Date().toISOString(), // Current date and time
+      date: new Date().toISOString(),
     };
-  
-    fetch('http://localhost:5000/eca', {
-      method: 'POST',
+
+    const url = editMode ? `http://localhost:5000/eca/${currentEditingId}` : 'http://localhost:5000/eca';
+    const method = editMode ? 'PATCH' : 'POST';
+
+    fetch(url, {
+      method: method,
       headers: { 'Content-Type': 'application/json' },
       body: JSON.stringify(payload),
     })
       .then(response => response.json())
       .then(data => {
         console.log(data);
-        setEcas([...ecas, data]); // Append new entry to the list
-        navigate('/viewFeedbacks'); // Navigate to /viewFeedbacks on success
+        setEcas(editMode ? ecas.map(eca => eca.uuid === currentEditingId ? data : eca) : [...ecas, data]);
+        navigate('/viewFeedbacks');
       })
       .catch(error => console.error('Error:', error));
+    resetForm();
   };
+
+
+  const handleEdit = (eca) => {
+    setEditMode(true);
+    setCurrentEditingId(eca.uuid);
+    setCommunicationRating(eca.communicationRating);
+    setParticipationRatings(eca.participationRatings);
+    setParentFeedback(eca.parentFeedback);
+    validateForm();
+  };
+
+  const resetForm = () => {
+    setCommunicationRating(null);
+    setParticipationRatings({
+      indoorSports: null,
+      outdoorSports: null,
+      music: null,
+      artLiterature: null,
+      leadershipTeamwork: null,
+      debatesActivities: null,
+    });
+    setParentFeedback('');
+    setFormValid(false);
+    setEditMode(false);
+    setCurrentEditingId(null);
+  };
+
 
   const getGradientColor = (value) => {
     const hue = (value - 1) * 12; // Scale value from 1-10 to 0-240 for hue (red to green)
@@ -111,14 +144,20 @@ const StudentECA = () => {
                         <p key={key}>{`${key}: ${value}`}</p>
                       ))}
                     </div>
-                    <button onClick={() => setExpandedId(null)} className="mt-4 px-4 py-2 bg-red-500 text-white rounded hover:bg-red-700">
-                      Close
-                    </button>
+                    <div className="flex justify-around mt-4">
+                      <button onClick={() => setExpandedId(null)} className="px-4 py-2 bg-red-500 text-white rounded hover:bg-red-700">
+                        Close
+                      </button>
+                      <button onClick={() => handleEdit(eca)} className="px-4 py-2 bg-blue-500 text-white rounded hover:bg-blue-700">
+                        Edit
+                      </button>
+                    </div>
                   </div>
                 )}
               </div>
             </div>
           ))}
+
           </div>
 
         <h1 className="text-3xl font-bold mb-8 text-center">

@@ -1,6 +1,8 @@
 const mongoose = require('mongoose');
+const { v4: uuidv4 } = require('uuid');
 
 const ecaSchema = new mongoose.Schema({
+  uuid: { type: String, default: uuidv4 }, // Add UUID field
   studentName: { type: String, required: true },
   applicationNumber: { type: String, required: true, unique: true },
   communicationRating: { type: Number, required: true },

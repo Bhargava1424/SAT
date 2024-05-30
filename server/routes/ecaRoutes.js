@@ -34,6 +34,17 @@ router.get('/:studentName', async (req, res) => { // Changed from '/eca/:student
     }
 });
 
+// Route to update an existing ECA entry
+router.patch('/:uuid', async (req, res) => {
+  try {
+    const updatedECA = await ECA.findOneAndUpdate({ uuid: req.params.uuid }, req.body, { new: true });
+    res.status(200).send(updatedECA);
+  } catch (error) {
+    res.status(400).send(error);
+  }
+});
+
+
 
 
   
