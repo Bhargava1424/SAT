@@ -34,14 +34,37 @@ const AddTeachers = () => {
         const fetchTeachers = async () => {
             const response = await fetch('http://localhost:5000/teachers');
             const data = await response.json();
-            
-            if (role === 'director') {
-                const filteredTeachers = data.filter(teacher => teacher.branch === userBranch);
-                setTeachers(filteredTeachers);
-            } else {
-                setTeachers(data);
+            const role = sessionStorage.getItem('role'); // Assuming the role is stored under 'userRole'
+            const userBranch = sessionStorage.getItem('branch'); // Assuming the branch is stored under 'userBranch'
+        
+            // Applying branch filter only for roles other than admin
+            let branchFilteredTeachers = role === 'admin' ? data : data.filter(teacher => teacher.branch === userBranch);
+        
+            let roleFilteredTeachers = [];
+            switch (role) {
+                case 'admin':
+                    // Admin sees all teachers, no further filtering
+                    roleFilteredTeachers = branchFilteredTeachers;
+                    break;
+                case 'director':
+                    // Director sees all except those with role 'admin'
+                    roleFilteredTeachers = branchFilteredTeachers.filter(teacher => teacher.role !== 'admin');
+                    break;
+                case 'vice president':
+                    // Vice president sees only those with roles 'teacher' and 'receptionist'
+                    roleFilteredTeachers = branchFilteredTeachers.filter(teacher =>
+                        teacher.role === 'teacher' || teacher.role === 'receptionist' || teacher.role=== 'vice president'
+                    );
+                    break;
+                default:
+                    // Default case for other roles, may not need further role-based filtering beyond branch
+                    roleFilteredTeachers = branchFilteredTeachers;
+                    break;
             }
+        
+            setTeachers(roleFilteredTeachers);
         };
+        
 
         fetchTeachers();
     }, [role, userBranch]);

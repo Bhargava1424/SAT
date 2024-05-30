@@ -289,7 +289,7 @@ const fetchAndSendEmail = async (branch) => {
         </div>
 
         <div className="space-y-4 text-xs md:text-sm">
-          <div className={`grid ${role === 'vice president' ? 'grid-cols-7' : 'grid-cols-5'} gap-4 items-center bg-gray-100 p-3 rounded shadow text-xxs md:text-lg`}>
+          <div className={`grid ${role === 'vice president' ? 'grid-cols-7' : 'grid-cols-4'} gap-4 items-center bg-gray-100 p-3 rounded shadow text-xxs md:text-lg`}>
             <div className="hidden md:flex justify-center">Profile</div>
             <div className="flex justify-center">Student Name</div>
             <div className="flex justify-center">Parent Name</div>
@@ -303,7 +303,7 @@ const fetchAndSendEmail = async (branch) => {
             )}
           </div>
           {students.map(item => (
-            <div key={item.applicationNumber} className={`grid ${role === 'vice president' ? 'grid-cols-7' : 'grid-cols-5'} gap-6 items-center bg-gray-100 p-3 rounded shadow text-xs md:text-lg`}>
+            <div key={item.applicationNumber} className={`grid ${role === 'vice president' ? 'grid-cols-7' : 'grid-cols-4'} gap-6 items-center bg-gray-100 p-3 rounded shadow text-xxs md:text-lg`}>
               <div className="hidden md:flex justify-center">
                 <img src={"/profileicon.jpeg"} alt="Profile" className="w-12 h-12 rounded-full flex items-center justify-center" />
               </div>
