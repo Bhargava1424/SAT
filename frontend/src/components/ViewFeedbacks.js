@@ -80,42 +80,44 @@ function ViewFeedbacks() {
     setNewFeedback(event.target.value);
   };
 
-  const saveEdit = async () => {
-    const updatedFeedback = {
-        ...viewingDateFeedback,
-        feedback: editText,
-    };
+// Update feedback by feedbackId
+const saveEdit = async () => {
+  if (!editFeedback || !editFeedback.feedbackId) {
+    setError('Feedback ID is missing.');
+    return;
+  }
 
-    try {
-        const response = await fetch(`http://localhost:5000/feedbacks/${updatedFeedback._id}`, {
-            method: 'PUT',
-            headers: {
-                'Content-Type': 'application/json',
-            },
-            body: JSON.stringify(updatedFeedback),
-        });
+  const updatedFeedback = {
+    feedback: editText,
+    reviewer: sessionStorage.getItem('name') // Assume the reviewer might be updated as well
+  };
 
-        if (!response.ok) {
-            throw new Error('Failed to update feedback');
-        }
+  try {
+    const response = await fetch(`http://localhost:5000/feedbacks/${editFeedback.feedbackId}`, {
+      method: 'PUT',
+      headers: {
+        'Content-Type': 'application/json',
+      },
+      body: JSON.stringify(updatedFeedback)
+    });
 
-        const updatedStudents = students.map(item => {
-            if (item.applicationNumber === editFeedback.applicationNumber) {
-                return {
-                    ...item,
-                    feedbacks: item.feedbacks.map(fb => fb._id === updatedFeedback._id ? updatedFeedback : fb)
-                };
-            }
-            return item;
-        });
-
-        setStudents(updatedStudents);
-        setEditFeedback(null);
-        setViewingDateFeedback(null);
-    } catch (error) {
-        setError('Error updating feedback: ' + error.message);
+    if (!response.ok) {
+      const errorData = await response.json();
+      throw new Error(errorData.error || 'Failed to update feedback');
     }
+
+    // setEditFeedback(null); // Reset after successful update
+    // setViewingDateFeedback(null);
+    // fetchFeedbacks(); // Refresh data
+    window.location.reload();
+  } catch (error) {
+    setError('Error updating feedback: ' + error.message);
+  }
 };
+
+  
+  
+  
 
 
   const fetchFeedbacks = async (applicationNumber) => {
@@ -142,14 +144,27 @@ function ViewFeedbacks() {
       setSelectedFeedbacks(feedbacks);
       setSelectedStudentName(`${student.firstName} ${student.surName}`);
       setViewingDateFeedback(null);
+      setEditFeedback(student); // Set the student being edited
+    } else {
+      setError('Student not found for the provided application number.');
     }
   };
   
+  
 
   const viewFeedbackByDate = (feedback) => {
-    setViewingDateFeedback(feedback);
-    setEditText(feedback.feedback);
+    const student = students.find(item => item.applicationNumber === feedback.applicationNumber);
+    if (student) {
+      setViewingDateFeedback(feedback); // This contains all feedback details, including feedbackId
+      setEditText(feedback.feedback);
+      setEditFeedback(feedback); // Now, editFeedback contains the entire feedback object, including feedbackId
+    } else {
+      setError('Student not found for the provided application number.');
+    }
   };
+  
+  
+  
 
   const addFeedback = (applicationNumber) => {
     const student = students.find(item => item.applicationNumber === applicationNumber);
@@ -161,52 +176,50 @@ function ViewFeedbacks() {
     }
   };
   
-  const submitNewFeedback = async () => {
-    if (!newFeedback) {
-        alert("Feedback cannot be empty");
-        return;
+// Submit new feedback
+const submitNewFeedback = async () => {
+  if (!newFeedback) {
+    alert("Feedback cannot be empty");
+    return;
+  }
+
+  const student = students.find(item => `${item.firstName} ${item.surName}` === selectedStudentName);
+  const applicationNumber = student?.applicationNumber;
+  const name = sessionStorage.getItem('name'); // Ensure this is retrieved correctly
+
+  if (!applicationNumber) {
+    console.error('Application number not found for student:', selectedStudentName);
+    return;
+  }
+
+  const payload = {
+    studentName: selectedStudentName,
+    feedback: newFeedback,
+    date: new Date().toISOString(), // current date and time
+    applicationNumber: applicationNumber,
+    reviewer: name
+  };
+
+  try {
+    const response = await fetch('http://localhost:5000/feedbacks', {
+      method: 'POST',
+      headers: {
+        'Content-Type': 'application/json'
+      },
+      body: JSON.stringify(payload)
+    });
+
+    if (!response.ok) {
+      throw new Error('Failed to submit feedback');
     }
-    const student = students.find(item => `${item.firstName} ${item.surName}` === selectedStudentName);
-    const applicationNumber = student?.applicationNumber;
-    const name = sessionStorage.getItem('name'); // Ensure this is retrieved correctly
+    await fetchAndSendEmail(student.branch);
 
-    if (!applicationNumber) {
-        console.error('Application number not found for student:', selectedStudentName);
-        return;
-    }
-
-    const payload = {
-        studentName: selectedStudentName,
-        feedback: newFeedback,
-        date: new Date().toISOString().split('T')[0], // current date
-        applicationNumber: applicationNumber,
-        reviewer: name
-    };
-
-    console.log('Payload being sent:', payload); // Debugging line to check payload
-
-    try {
-        const response = await fetch('http://localhost:5000/feedbacks', {
-            method: 'POST',
-            headers: {
-                'Content-Type': 'application/json'
-            },
-            body: JSON.stringify(payload)
-        });
-
-        if (!response.ok) {
-            throw new Error('Failed to submit feedback');
-        }
-
-        // Fetch director's Gmail and send an email
-        await fetchAndSendEmail(student.branch);
-
-        setAddingFeedback(false);
-        setNewFeedback('');
-        fetchStudents(); // Refresh the students list to include new feedback
-    } catch (error) {
-        console.error('Error:', error);
-    }
+    fetchFeedbacks(); // Refresh the students list to include new feedback
+    setAddingFeedback(false);
+    setNewFeedback('');
+  } catch (error) {
+    console.error('Error:', error);
+  }
 };
 
 // Fetch director's Gmail and send an email
@@ -331,13 +344,16 @@ const fetchAndSendEmail = async (branch) => {
                 {selectedFeedbacks.map(fb => (
                   <div key={fb.date} className="flex justify-between items-center mb-2 p-2 border-b items-center bg-gray-100 rounded shadow text-xs md:text-lg">
                     <span className='mr-2'>Dated:</span>
-                    <button onClick={() => viewFeedbackByDate(fb)} className="text-blue-500 hover:text-blue-700 flex justify-center">{fb.date}</button>
+                    <button onClick={() => viewFeedbackByDate(fb)} className="text-blue-500 hover:text-blue-700 flex justify-center">
+                      {new Date(fb.date).toLocaleDateString()} {/* Format the date */}
+                    </button>
                   </div>
                 ))}
               </div>
             </div>
           </Modal>
         )}
+
 
         {viewingDateFeedback && (
           <Modal onClose={() => {
