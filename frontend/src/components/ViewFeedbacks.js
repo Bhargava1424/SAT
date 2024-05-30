@@ -23,7 +23,6 @@ function ViewFeedbacks() {
   const [selectedStudentName, setSelectedStudentName] = useState('');
   const [addingFeedback, setAddingFeedback] = useState(false);
   const [newFeedback, setNewFeedback] = useState('');
-  const [addingAssessment, setAddingAssessment] = useState(false);
   const [error, setError] = useState('');
   const [isLoading, setIsLoading] = useState(false);
 
