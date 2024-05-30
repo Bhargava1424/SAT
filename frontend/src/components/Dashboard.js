@@ -2,8 +2,6 @@ import React, { useState, useEffect } from 'react';
 import Navbar from './Navbar';
 import profileImage from '../assets/profile.jpg';
 
-
-
 const Dashboard = () => {
   const [students, setStudents] = useState([]);
   const [selectedRow, setSelectedRow] = useState(null);
@@ -14,7 +12,8 @@ const Dashboard = () => {
   const [searchQuery, setSearchQuery] = useState('');
   const [sortColumn, setSortColumn] = useState(null);
   const [sortDirection, setSortDirection] = useState('asc');
-
+  const [isModalOpen, setIsModalOpen] = useState(false);
+  const [modalImageSrc, setModalImageSrc] = useState('');
 
   useEffect(() => {
     fetchStudents();
@@ -197,6 +196,15 @@ const Dashboard = () => {
 
   const role = sessionStorage.getItem('role');
 
+  const handleImageClick = (src) => {
+    setModalImageSrc(src);
+    setIsModalOpen(true);
+  };
+
+  const closeModal = () => {
+    setIsModalOpen(false);
+  };
+
   return (
     <div>
       <Navbar />
@@ -282,7 +290,8 @@ const Dashboard = () => {
                         <img
                           src={profileImage}
                           alt="Profile"
-                          className="w-8 h-8 md:w-12 md:h-12 rounded-full transition-transform duration-300 transform hover:scale-110"
+                          className="w-8 h-8 md:w-12 md:h-12 rounded-full transition-transform duration-300 transform hover:scale-110 cursor-pointer"
+                          onClick={() => handleImageClick(profileImage)}
                         />
                       </div>
                     </td>
@@ -311,6 +320,19 @@ const Dashboard = () => {
           </div>
         </div>
       </div>
+      {isModalOpen && (
+        <div className="fixed inset-0 flex items-center justify-center bg-black bg-opacity-75">
+          <div className="bg-white p-4 rounded-lg shadow-lg w-96 ">
+            <img src={modalImageSrc} alt="Enlarged Profile" className="max-w-full h-auto rounded-lg" />
+            <button
+              onClick={closeModal}
+              className="mt-4 px-4 py-2 bg-[#2D5990] text-white rounded-full transition-all duration-300 hover:bg-[#00A0E3]"
+            >
+              Close
+            </button>
+          </div>
+        </div>
+      )}
     </div>
   );
 };

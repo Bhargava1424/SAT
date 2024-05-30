@@ -11,8 +11,8 @@ const SessionAndAllotments = () => {
   const [sessions, setSessions] = useState([]);
   const [clusters, setClusters] = useState([]);
   const [hoveredCluster, setHoveredCluster] = useState(null);
+  const [hoveredCell, setHoveredCell] = useState(null);
 
-  // Function to fetch all teachers
   useEffect(() => {
     const fetchTeachers = async () => {
       const response = await fetch('http://localhost:5000/teachers');
@@ -23,7 +23,6 @@ const SessionAndAllotments = () => {
     fetchTeachers();
   }, []);
 
-  // Function to fetch sessions from the server
   useEffect(() => {
     const fetchSessions = async () => {
       const response = await fetch('http://localhost:5000/sessions');
@@ -33,7 +32,6 @@ const SessionAndAllotments = () => {
     fetchSessions();
   }, [selectedMonday]);
 
-  // Function to fetch clusters from the server
   useEffect(() => {
     const fetchClusters = async () => {
       const response = await fetch('http://localhost:5000/clusters');
@@ -78,16 +76,18 @@ const SessionAndAllotments = () => {
 
   const getClusterInfo = (clusterID) => {
     const cluster = clusters.find(c => c.clusterID === clusterID);
-    return cluster ? `Set A: ${cluster.setA.join(', ')}, Set B: ${cluster.setB.join(', ')}` : '';
+    return cluster ? { setA: cluster.setA.join(', '), setB: cluster.setB.join(', ') } : { setA: '', setB: '' };
   };
 
-  const handleMouseEnter = (clusterID) => {
+  const handleMouseEnter = (clusterID, cellID) => {
     const clusterInfo = getClusterInfo(clusterID);
     setHoveredCluster(clusterInfo);
+    setHoveredCell(cellID);
   };
 
   const handleMouseLeave = () => {
     setHoveredCluster(null);
+    setHoveredCell(null);
   };
 
   return (
@@ -105,7 +105,7 @@ const SessionAndAllotments = () => {
             className="px-6 py-3 text-lg bg-white border-2 border-[#2D5990] rounded-full shadow-lg focus:outline-none focus:ring-4 focus:ring-[#2D5990] transition duration-300 ease-in-out"
           />
         </div>
-        <div className="overflow-auto max-h-screen rounded-3xl shadow-2xl bg-white border-4 border-[#2D5990]">
+        <div className="overflow-visible max-h-screen rounded-3xl shadow-2xl bg-white border-4 border-[#2D5990]">
           <table className="table-auto w-full bg-white border-collapse">
             <thead className="bg-gradient-to-r from-[#2D5990] to-[#00A0E3] text-white">
               <tr>
@@ -139,8 +139,8 @@ const SessionAndAllotments = () => {
                     {session ? session.teachers.map((teacher, idx) => (
                       <td
                         key={idx}
-                        className={`px-4 py-2 border-b-2 border-gray-200 text-center text-lg md:text-base font-medium`}
-                        onMouseEnter={() => handleMouseEnter(teacher.clusterID)}
+                        className={`relative px-4 py-2 border-b-2 border-gray-200 text-center text-lg md:text-base font-medium`}
+                        onMouseEnter={() => handleMouseEnter(teacher.clusterID, `${index}-${idx}`)}
                         onMouseLeave={handleMouseLeave}
                       >
                         <div
@@ -151,6 +151,16 @@ const SessionAndAllotments = () => {
                         >
                           {getTeacherName(teacher.teacherID)}
                         </div>
+                        {hoveredCell === `${index}-${idx}` && hoveredCluster && (
+                          <div className="absolute min-w-fit bottom-full mb-2 w-full bg-gray-800 text-white text-lg md:text-base font-medium p-4 rounded-2xl shadow-2xl border-4 border-[#2D5990] animate-fade-in flex justify-between">
+                            <div className="mr-4">
+                              <strong>Set A:</strong> {hoveredCluster.setA}
+                            </div>
+                            <div>
+                              <strong>Set B:</strong> {hoveredCluster.setB}
+                            </div>
+                          </div>
+                        )}
                       </td>
                     )) : <td colSpan={teachers.length} className="px-6 py-4 border-b-2 border-gray-200 text-center text-lg md:text-base font-medium">No data</td>}
                   </motion.tr>
@@ -158,11 +168,6 @@ const SessionAndAllotments = () => {
               })}
             </tbody>
           </table>
-          {hoveredCluster && (
-            <div className="fixed bottom-10 left-1/2 transform -translate-x-1/2 bg-gray-800 text-white text-lg md:text-base font-medium p-6 rounded-2xl shadow-2xl border-4 border-[#2D5990] animate-fade-in">
-              {hoveredCluster}
-            </div>
-          )}
         </div>
       </div>
     </div>
