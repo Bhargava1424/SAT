@@ -1,15 +1,38 @@
 const mongoose = require('mongoose');
 
 const teacherSchema = new mongoose.Schema({
-    name: { type: String, required: true },
-    email: { type: String, required: true, unique: true },
-    gmail: { type: String, required: true, unique: true }, // New Gmail field
-    password: { type: String, required: true },
-    phoneNumber: { type: String, required: true },
-    branch: { type: String, required: true },
-    teacherID: { type: String, required: true, unique: true },
-    role: { type: String, required: true }
-}, { strict: true });
+  name: {
+    type: String,
+    required: true,
+  },
+  email: {
+    type: String,
+    required: true,
+    unique: true,
+  },
+  gmail: { // New Gmail field
+    type: String,
+    unique: true,
+  },
+  password: {
+    type: String,
+    required: true,
+  },
+  phoneNumber: {
+    type: String,
+  },
+  branch: {
+    type: String,
+  },
+  teacherID: {
+    type: String,
+    unique: true,
+  },
+  role: {
+    type: String,
+    enum: ['admin', 'director', 'vice president', 'teacher', 'receptionist'],
+    default: 'teacher',
+  },
+});
 
 module.exports = mongoose.model('Teacher', teacherSchema);
-

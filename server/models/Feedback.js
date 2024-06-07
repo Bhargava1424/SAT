@@ -1,13 +1,33 @@
 const mongoose = require('mongoose');
-const { v4: uuidv4 } = require('uuid');
+const { v4: uuidv4 } = require('uuid'); 
 
-const FeedbackSchema = new mongoose.Schema({
-  feedbackId: { type: String, default: uuidv4 }, // Use UUID for feedbackId
-  studentName: { type: String, required: true },
-  applicationNumber: { type: String, required: true }, // Not unique
-  date: { type: Date, required: true, default: Date.now }, // Includes time
-  feedback: { type: String, required: true },
-  reviewer: { type: String, required: true }
+const feedbackSchema = new mongoose.Schema({
+  studentName: {
+    type: String,
+    required: true
+  },
+  applicationNumber: { 
+    type: String, 
+    required: true 
+  },
+  date: {
+    type: Date,
+    default: Date.now,
+    required: true
+  },
+  feedback: {
+    type: String,
+    required: true
+  },
+  reviewer: {
+    type: String,
+    required: true
+  },
+  feedbackId: {
+    type: String,
+    default: uuidv4, // Assign a UUID automatically
+    unique: true
+  }
 });
 
-module.exports = mongoose.model('Feedback', FeedbackSchema);
+module.exports = mongoose.model('Feedback', feedbackSchema);
