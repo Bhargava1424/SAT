@@ -1,21 +1,46 @@
 const mongoose = require('mongoose');
 
+
 const studentSchema = new mongoose.Schema({
-  applicationNumber: String,
+  applicationNumber: {
+    type: String,
+    required: true,
+    unique: true,
+  },
   dateOfJoining: String,
   course: String,
-  firstName: String,
-  surName: String,
+  firstName: {
+    type: String,
+    required: true,
+  },
+  surName: {
+    type: String,
+    required: true,
+  },
   parentName: String,
   gender: String,
   batch: String,
-  branch: String,
+  branch: {
+    type: String,
+    required: true,
+  },
   yearOfJoining: String,
   modeOfResidence: String,
   primaryContact: String,
   secondaryContact: String,
+  firstYearHostelFee: Number,
+  firstYearTuitionFee: Number,
+  secondYearHostelFee: Number,
+  secondYearTuitionFee: Number,
+  pendingFirstYearTuitionFee: Number,
+  pendingFirstYearHostelFee: Number,
+  pendingSecondYearTuitionFee: Number,
+  pendingSecondYearHostelFee: Number,
+  paidFirstYearTuitionFee: Number,
+  paidFirstYearHostelFee: Number,
+  paidSecondYearTuitionFee: Number,
+  paidSecondYearHostelFee: Number,
+  studentStatus: String,
 });
 
-const Student = mongoose.model('Student', studentSchema);
-
-module.exports = Student;
+module.exports = mongoose.model('Student', studentSchema);
