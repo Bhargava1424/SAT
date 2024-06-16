@@ -1,26 +1,34 @@
 const mongoose = require('mongoose');
 
 const sessionSchema = new mongoose.Schema({
-  period: {
-    type: String, 
-    required: true, 
-    unique: true 
-  },
-  teachers: [{
-    teacherID: {
-      type: String, 
-      ref: 'Teacher'
+    period: {
+        type: String,
+        required: true,
+        unique: true
     },
-    status: {
-      type: String,
-      enum: ['pending', 'complete', 'incomplete'],
-      default: 'pending'
+    startDate: {
+        type: Date,
+        required: true
     },
-    clusterID: {
-      type: String, 
-      ref: 'Cluster'
+    teachers: [{
+        teacherID: {
+            type: String,
+            ref: 'Teacher'
+        },
+        status: {
+            type: String,
+            enum: ['pending', 'complete', 'incomplete'],
+            default: 'pending'
+        },
+        clusterID: {
+            type: String,
+            ref: 'Cluster'
+        }
+    }],
+    clusterAssignmentOrder: {
+        type: Array, // Store the cluster assignment order for the session
+        default: ['A', 'B', 'C']
     }
-  }]
 });
 
 module.exports = mongoose.model('Session', sessionSchema);

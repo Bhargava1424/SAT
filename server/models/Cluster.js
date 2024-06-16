@@ -1,23 +1,31 @@
-    const mongoose = require('mongoose');
+const mongoose = require('mongoose');
 
-    const clusterSchema = new mongoose.Schema({
-        clusterID: {
-            type: String,
-            required: true,
-            unique: true
-        },
-        setA: {
-            type: Object,
-            required: true
-        },
-        setB: {
-            type: Object,
-            required: true
-        },
-        clusterCount: {
-            type: Number,
-            required: true
-        }
-    });
+const clusterSchema = new mongoose.Schema({
+    clusterID: {
+        type: String,
+        required: true,
+        unique: true
+    },
+    setA: {
+        type: Number,
+        required: true,
+    },
+    setB: {
+        type: Number,
+        required: true,
+    },
+    branch: {
+        type: String,
+        required: true,
+    },
+    batch: {
+        type: String,
+        required: true,
+    },
+    studentCount: {
+        type: Number,
+        default: 0
+    }
+});
 
-    module.exports = mongoose.model('Cluster', clusterSchema);
+module.exports = mongoose.model('Cluster', clusterSchema);

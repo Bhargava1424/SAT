@@ -21,12 +21,12 @@ router.get('/:id', getTeacher, (req, res) => {
 // Create a new teacher
 router.post('/', async (req, res) => {
   try {
-    const hashedPassword = await bcrypt.hash(req.body.password, 10)
+    // const hashedPassword = await bcrypt.hash(req.body.password, 10)
     const teacher = new Teacher({
       name: req.body.name,
       email: req.body.email,
       gmail: req.body.gmail, // Store the provided Gmail
-      password: hashedPassword, 
+      password: req.body.password, 
       phoneNumber: req.body.phoneNumber,
       branch: req.body.branch,
       teacherID: req.body.teacherID,

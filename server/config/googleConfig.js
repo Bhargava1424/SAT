@@ -1,21 +1,17 @@
-const { google } = require('googleapis');
+// const { google } = require('googleapis');
+// // You'll need to set up a Google Cloud Platform project and get credentials:
+// // https://developers.google.com/drive/api/v3/quickstart/nodejs
+// const CREDENTIALS = require('./credentials.json'); // Replace with your credentials file
 
-const CLIENT_ID = '660495865700-eub3k43pf368cv6e3ul0j4mdsutgak1p.apps.googleusercontent.com';
-const CLIENT_SECRET = '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';
-const REDIRECT_URI = 'https://developers.google.com/oauthplayground';
-const REFRESH_TOKEN = 'your-refresh-token-from-oauth-playground';
+// const SCOPES = ['https://www.googleapis.com/auth/drive'];
 
-const oauth2Client = new google.auth.OAuth2(
-    CLIENT_ID,
-    CLIENT_SECRET,
-    REDIRECT_URI
-);
+// const auth = new google.auth.JWT(
+//   CREDENTIALS.client_email,
+//   null,
+//   CREDENTIALS.private_key,
+//   SCOPES
+// );
 
-oauth2Client.setCredentials({ refresh_token: REFRESH_TOKEN });
+// const drive = google.drive({ version: 'v3', auth });
 
-const drive = google.drive({
-    version: 'v3',
-    auth: oauth2Client
-});
-
-module.exports = { drive };
+// module.exports = { drive };
