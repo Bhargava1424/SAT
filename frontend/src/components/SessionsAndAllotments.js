@@ -1,3 +1,4 @@
+// frontend/src/components/SessionsAndAllotments.js
 import React, { useState, useEffect } from 'react';
 import Navbar from './Navbar';
 import DatePicker from 'react-datepicker';
@@ -15,28 +16,42 @@ const SessionAndAllotments = () => {
 
   useEffect(() => {
     const fetchTeachers = async () => {
-      const response = await fetch('http://localhost:5000/teachers');
-      const data = await response.json();
-      const filteredTeachers = data.filter(teacher => teacher.role === 'teacher');
-      setTeachers(filteredTeachers);
+      try {
+        const response = await fetch('http://localhost:5000/teachers');
+        const data = await response.json();
+        const filteredTeachers = data.filter(teacher => teacher.role === 'teacher');
+        setTeachers(filteredTeachers);
+      } catch (error) {
+        console.error('Error fetching teachers:', error);
+      }
     };
     fetchTeachers();
   }, []);
 
   useEffect(() => {
     const fetchSessions = async () => {
-      const response = await fetch('http://localhost:5000/sessions');
-      const data = await response.json();
-      setSessions(data);
+      try {
+        const response = await fetch('http://localhost:5000/sessions');
+        const data = await response.json();
+        console.log('Fetched sessions:', data);
+        setSessions(data);
+      } catch (error) {
+        console.error('Error fetching sessions:', error);
+      }
     };
     fetchSessions();
   }, [selectedMonday]);
 
   useEffect(() => {
     const fetchClusters = async () => {
-      const response = await fetch('http://localhost:5000/clusters');
-      const data = await response.json();
-      setClusters(data);
+      try {
+        const response = await fetch('http://localhost:5000/clusters');
+        const data = await response.json();
+        console.log('Fetched clusters:', data);
+        setClusters(data);
+      } catch (error) {
+        console.error('Error fetching clusters:', error);
+      }
     };
     fetchClusters();
   }, []);
@@ -47,6 +62,11 @@ const SessionAndAllotments = () => {
     } else {
       setSelectedMonday(nextMonday(date));
     }
+  };
+
+  const getClusterDetails = (session) => {
+    const cluster = clusters.find(c => c.clusterID === session.clusterID);
+    return cluster ? { setA: cluster.setA.join(', '), setB: cluster.setB.join(', ') } : null;
   };
 
   const generateSessions = (startDate, numberOfSessions) => {
@@ -70,18 +90,13 @@ const SessionAndAllotments = () => {
   };
 
   const getTeacherName = (teacherID) => {
-    const teacher = teachers.find(t => t.teacherID === teacherID);
+    const teacher = teachers.find(t => t._id === teacherID);
     return teacher ? teacher.name : teacherID;
   };
 
-  const getClusterInfo = (clusterID) => {
-    const cluster = clusters.find(c => c.clusterID === clusterID);
-    return cluster ? { setA: cluster.setA.join(', '), setB: cluster.setB.join(', ') } : { setA: '', setB: '' };
-  };
-
-  const handleMouseEnter = (clusterID, cellID) => {
-    const clusterInfo = getClusterInfo(clusterID);
-    setHoveredCluster(clusterInfo);
+  const handleMouseEnter = (session, cellID) => {
+    const clusterDetails = getClusterDetails(session);
+    setHoveredCluster(clusterDetails);
     setHoveredCell(cellID);
   };
 
@@ -125,6 +140,7 @@ const SessionAndAllotments = () => {
             </thead>
             <tbody>
               {filteredSessions.map((sessionPeriod, index) => {
+                console.log('Session period:', sessionPeriod);
                 const session = sessions.find(s => s.period === sessionPeriod);
                 const currentDateClass = isCurrentDate(sessionPeriod) ? 'bg-gradient-to-r from-[#00A0E3] to-[#2D5990] text-white' : '';
                 return (
@@ -140,7 +156,7 @@ const SessionAndAllotments = () => {
                       <td
                         key={idx}
                         className={`relative px-4 py-2 border-b-2 border-gray-200 text-center text-lg md:text-base font-medium`}
-                        onMouseEnter={() => handleMouseEnter(teacher.clusterID, `${index}-${idx}`)}
+                        onMouseEnter={() => handleMouseEnter(session, `${index}-${idx}`)}
                         onMouseLeave={handleMouseLeave}
                       >
                         <div
@@ -162,7 +178,9 @@ const SessionAndAllotments = () => {
                           </div>
                         )}
                       </td>
-                    )) : <td colSpan={teachers.length} className="px-6 py-4 border-b-2 border-gray-200 text-center text-lg md:text-base font-medium">No data</td>}
+                    )) : (
+                      <td colSpan={teachers.length} className="px-6 py-4 border-b-2 border-gray-200 text-center text-lg md:text-base font-medium">No data</td>
+                    )}
                   </motion.tr>
                 );
               })}

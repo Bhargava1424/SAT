@@ -5,20 +5,24 @@ const AddTeachers = () => {
     const [form, setForm] = useState({
         name: '',
         email: '',
-        gmail: '', // New Gmail state field
+        gmail: '',
         password: '',
         phoneNumber: '',
         branch: '',
         teacherID: '',
-        role: ''
+        role: '',
+        subject: '' // New subject state field
     });
-    
+
     const [teachers, setTeachers] = useState([]);
     const [selectedRow, setSelectedRow] = useState(null);
     const [branches, setBranches] = useState([]);
+    const [selectedTeacher, setSelectedTeacher] = useState(null);
 
     const role = sessionStorage.getItem('role');
     const userBranch = sessionStorage.getItem('branch');
+
+    const mpcSubjects = ['Mathematics', 'Physics', 'Chemistry'];
 
     useEffect(() => {
         const fetchBranches = async () => {
@@ -34,37 +38,31 @@ const AddTeachers = () => {
         const fetchTeachers = async () => {
             const response = await fetch('http://localhost:5000/teachers');
             const data = await response.json();
-            const role = sessionStorage.getItem('role'); // Assuming the role is stored under 'userRole'
-            const userBranch = sessionStorage.getItem('branch'); // Assuming the branch is stored under 'userBranch'
-        
-            // Applying branch filter only for roles other than admin
+            const role = sessionStorage.getItem('role');
+            const userBranch = sessionStorage.getItem('branch');
+
             let branchFilteredTeachers = role === 'admin' ? data : data.filter(teacher => teacher.branch === userBranch);
-        
+
             let roleFilteredTeachers = [];
             switch (role) {
                 case 'admin':
-                    // Admin sees all teachers, no further filtering
                     roleFilteredTeachers = branchFilteredTeachers;
                     break;
                 case 'director':
-                    // Director sees all except those with role 'admin'
                     roleFilteredTeachers = branchFilteredTeachers.filter(teacher => teacher.role !== 'admin');
                     break;
                 case 'vice president':
-                    // Vice president sees only those with roles 'teacher' and 'receptionist'
                     roleFilteredTeachers = branchFilteredTeachers.filter(teacher =>
-                        teacher.role === 'teacher' || teacher.role === 'receptionist' || teacher.role=== 'vice president'
+                        teacher.role === 'teacher' || teacher.role === 'receptionist' || teacher.role === 'vice president'
                     );
                     break;
                 default:
-                    // Default case for other roles, may not need further role-based filtering beyond branch
                     roleFilteredTeachers = branchFilteredTeachers;
                     break;
             }
-        
+
             setTeachers(roleFilteredTeachers);
         };
-        
 
         fetchTeachers();
     }, [role, userBranch]);
@@ -105,7 +103,7 @@ const AddTeachers = () => {
             const newTeacher = await response.json();
             if (response.ok) {
                 window.location.reload();
-                setForm({ name: '', email: '', password: '', phoneNumber: '', branch: '', teacherID: '', role: '' });
+                setForm({ name: '', email: '', gmail: '', password: '', phoneNumber: '', branch: '', teacherID: '', role: '', subject: '' });
                 alert('Teacher added successfully!');
             } else {
                 throw new Error(newTeacher.error || 'Failed to add teacher');
@@ -115,12 +113,19 @@ const AddTeachers = () => {
         }
     };
 
-    const handleRowClick = (id) => {
-        if (selectedRow === id) {
-            setSelectedRow(null);
-        } else {
-            setSelectedRow(id);
-        }
+    const handleRowClick = (teacher) => {
+        setSelectedTeacher(teacher);
+        setForm({
+            name: teacher.name,
+            email: teacher.email,
+            gmail: teacher.gmail,
+            password: '',
+            phoneNumber: teacher.phoneNumber,
+            branch: teacher.branch,
+            teacherID: teacher.teacherID,
+            role: teacher.role,
+            subject: teacher.subject
+        });
     };
 
     const getAvailableRoles = () => {
@@ -227,6 +232,21 @@ const AddTeachers = () => {
                                 onChange={handleChange}
                                 className="input input-bordered w-full bg-white my-1 md:my-2 rounded-xl text-xs md:text-sm focus:ring-2 focus:ring-blue-500"
                             />
+                            {form.role === 'teacher' && (
+                                <select
+                                    name="subject"
+                                    value={form.subject}
+                                    onChange={handleChange}
+                                    className="input input-bordered w-full bg-white text-black my-1 md:my-2 rounded-xl text-xs md:text-sm focus:ring-2 focus:ring-blue-500"
+                                >
+                                    <option value="">Select Subject</option>
+                                    {mpcSubjects.map((subject) => (
+                                        <option key={subject} value={subject}>
+                                            {subject}
+                                        </option>
+                                    ))}
+                                </select>
+                            )}
                         </div>
                         <button type="submit" className="btn btn-primary mt-4 w-full md:w-auto bg-[#2D5990] hover:bg-[#00A0E3] text-white font-bold py-2 px-4 rounded-full transition-all duration-300 transform hover:scale-105">
                             Add User
@@ -246,6 +266,8 @@ const AddTeachers = () => {
                                     <th className="px-2 md:px-4 py-2 text-center border-b border-gray-600 border-r text-sm md:text-base">Email</th>
                                     <th className="px-2 md:px-4 py-2 text-center border-b border-gray-600 border-r text-sm md:text-base">Phone Number</th>
                                     <th className="px-2 md:px-4 py-2 text-center border-b border-gray-600 border-r text-sm md:text-base">Branch</th>
+                                    <th className="px-2 md:px-4 py-2 text-center border-b border-gray-600 text-sm md:text-base">Subject</th>
+                                    {/* <th className="px-2 md:px-4 py-2 text-center border-b border-gray-600 text-sm md:text-base">Actions</th> */}
                                 </tr>
                             </thead>
                             <tbody>
@@ -255,7 +277,7 @@ const AddTeachers = () => {
                                         className={`cursor-pointer ${
                                             selectedRow === teacher._id ? 'bg-[#00A0E3] text-white' : 'even:bg-gray-200 hover:bg-gray-400'
                                         } transition-all duration-300`}
-                                        onClick={() => handleRowClick(teacher._id)}
+                                        onClick={() => handleRowClick(teacher)}
                                     >
                                         <td className="px-2 md:px-4 py-1 md:py-2 border-b border-gray-600 border-r text-sm md:text-base">{teacher.teacherID}</td>
                                         <td className="px-2 md:px-4 py-1 md:py-2 border-b border-gray-600 border-r text-sm md:text-base">{teacher.name}</td>
@@ -263,6 +285,12 @@ const AddTeachers = () => {
                                         <td className="px-2 md:px-4 py-1 md:py-2 border-b border-gray-600 border-r text-sm md:text-base">{teacher.email}</td>
                                         <td className="px-2 md:px-4 py-1 md:py-2 border-b border-gray-600 border-r text-sm md:text-base">{teacher.phoneNumber}</td>
                                         <td className="px-2 md:px-4 py-1 md:py-2 border-b border-gray-600 border-r text-sm md:text-base">{teacher.branch}</td>
+                                        <td className="px-2 md:px-4 py-1 md:py-2 border-b border-gray-600 text-sm md:text-base">{teacher.subject || 'N/A'}</td>
+                                        {/* <td className="px-2 md:px-4 py-1 md:py-2 border-b border-gray-600 text-sm md:text-base">
+                                            <button className="bg-[#2D5990] text-white px-2 py-1 rounded-md" onClick={() => handleRowClick(teacher)}>
+                                                Edit
+                                            </button>
+                                        </td> */}
                                     </tr>
                                 ))}
                             </tbody>

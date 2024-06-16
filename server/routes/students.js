@@ -2,6 +2,7 @@ const express = require('express');
 const router = express.Router();
 const Student = require('../models/Student');
 const Cluster = require('../models/Cluster');
+const Session = require('../models/Session');
 const MongoClient = require('mongodb').MongoClient;
 
 // Get all students
@@ -105,17 +106,81 @@ async function fetchStudentsFromOtherDB() {
 // Function to create clusters if they don't exist
 async function createClustersIfNecessary(branch, batch) {
   const existingClusters = await Cluster.find({ branch, batch });
-  // console.log('existingClusters', existingClusters);
   if (existingClusters.length === 0) {
     console.log('Creating clusters for branch and batch:', branch, batch);
     const clusters = [
-      { clusterID: `A-${branch}-${batch}`, setA: 0, setB: 0, branch, batch},
-      { clusterID: `B-${branch}-${batch}`, setA: 0, setB: 0, branch, batch },
-      { clusterID: `C-${branch}-${batch}`, setA: 0, setB: 0, branch, batch }
+      { clusterID: `A-${branch}-${batch}`, setA: 0, setB: 0, branch, batch, clusterType: 'A' },
+      { clusterID: `B-${branch}-${batch}`, setA: 0, setB: 0, branch, batch, clusterType: 'B' },
+      { clusterID: `C-${branch}-${batch}`, setA: 0, setB: 0, branch, batch, clusterType: 'C' }
     ];
     await Cluster.insertMany(clusters);
+    // Call the function to create sessions after creating clusters
+    await createSessionsForTwoYears(branch, batch); 
   }
 }
+
+// Function to create sessions for two years
+const createSessionsForTwoYears = async (branch, batch) => {
+  try {
+    const startDate = new Date();
+    const sessions = generateSessionsForTwoYears(startDate, branch, batch);
+    await Session.insertMany(sessions);
+    console.log('Sessions created for two years');
+  } catch (err) {
+    console.error("Error creating sessions:", err);
+    throw err; // Re-throw the error to be handled at a higher level
+  }
+};
+
+// Function to generate sessions for two years
+const generateSessionsForTwoYears = (startDate, branch, batch) => {
+  const sessions = [];
+  const subjectClusterMapping = {
+    'Mathematics': ['A', 'B', 'C'],
+    'Physics': ['B', 'C', 'A'],
+    'Chemistry': ['C', 'A', 'B']
+  };
+
+  let currentDate = nextMonday(startDate); // Start from next Monday
+
+  for (let year = 0; year < 2; year++) {
+    for (let week = 0; week < 52; week++) {
+      for (const subject in subjectClusterMapping) {
+        const clusterType = subjectClusterMapping[subject][(week % 6) / 2 | 0]; 
+
+        const session = {
+          clusterID: `${clusterType}-${branch}-${batch}`,
+          period: `${format(currentDate, 'MMM d, yyyy')} - ${format(addDays(currentDate, 13), 'MMM d, yyyy')}`,
+          startDate: new Date(currentDate),
+          subject: subject,
+          branch: branch, // Replace with dynamic branch assignment
+          batch: batch, // Replace with dynamic batch assignment
+          clusterType: clusterType,
+          status: 'pending',
+        };
+        sessions.push(session);
+      }
+      currentDate = addDays(currentDate, 14); 
+    }
+  }
+  return sessions;
+};
+
+const nextMonday = (date) => {
+  const day = date.getDay();
+  const diff = 1 - day + (day === 0 ? -6 : 1);
+  return addDays(date, diff);
+};
+
+const addDays = (date, days) => {
+  const result = new Date(date);
+  result.setDate(result.getDate() + days);
+  return result;
+};
+
+const format = (date, format) => {
+  return date.toLocaleDateString('en-US', { month: 'short', day: 'numeric', year: 'numeric' });
+};
 
 // Function to assign a cluster to a student
 async function assignCluster(branch, batch) {

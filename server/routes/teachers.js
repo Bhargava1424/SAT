@@ -33,6 +33,7 @@ router.post('/', async (req, res) => {
       branch: req.body.branch,
       teacherID: req.body.teacherID,
       role: req.body.role,
+      subject: req.body.subject,
     });
     const newTeacher = await teacher.save();
     res.status(201).json(newTeacher);
