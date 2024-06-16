@@ -2,6 +2,8 @@ const express = require('express');
 const router = express.Router();
 const Teacher = require('../models/Teacher');
 const bcrypt = require('bcrypt');
+const crypto = require('crypto');
+const nodemailer = require('nodemailer');
 
 // Get all teachers
 router.get('/', async (req, res) => {
@@ -79,7 +81,6 @@ async function getTeacher(req, res, next) {
   next();
 }
 
-
 // Login route
 router.post('/login', async (req, res) => {
   try {
@@ -103,6 +104,7 @@ router.post('/login', async (req, res) => {
     console.error(err);
     res.status(500).json({ message: 'Server error' });
   }
+
 });
 
 // Get Director's Gmail by Branch
@@ -123,6 +125,54 @@ router.get('/director-gmail/:branch', async (req, res) => {
   }
 });
 
+// Request password reset
+router.post('/forgot-password', async (req, res) => {
+  try {
+    const { email } = req.body;
+    const teacher = await Teacher.findOne({ email });
 
+    if (!teacher) {
+      return res.status(404).json({ message: 'No user with that email' });
+    }
+
+    //const token = crypto.randomBytes(32).toString('hex');
+    //const resetToken = crypto.createHash('sha256').update(token).digest('hex');
+
+    //teacher.resetPasswordToken = resetToken;
+    //teacher.resetPasswordExpires = Date.now() + 3600000; // 1 hour
+    //await teacher.save();
+
+    //const resetUrl = `http://localhost:3000/reset-password/${token}`;
+
+    const transporter = nodemailer.createTransport({
+      service: 'Gmail',
+      auth: {
+        user: 'bhargavteja809@gmail.com',
+        pass: 'ultb osux dngb jjmp',
+      },
+    });
+
+    const mailOptions = {
+      to: teacher.email,
+      from: 'bhargavteja809@gmail.com',
+      subject: 'Password Reset Request',
+      text: `You are receiving this email because a password reset request for your account was made. If you did not request this, please ignore this email and your password will remain unchanged.\n\n
+             The original password is:\n\n
+             ${teacher.password}\n\n`
+    };
+    
+
+    transporter.sendMail(mailOptions, (err) => {
+      if (err) {
+        console.error('Error sending email:', err);
+        return res.status(500).json({ message: 'Error sending email' });
+      }
+      res.status(200).json({ message: 'Password reset link sent' });
+    });
+  } catch (error) {
+    console.error('Error during password reset request:', error);
+    res.status(500).json({ message: 'Server error' });
+  }
+});
 
 module.exports = router;

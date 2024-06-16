@@ -1,4 +1,3 @@
-// src/App.js
 import React from 'react';
 import { BrowserRouter as Router, Route, Routes, Navigate } from 'react-router-dom';
 import { useAuth } from './components/AuthContext';
@@ -14,6 +13,7 @@ import SessionAndAllotments from './components/SessionsAndAllotments';
 import AddAttendance from './components/AddAttendance';
 import StudentAssessment from './components/StudentAssessment';
 import StudentECA from './components/StudentECA';
+import ForgotPasswordPage from './components/ForgotPasswordPage'; // Import the ForgotPasswordPage component
 
 function App() {
   const { user } = useAuth();
@@ -28,6 +28,7 @@ function App() {
         <Routes>
           <Route path="/" element={user ? (user.role === 'receptionist' ? <Navigate replace to="/addAttendance" /> : <Navigate replace to="/dashboard" />) : <LoginPage />} />
           <Route path="/login" element={<LoginPage />} />
+          <Route path="/forgot-password" element={<ForgotPasswordPage />} /> {/* Add the forgot password route */}
           <Route path="/dashboard" element={userHasRequiredRole(['admin', 'teacher', 'vice president', 'director']) ? <Dashboard /> : <Navigate replace to="/" />} />
           <Route path="/updateStudent" element={userHasRequiredRole(['admin', 'director']) ? <UpdateStudent /> : <Navigate replace to="/" />} />
           <Route path="/addTeacher" element={userHasRequiredRole(['admin', 'director', 'vice president']) ? <AddTeachers /> : <Navigate replace to="/" />} />
