@@ -1,192 +1,153 @@
-// frontend/src/components/SessionsAndAllotments.js
 import React, { useState, useEffect } from 'react';
-import Navbar from './Navbar';
+import axios from 'axios';
 import DatePicker from 'react-datepicker';
 import 'react-datepicker/dist/react-datepicker.css';
-import { addDays, format, isMonday, nextMonday, isSameDay } from 'date-fns';
-import { motion } from 'framer-motion';
+import Navbar from './Navbar';
+
+const Tooltip = ({ tooltipText }) => {
+  return (
+    <div className="relative inline-block">
+      <div className="absolute bottom-0 left-0 hidden group-hover:block w-48 p-2 text-sm text-white bg-[#2D5990] rounded-md shadow-lg z-10">
+        {tooltipText}
+      </div>
+    </div>
+  );
+};
 
 const SessionAndAllotments = () => {
-  const [teachers, setTeachers] = useState([]);
-  const [selectedMonday, setSelectedMonday] = useState(null);
   const [sessions, setSessions] = useState([]);
-  const [clusters, setClusters] = useState([]);
-  const [hoveredCluster, setHoveredCluster] = useState(null);
-  const [hoveredCell, setHoveredCell] = useState(null);
+  const [transformedData, setTransformedData] = useState({});
+  const [startDate, setStartDate] = useState(new Date());
+  const [selectedBranch, setSelectedBranch] = useState('All');
 
   useEffect(() => {
-    const fetchTeachers = async () => {
+    const fetchData = async () => {
       try {
-        const response = await fetch('http://localhost:5000/teachers');
-        const data = await response.json();
-        const filteredTeachers = data.filter(teacher => teacher.role === 'teacher');
-        setTeachers(filteredTeachers);
+        const response = await axios.get('http://localhost:5000/sessions');
+        setSessions(response.data);
       } catch (error) {
-        console.error('Error fetching teachers:', error);
+        console.error('Error fetching session data', error);
       }
     };
-    fetchTeachers();
+
+    fetchData();
   }, []);
 
   useEffect(() => {
-    const fetchSessions = async () => {
-      try {
-        const response = await fetch('http://localhost:5000/sessions');
-        const data = await response.json();
-        console.log('Fetched sessions:', data);
-        setSessions(data);
-      } catch (error) {
-        console.error('Error fetching sessions:', error);
-      }
-    };
-    fetchSessions();
-  }, [selectedMonday]);
-
-  useEffect(() => {
-    const fetchClusters = async () => {
-      try {
-        const response = await fetch('http://localhost:5000/clusters');
-        const data = await response.json();
-        console.log('Fetched clusters:', data);
-        setClusters(data);
-      } catch (error) {
-        console.error('Error fetching clusters:', error);
-      }
-    };
-    fetchClusters();
-  }, []);
-
-  const handleDateChange = (date) => {
-    if (isMonday(date)) {
-      setSelectedMonday(date);
-    } else {
-      setSelectedMonday(nextMonday(date));
+    if (sessions.length > 0) {
+      filterDataByDate(sessions, startDate);
     }
+  }, [sessions, startDate]);
+
+  const filterDataByDate = (data, date) => {
+    const filteredData = data.filter((session) => {
+      const sessionDate = new Date(session.startDate);
+      return sessionDate >= date;
+    });
+
+    const groupedData = {};
+    const branches = {};
+
+    filteredData.forEach((session) => {
+      const { period, subject, status, clusterID } = session;
+      const branch = clusterID.substring(2, 5);
+
+      if (!branches[branch]) {
+        branches[branch] = [];
+      }
+
+      if (!groupedData[branch]) {
+        groupedData[branch] = {};
+      }
+
+      if (!groupedData[branch][period] && branches[branch].length < 8) {
+        groupedData[branch][period] = {
+          period,
+          Mathematics: { status: 'N/A', clusterID: '' },
+          Physics: { status: 'N/A', clusterID: '' },
+          Chemistry: { status: 'N/A', clusterID: '' },
+        };
+        branches[branch].push(period);
+      }
+
+      if (groupedData[branch][period]) {
+        groupedData[branch][period][subject] = { status, clusterID };
+      }
+    });
+
+    setTransformedData(groupedData);
   };
 
-  const getClusterDetails = (session) => {
-    const cluster = clusters.find(c => c.clusterID === session.clusterID);
-    return cluster ? { setA: cluster.setA.join(', '), setB: cluster.setB.join(', ') } : null;
+  const handleBranchChange = (event) => {
+    setSelectedBranch(event.target.value);
   };
 
-  const generateSessions = (startDate, numberOfSessions) => {
-    const sessions = [];
-    for (let i = 0; i < numberOfSessions; i++) {
-      const start = addDays(startDate, i * 14);
-      const end = addDays(start, 13);
-      sessions.push(`${format(start, 'MMM d, yyyy')} - ${format(end, 'MMM d, yyyy')}`);
-    }
-    return sessions;
-  };
-
-  const filteredSessions = selectedMonday ? generateSessions(selectedMonday, 8) : [];
-
-  const isCurrentDate = (sessionPeriod) => {
-    const today = new Date();
-    const [startDateStr, endDateStr] = sessionPeriod.split(' - ');
-    const startDate = new Date(startDateStr);
-    const endDate = new Date(endDateStr);
-    return isSameDay(today, startDate) || (today > startDate && today <= endDate);
-  };
-
-  const getTeacherName = (teacherID) => {
-    const teacher = teachers.find(t => t._id === teacherID);
-    return teacher ? teacher.name : teacherID;
-  };
-
-  const handleMouseEnter = (session, cellID) => {
-    const clusterDetails = getClusterDetails(session);
-    setHoveredCluster(clusterDetails);
-    setHoveredCell(cellID);
-  };
-
-  const handleMouseLeave = () => {
-    setHoveredCluster(null);
-    setHoveredCell(null);
+  const renderTable = (branch) => {
+    return (
+      <div key={branch} className="mb-12">
+        <h2 className="text-3xl font-semibold my-6 text-[#2D5990]">Branch: {branch}</h2>
+        <table className="min-w-full bg-white shadow-lg rounded-lg overflow-hidden">
+          <thead>
+            <tr className="bg-gradient-to-r from-[#2D5990] to-[#00A0E3] text-white">
+              <th className="py-4 px-6 border-b">Period</th>
+              <th className="py-4 px-6 border-b">Mathematics</th>
+              <th className="py-4 px-6 border-b">Physics</th>
+              <th className="py-4 px-6 border-b">Chemistry</th>
+            </tr>
+          </thead>
+          <tbody>
+            {Object.values(transformedData[branch]).slice(0, 8).map((row, index) => (
+              <tr key={index} className="group hover:bg-[#F0F8FF] transition duration-300">
+                <td className="py-4 px-6 border-b text-center">{row.period}</td>
+                <td className="py-4 px-6 border-b text-center relative">
+                  {row.Mathematics.status}
+                  <Tooltip tooltipText={row.Mathematics.clusterID} />
+                </td>
+                <td className="py-4 px-6 border-b text-center relative">
+                  {row.Physics.status}
+                  <Tooltip tooltipText={row.Physics.clusterID} />
+                </td>
+                <td className="py-4 px-6 border-b text-center relative">
+                  {row.Chemistry.status}
+                  <Tooltip tooltipText={row.Chemistry.clusterID} />
+                </td>
+              </tr>
+            ))}
+          </tbody>
+        </table>
+      </div>
+    );
   };
 
   return (
-    <div className="w-full bg-gradient-to-br from-gray-100 to-gray-200 min-h-screen pb-20">
+    <div className="container mx-auto px-4">
       <Navbar />
-      <div className="max-w-7xl mx-auto py- px-4 sm:px-6 lg:px-8">
-        <h2 className="text-3xl md:text-4xl font-bold mb-6 text-center text-[#2D5990] animate-pulse">SESSIONS & ALLOTMENTS</h2>
-        <div className="text-center my-6">
-          <DatePicker
-            selected={selectedMonday}
-            onChange={handleDateChange}
-            dateFormat="MMMM d, yyyy"
-            placeholderText="Select a Monday"
-            filterDate={date => isMonday(date)}
-            className="px-6 py-3 text-lg bg-white border-2 border-[#2D5990] rounded-full shadow-lg focus:outline-none focus:ring-4 focus:ring-[#2D5990] transition duration-300 ease-in-out"
-          />
-        </div>
-        <div className="overflow-visible max-h-screen rounded-3xl shadow-2xl bg-white border-4 border-[#2D5990]">
-          <table className="table-auto w-full bg-white border-collapse">
-            <thead className="bg-gradient-to-r from-[#2D5990] to-[#00A0E3] text-white">
-              <tr>
-                <th className="px-6 py-2 text-center border-b-4 border-white text-lg md:text-base font-bold">Session</th>
-                <th className="px-6 py-2 text-center border-b-4 border-white text-lg md:text-base font-bold" colSpan={teachers.length}>
-                  Teachers
-                </th>
-              </tr>
-              <tr>
-                <th className="px-6 text-center border-b-4 border-white"></th>
-                {teachers.map((teacher) => (
-                  <th key={teacher._id} className="px-6 py-2 text-center border-b-4 border-white text-lg md:text-base font-semibold">
-                    {teacher.name}
-                  </th>
-                ))}
-              </tr>
-            </thead>
-            <tbody>
-              {filteredSessions.map((sessionPeriod, index) => {
-                console.log('Session period:', sessionPeriod);
-                const session = sessions.find(s => s.period === sessionPeriod);
-                const currentDateClass = isCurrentDate(sessionPeriod) ? 'bg-gradient-to-r from-[#00A0E3] to-[#2D5990] text-white' : '';
-                return (
-                  <motion.tr
-                    key={index}
-                    className={`even:bg-gray-100 hover:bg-gray-200 ${currentDateClass}`}
-                    initial={{ opacity: 0, y: 20 }}
-                    animate={{ opacity: 1, y: 0 }}
-                    transition={{ duration: 0.3, delay: index * 0.05 }}
-                  >
-                    <td className="px-6 py-4 border-b-2 border-gray-200 text-center text-lg md:text-base font-semibold">{sessionPeriod}</td>
-                    {session ? session.teachers.map((teacher, idx) => (
-                      <td
-                        key={idx}
-                        className={`relative px-4 py-2 border-b-2 border-gray-200 text-center text-lg md:text-base font-medium`}
-                        onMouseEnter={() => handleMouseEnter(session, `${index}-${idx}`)}
-                        onMouseLeave={handleMouseLeave}
-                      >
-                        <div
-                          className={`py-2 border-b-2 border-gray-200 text-center text-lg md:text-base font-medium ${
-                            teacher.status === 'complete' ? 'bg-green-600 text-white' :
-                            teacher.status === 'incomplete' ? 'bg-red-600 text-white' : 'bg-gray-600 text-white'
-                          } rounded-3xl opacity-95 shadow-md transition duration-300 ease-in-out hover:scale-105`}
-                        >
-                          {getTeacherName(teacher.teacherID)}
-                        </div>
-                        {hoveredCell === `${index}-${idx}` && hoveredCluster && (
-                          <div className="absolute min-w-fit bottom-full mb-2 w-full bg-gray-800 text-white text-lg md:text-base font-medium p-4 rounded-2xl shadow-2xl border-4 border-[#2D5990] animate-fade-in flex justify-between">
-                            <div className="mr-4">
-                              <strong>Set A:</strong> {hoveredCluster.setA}
-                            </div>
-                            <div>
-                              <strong>Set B:</strong> {hoveredCluster.setB}
-                            </div>
-                          </div>
-                        )}
-                      </td>
-                    )) : (
-                      <td colSpan={teachers.length} className="px-6 py-4 border-b-2 border-gray-200 text-center text-lg md:text-base font-medium">No data</td>
-                    )}
-                  </motion.tr>
-                );
-              })}
-            </tbody>
-          </table>
-        </div>
+      <h1 className="text-4xl font-bold my-8 text-center text-[#2D5990]">Sessions and Allotments</h1>
+      <div className="my-6 flex justify-center items-center">
+        <label className="mr-4 text-xl font-medium text-[#2D5990]">Select Start Date:</label>
+        <DatePicker
+          selected={startDate}
+          onChange={(date) => setStartDate(date)}
+          className="border-2 border-[#00A0E3] bg-white rounded-lg p-3 focus:outline-none focus:ring-2 focus:ring-[#00A0E3]"
+        />
+        <label className="ml-8 mr-4 text-xl font-medium text-[#2D5990]">Select Branch:</label>
+        <select
+          value={selectedBranch}
+          onChange={handleBranchChange}
+          className="border-2 border-[#00A0E3] bg-white rounded-lg p-3 focus:outline-none focus:ring-2 focus:ring-[#00A0E3]"
+        >
+          <option value="All">All</option>
+          {Object.keys(transformedData).map((branch) => (
+            <option key={branch} value={branch}>
+              {branch}
+            </option>
+          ))}
+        </select>
+      </div>
+      <div className="overflow-x-auto">
+        {selectedBranch === 'All'
+          ? Object.keys(transformedData).map((branch) => renderTable(branch))
+          : renderTable(selectedBranch)}
       </div>
     </div>
   );
