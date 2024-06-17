@@ -92,6 +92,11 @@ const AddTeachers = () => {
             formData.branch = userBranch;
         }
 
+        if (form.role === 'teacher' && !form.subject) {
+            alert('Subject is required for teachers');
+            return;
+        }
+
         try {
             const response = await fetch('http://localhost:5000/teachers', {
                 method: 'POST',
@@ -104,7 +109,7 @@ const AddTeachers = () => {
             if (response.ok) {
                 window.location.reload();
                 setForm({ name: '', email: '', gmail: '', password: '', phoneNumber: '', branch: '', teacherID: '', role: '', subject: '' });
-                alert('Teacher added successfully!');
+                alert('User added successfully!');
             } else {
                 throw new Error(newTeacher.error || 'Failed to add teacher');
             }
