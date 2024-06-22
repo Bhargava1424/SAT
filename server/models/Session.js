@@ -13,13 +13,25 @@ const sessionSchema = new mongoose.Schema({
     type: Date,
     required: true
   },
-  subject: {
+  sessionEndDate: {
+    type: Date,
+    required: true
+  },
+  branch: {
     type: String,
     required: true,
   },
-  clusterType: { // New field to store the cluster type (A, B, C)
+  batch: {
     type: String,
-    enum: ['A', 'B', 'C'],
+    required: true,
+  },
+  clusterType: { 
+    type: String,
+    required: true
+  },
+  lecturer: { 
+    type: mongoose.Schema.Types.ObjectId, // Reference to the Teacher model
+    ref: 'Teacher',
     required: true
   },
   status: {

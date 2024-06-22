@@ -55,12 +55,28 @@ const SessionAndAllotments = () => {
   const [modalBranch, setModalBranch] = useState('');
   const [teacherCount, setTeacherCount] = useState(0);
   const [studentCount, setStudentCount] = useState(0);
+  const [branches, setBranches] = useState([]);
+  const [selectedBatch, setSelectedBatch] = useState('All');
 
   useEffect(() => {
     const fetchData = async () => {
       try {
         const response = await axios.get('http://localhost:5000/sessions');
         setSessions(response.data);
+      } catch (error) {
+        console.error('Error fetching session data', error);
+      }
+    };
+
+    fetchData();
+  }, []);
+
+  useEffect(() => {
+    const fetchData = async () => {
+      try {
+        const response = await axios.get('http://localhost:5000/branches');
+        console.log(response.data);
+        setBranches(response.data);
       } catch (error) {
         console.error('Error fetching session data', error);
       }
@@ -118,6 +134,10 @@ const SessionAndAllotments = () => {
     setSelectedBranch(event.target.value);
   };
 
+  const handleBatchChange = (event) => {
+    setSelectedBatch(event.target.value);
+  };
+
   const handleModalBranchChange = async (event) => {
     setModalBranch(event.target.value);
 
@@ -136,6 +156,15 @@ const SessionAndAllotments = () => {
       console.error('Error fetching counts:', error);
     }
   };
+
+  const startYear = 2020;
+  const endYear = 2050; // Adjust this to your required end year
+
+  // Generate year ranges
+  const yearRanges = [];
+  for (let year = startYear; year < endYear; year += 2) {
+    yearRanges.push(`${year} - ${year + 2}`);
+  }
 
   const renderTable = (branch) => {
     return (
@@ -198,9 +227,24 @@ const SessionAndAllotments = () => {
           className="border-2 border-[#00A0E3] bg-white rounded-lg p-3 focus:outline-none focus:ring-2 focus:ring-[#00A0E3]"
         >
           <option value="All">All</option>
-          {Object.keys(transformedData).map((branch) => (
-            <option key={branch} value={branch}>
-              {branch}
+          {branches.map((branch) => (
+            <option key={branch._id} value={branch.branchCode}>
+              {branch.branchCode}
+            </option>
+          ))}
+        </select>
+        <label className="ml-8 mr-4 text-xl font-medium text-[#2D5990]">
+          Select Batch:
+        </label>
+        <select
+          value={selectedBatch}
+          onChange={handleBatchChange}
+          className="border-2 border-[#00A0E3] bg-white rounded-lg p-3 focus:outline-none focus:ring-2 focus:ring-[#00A0E3]"
+        >
+          <option value="All">All</option>
+          {yearRanges.map((range, index) => (
+            <option key={index} value={range}>
+              {range}
             </option>
           ))}
         </select>
@@ -217,56 +261,73 @@ const SessionAndAllotments = () => {
           : renderTable(selectedBranch)}
       </div>
 
-      {/* Modal with Close Button */}
-      <Modal isOpen={isModalOpen} onClose={() => setIsModalOpen(false)}>
-        <div className="space-y-6">
-          <div className="flex items-center space-x-4">
-            <label className="text-lg font-medium text-[#2D5990] w-1/3">
-              Select Branch:
-            </label>
-            <select
-              value={modalBranch}
-              onChange={handleModalBranchChange}
-              className="flex-grow border-2 border-[#00A0E3] bg-white rounded-lg p-3 focus:outline-none focus:ring-2 focus:ring-[#00A0E3] transition-all duration-200"
-            >
-              <option value="">Select Branch</option>
-              {Object.keys(transformedData).map((branch) => (
-                <option key={branch} value={branch}>
-                  {branch}
-                </option>
-              ))}
-            </select>
-          </div>
-
-          <button
-            className={`w-full bg-[#2D5990] text-white font-medium py-3 px-6 rounded-lg hover:bg-[#00A0E3] focus:outline-none focus:ring-2 focus:ring-[#00A0E3] transition-all duration-300 ${
-              modalBranch ? 'cursor-pointer' : 'cursor-not-allowed opacity-50'
-            }`}
-            disabled={!modalBranch}
-            onClick={() => {
-              // Implement reassignment logic here
-            }}
+      /* Modal with Close Button */
+        <Modal isOpen={isModalOpen} onClose={() => setIsModalOpen(false)}>
+          <div className="space-y-6">
+            <div className="flex items-center space-x-4">
+          <label className="text-lg font-medium text-[#2D5990] w-1/3">
+            Select Branch:
+          </label>
+          <select
+            value={modalBranch}
+            onChange={handleModalBranchChange}
+            className="flex-grow border-2 border-[#00A0E3] bg-white rounded-lg p-3 focus:outline-none focus:ring-2 focus:ring-[#00A0E3] transition-all duration-200"
           >
-            Reassign Session
-          </button>
-
-
-          {modalBranch && (
-            <div className="bg-gradient-to-r from-yellow-50 to-yellow-100 border-l-4 border-yellow-500 text-yellow-700 p-4 rounded-lg shadow-md">
-              <p className="font-medium">
-                Branch Statistics:
-              </p>
-              <p>
-                Teachers: <span className="font-bold">{teacherCount}</span>
-              </p>
-              <p>
-                Students: <span className="font-bold">{studentCount}</span>
-              </p>
+            <option value="">Select Branch</option>
+            {branches.map((branch) => (
+              <option key={branch._id} value={branch.branchCode}>
+            {branch.branchCode}
+              </option>
+            ))}
+          </select>
             </div>
-          )}
-        </div>
-      </Modal>
 
+            <div className="flex items-center space-x-4">
+          <label className="ml-8 mr-4 text-xl font-medium text-[#2D5990]">
+            Select Batch:
+          </label>
+          <select
+            value={selectedBatch}
+            onChange={handleBatchChange}
+            className="border-2 border-[#00A0E3] bg-white rounded-lg p-3 focus:outline-none focus:ring-2 focus:ring-[#00A0E3]"
+          >
+            <option value="All">All</option>
+            {yearRanges.map((range, index) => (
+              <option key={index} value={range}>
+            {range}
+              </option>
+            ))}
+          </select>
+            </div>
+
+            <button
+          className={`w-full bg-[#2D5990] text-white font-medium py-3 px-6 rounded-lg hover:bg-[#00A0E3] focus:outline-none focus:ring-2 focus:ring-[#00A0E3] transition-all duration-300 ${
+            modalBranch ? 'cursor-pointer' : 'cursor-not-allowed opacity-50'
+          }`}
+          disabled={!modalBranch}
+          onClick={() => {
+            // Implement reassignment logic here
+          }}
+            >
+          Reassign Session
+            </button>
+
+
+            {modalBranch && (
+          <div className="bg-gradient-to-r from-yellow-50 to-yellow-100 border-l-4 border-yellow-500 text-yellow-700 p-4 rounded-lg shadow-md">
+            <p className="font-medium">
+              Branch Statistics:
+            </p>
+            <p>
+              Teachers: <span className="font-bold">{teacherCount}</span>
+            </p>
+            <p>
+              Students: <span className="font-bold">{studentCount}</span>
+            </p>
+          </div>
+            )}
+          </div>
+        </Modal>
     </div>
   );
 };

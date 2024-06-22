@@ -12,7 +12,7 @@ const teacherSchema = new mongoose.Schema({
     required: true,
     unique: true,
   },
-  gmail: { // New Gmail field
+  gmail: { 
     type: String,
     unique: true,
   },
@@ -35,9 +35,9 @@ const teacherSchema = new mongoose.Schema({
     enum: ['admin', 'director', 'vice president', 'teacher', 'receptionist'],
     default: 'teacher',
   },
-  subject: {
-    type: String,
-  },
+  subjects: [{
+    type: String, 
+  }] // Subjects array
 });
 
 module.exports = mongoose.model('Teacher', teacherSchema);

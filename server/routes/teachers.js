@@ -115,6 +115,7 @@ router.post('/login', async (req, res) => {
 // Get teacher count by branch
 router.get('/count-by-branch/:branch', async (req, res) => {
   try {
+    console.log('Fetching teacher count by branch:', req.params.branch);
     const count = await Teacher.countDocuments({ branch: req.params.branch });
     res.json({ count });
   } catch (error) {

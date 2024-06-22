@@ -26,9 +26,8 @@ const clusterSchema = new mongoose.Schema({
     type: Number,
     default: 0
   },
-  clusterType: { // New field for cluster type (A, B, or C)
+  clusterType: {
     type: String,
-    enum: ['A', 'B', 'C'],
     required: true
   }
 });
