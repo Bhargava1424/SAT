@@ -1,3 +1,5 @@
+//routes/student.js
+
 const express = require('express');
 const router = express.Router();
 const Student = require('../models/Student');
@@ -268,6 +270,18 @@ router.delete('/:id', getStudent, async (req, res) => {
       res.status(500).json({ message: err.message });
   }
 });
+
+
+// Get student count by branch
+router.get('/count-by-branch/:branch', async (req, res) => {
+  try {
+    const count = await Student.countDocuments({ branch: req.params.branch });
+    res.json({ count });
+  } catch (error) {
+    res.status(500).json({ error: error.message });
+  }
+});
+
 
 // Middleware function to get a student by ID
 async function getStudent(req, res, next) {

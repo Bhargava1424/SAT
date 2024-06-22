@@ -23,12 +23,11 @@ router.get('/:id', getTeacher, (req, res) => {
 // Create a new teacher
 router.post('/', async (req, res) => {
   try {
-    // const hashedPassword = await bcrypt.hash(req.body.password, 10)
     const teacher = new Teacher({
       name: req.body.name,
       email: req.body.email,
-      gmail: req.body.gmail, // Store the provided Gmail
-      password: req.body.password, 
+      gmail: req.body.gmail,
+      password: req.body.password,
       phoneNumber: req.body.phoneNumber,
       branch: req.body.branch,
       teacherID: req.body.teacherID,
@@ -44,23 +43,29 @@ router.post('/', async (req, res) => {
 
 // Update a teacher by ID
 router.patch('/:id', getTeacher, async (req, res) => {
-  if (req.body.name != null) {
-    res.teacher.name = req.body.name;
-  }
-  // ... update other fields similarly ...
+  console.log(req.body); // Log the request body
+
+  const updates = ['name', 'email', 'gmail', 'phoneNumber', 'branch', 'teacherID', 'role', 'subject'];
+  updates.forEach(update => {
+    if (req.body[update] != null) {
+      res.teacher[update] = req.body[update];
+    }
+  });
 
   try {
     const updatedTeacher = await res.teacher.save();
     res.json(updatedTeacher);
   } catch (error) {
+    console.log(error); // Log the error for debugging
     res.status(400).json({ message: error.message });
   }
 });
 
+
 // Delete a teacher by ID
 router.delete('/:id', getTeacher, async (req, res) => {
   try {
-    await res.teacher.deleteOne()
+    await res.teacher.deleteOne();
     res.json({ message: 'Teacher deleted successfully!' });
   } catch (error) {
     res.status(500).json({ message: error.message });
@@ -69,7 +74,7 @@ router.delete('/:id', getTeacher, async (req, res) => {
 
 // Middleware to find a teacher by ID
 async function getTeacher(req, res, next) {
-  let teacher
+  let teacher;
   try {
     teacher = await Teacher.findById(req.params.id);
     if (teacher == null) {
@@ -105,15 +110,24 @@ router.post('/login', async (req, res) => {
     console.error(err);
     res.status(500).json({ message: 'Server error' });
   }
+});
 
+// Get teacher count by branch
+router.get('/count-by-branch/:branch', async (req, res) => {
+  try {
+    const count = await Teacher.countDocuments({ branch: req.params.branch });
+    res.json({ count });
+  } catch (error) {
+    res.status(500).json({ error: error.message });
+  }
 });
 
 // Get Director's Gmail by Branch
 router.get('/director-gmail/:branch', async (req, res) => {
   try {
-    const director = await Teacher.findOne({ 
-      role: 'director', 
-      branch: req.params.branch 
+    const director = await Teacher.findOne({
+      role: 'director',
+      branch: req.params.branch
     });
 
     if (!director) {
@@ -136,15 +150,6 @@ router.post('/forgot-password', async (req, res) => {
       return res.status(404).json({ message: 'No user with that email' });
     }
 
-    //const token = crypto.randomBytes(32).toString('hex');
-    //const resetToken = crypto.createHash('sha256').update(token).digest('hex');
-
-    //teacher.resetPasswordToken = resetToken;
-    //teacher.resetPasswordExpires = Date.now() + 3600000; // 1 hour
-    //await teacher.save();
-
-    //const resetUrl = `http://localhost:3000/reset-password/${token}`;
-
     const transporter = nodemailer.createTransport({
       service: 'Gmail',
       auth: {
@@ -161,7 +166,6 @@ router.post('/forgot-password', async (req, res) => {
              The original password is:\n\n
              ${teacher.password}\n\n`
     };
-    
 
     transporter.sendMail(mailOptions, (err) => {
       if (err) {
