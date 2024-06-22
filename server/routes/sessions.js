@@ -127,6 +127,7 @@ async function getSession(req, res, next) {
 router.post('/reassign', async (req, res) => {
   try {
     const { branch, batch, teachers } = req.body; 
+    console.log(teachers)
     if (!branch || !batch || !teachers) {
       return res.status(400).json({ message: 'Branch, batch, and teachers are required' });
     }
