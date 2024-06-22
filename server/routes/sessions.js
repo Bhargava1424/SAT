@@ -7,22 +7,24 @@ const { addDays, format, isSameDay, nextMonday } = require('date-fns');
 const Cluster = require('../models/Cluster');
 const Student = require('../models/Student');
 const {createClusters} = require('../utils/services'); 
+const mongoose = require('mongoose');
+const { ObjectId } = mongoose.Types;
 
 // Function to generate sessions for one year
-const generateSessionsForOneYear = (startDate, sessionEndDate, branch, batch, lecturers) => {
+const generateSessionsForOneYear = async (startDate, sessionEndDate, branch, batch, teachers) => {
   const sessions = [];
 
-  // Create clusters for this branch and batch based on lecturers 
-  createClusters(branch, batch, lecturers.length);
+  // Create clusters for this branch and batch based on teachers 
+  await createClusters(branch, batch, teachers.length);
 
-  let currentDate = nextMonday(startDate); 
+  let currentDate = nextMonday(startDate);
   let clusterIndex = 0; // Initialize cluster index
 
   while (currentDate <= sessionEndDate) {
     const clusterType = `Cluster ${clusterIndex + 1}`; // Calculate cluster type based on cluster index
 
-    for (let i = 0; i < lecturers.length; i++) { // Iterate over lecturers
-      const lecturer = lecturers[i]; // Assign lecturer to session
+    for (let i = 0; i < teachers.length; i++) { // Iterate over teachers
+      const teacher = teachers[i]; // Assign teacher to session
 
       const session = {
         clusterID: `${clusterType}-${branch}-${batch}`,
@@ -32,15 +34,16 @@ const generateSessionsForOneYear = (startDate, sessionEndDate, branch, batch, le
         branch: branch,
         batch: batch,
         clusterType: clusterType,
-        lecturer: lecturer, // Assign lecturer to the session
+        teacher: new ObjectId(teacher._id.$oid), // Convert teacher._id to ObjectId
         status: 'pending',
       };
       sessions.push(session);
     }
 
     currentDate = addDays(currentDate, 14); // Increment current date by 14 days
-    clusterIndex = (clusterIndex + 1) % lecturers.length; // Update cluster index in a cyclic manner
+    clusterIndex = (clusterIndex + 1) % teachers.length; // Update cluster index in a cyclic manner
   }
+
   return sessions;
 };
 
@@ -123,10 +126,12 @@ async function getSession(req, res, next) {
 // Function to reassign sessions
 router.post('/reassign', async (req, res) => {
   try {
-    const { branch, batch, lecturers } = req.body; 
-    if (!branch || !batch || !lecturers) {
-      return res.status(400).json({ message: 'Branch, batch, and lecturers are required' });
+    const { branch, batch, teachers } = req.body; 
+    if (!branch || !batch || !teachers) {
+      return res.status(400).json({ message: 'Branch, batch, and teachers are required' });
     }
+
+    console.log(teachers);
 
     // Delete existing sessions for the remainder of the year
     const existingSession = await Session.findOne({
@@ -149,10 +154,9 @@ router.post('/reassign', async (req, res) => {
     });
 
     const startDate = new Date();
-    const sessions = generateSessionsForOneYear(startDate, branch, sessionEndDate, batch, lecturers);
+    const sessions = await generateSessionsForOneYear(startDate, sessionEndDate, branch, batch, teachers);
     await Session.insertMany(sessions);
     console.log('Sessions created for the remaining time in the year');
-
     res.status(200).json({ message: 'Sessions reassigned' });
   } catch (err) {
     console.error("Error reassigning sessions:", err);

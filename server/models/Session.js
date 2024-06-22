@@ -1,4 +1,5 @@
 const mongoose = require('mongoose');
+const { Teacher } = require('./Teacher');
 
 const sessionSchema = new mongoose.Schema({
   clusterID: {
@@ -29,7 +30,7 @@ const sessionSchema = new mongoose.Schema({
     type: String,
     required: true
   },
-  lecturer: { 
+  teacher: { 
     type: mongoose.Schema.Types.ObjectId, // Reference to the Teacher model
     ref: 'Teacher',
     required: true

@@ -41,6 +41,10 @@ app.use('/receptionist', receptionistRouter); // New route for receptionist acti
 app.use('/branches', branchRouter); 
 app.use('/', driveRouter);
 
-app.listen(port, () => {
+console.log('Server started');
+
+app.listen(port => {
     console.log(`Server is listening on port ${port}`);
+}).on('error', (err) => {
+    console.error('Server failed to start:', err);
 });

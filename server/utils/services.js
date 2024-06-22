@@ -6,6 +6,9 @@ const { MongoClient } = require('mongodb');
 async function createClusters(branch, batch, numberOfClusters){
     const clusters = [];
 
+    // delete existing clusters
+    await Cluster.deleteMany({ branch, batch });
+
     for (let i = 0; i < numberOfClusters; i++) {
         const cluster = new Cluster({
             clusterID: `${branch}-${batch}-${i + 1}`,
@@ -26,47 +29,40 @@ async function createClusters(branch, batch, numberOfClusters){
 
 async function assignStudentsToClusters(branch, batch){
     try{
-      // fetch all students from the older database from same branch
-      const studentsFromOtherDB = await fetchStudentsFromOtherDB(branch, batch);
+      // fetch all students from the older database
+      const studentsFromOtherDB = await fetchStudentsFromOtherDB();
       
       // 1. Find existing students in this application's database
       const existingStudents = await Student.find();
+  
+      // 2. Identify new students (those not in this app's database)
+      const newStudents = studentsFromOtherDB.filter(
+        student => !existingStudents.some(
+          existing => existing.applicationNumber === student.applicationNumber
+        )
+      );
 
-      console.log('Existing students:', existingStudents);
-  
-     // 2. Identify new students (those not in this app's database) and those who need to be assigned clusters
-        const newStudents = studentsFromOtherDB.filter(
-            student => !existingStudents.some(
-                existing => existing.applicationNumber === student.applicationNumber
-            )
-        ).map(student => {
-            return {
-                ...student,
-                branch,
-                batch,
-            };
-        });
-      
-      console.log('New students:', newStudents);
+      // 3. Adding new students to the database
+        await Student.insertMany(newStudents);
 
-      // 3. Assign Clusters to new students
-      for (const newStudent of newStudents) { 
-        const assignedCluster = await assignCluster(newStudent.branch, newStudent.batch);
-        const setType = await assignSet(newStudent.branch, newStudent.batch, assignedCluster); 
+      // 4. Assign clusters to students of this batch
+      console.log('Assigning clusters to students of this batch');
+      console.log('Branch:', branch);
+      console.log('Batch:', batch);
+      const students = await Student.find({ branch, batch});
+
+        console.log('Students:', students);
+      // 5. Assign Clusters to new students
+      for (const student of students) { 
+        const assignedCluster = await assignCluster(student.branch, student.batch);
+        const setType = await assignSet(student.branch, student.batch, assignedCluster); 
   
-        newStudent.clusterID = assignedCluster;
-        newStudent.setType = setType;
+        student.clusterID = assignedCluster;
+        student.setType = setType;
   
-        await new Student(newStudent).save(); // Save the new student with assigned cluster
+        await new Student(student).save(); // Save the new student with assigned cluster
+        console.log('New student with cluster:', student);
       }
-
-      console.log('New students with clusters:', newStudents);
-  
-      // 5. Send all students from this app's database
-      const allStudents = await Student.find();
-      return(allStudents);
-
-      console.log('All students:', allStudents);
     }
     catch (err) {
         console.error('Error fetching students from other database:', err);

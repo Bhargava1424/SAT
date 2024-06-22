@@ -261,7 +261,7 @@ const SessionAndAllotments = () => {
           : renderTable(selectedBranch)}
       </div>
 
-      /* Modal with Close Button */
+      {/* Modal with Close Button */}
         <Modal isOpen={isModalOpen} onClose={() => setIsModalOpen(false)}>
           <div className="space-y-6">
             <div className="flex items-center space-x-4">
