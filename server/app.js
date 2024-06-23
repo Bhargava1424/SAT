@@ -43,8 +43,6 @@ app.use('/', driveRouter);
 
 console.log('Server started');
 
-app.listen(port => {
+app.listen(port, () => {
     console.log(`Server is listening on port ${port}`);
-}).on('error', (err) => {
-    console.error('Server failed to start:', err);
 });

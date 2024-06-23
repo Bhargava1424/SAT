@@ -31,8 +31,7 @@ const sessionSchema = new mongoose.Schema({
     required: true
   },
   teacher: { 
-    type: mongoose.Schema.Types.ObjectId, // Reference to the Teacher model
-    ref: 'Teacher',
+    type: String,
     required: true
   },
   status: {

@@ -25,7 +25,7 @@ const generateSessionsForOneYear = async (startDate, sessionEndDate, branch, bat
 
     for (let i = 0; i < teachers.length; i++) { // Iterate over teachers
       const teacher = teachers[i]; // Assign teacher to session
-
+      console.log(teacher);
       const session = {
         clusterID: `${clusterType}-${branch}-${batch}`,
         period: `${format(currentDate, 'MMM d, yyyy')} - ${format(addDays(currentDate, 13), 'MMM d, yyyy')}`,
@@ -34,7 +34,7 @@ const generateSessionsForOneYear = async (startDate, sessionEndDate, branch, bat
         branch: branch,
         batch: batch,
         clusterType: clusterType,
-        teacher: new ObjectId(teacher._id.$oid), // Convert teacher._id to ObjectId
+        teacher: teacher.name, // Convert teacher._id to ObjectId
         status: 'pending',
       };
       sessions.push(session);
