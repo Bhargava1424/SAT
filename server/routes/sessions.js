@@ -14,38 +14,44 @@ const { ObjectId } = mongoose.Types;
 const generateSessionsForOneYear = async (startDate, sessionEndDate, branch, batch, teachers) => {
   const sessions = [];
 
-  // Create clusters for this branch and batch based on teachers 
+  // Create clusters for this branch and batch based on the number of teachers
   await createClusters(branch, batch, teachers.length);
 
+  const clusters = await Cluster.find({ branch, batch });
+
   let currentDate = nextMonday(startDate);
+  let teacherIndex = 0; // Initialize teacher index
   let clusterIndex = 0; // Initialize cluster index
 
   while (currentDate <= sessionEndDate) {
-    const clusterType = `Cluster ${clusterIndex + 1}`; // Calculate cluster type based on cluster index
+    for (let i = 0; i < teachers.length; i++) {
+      const teacher = teachers[teacherIndex]; // Assign teacher to session
+      const cluster = clusters[clusterIndex]; // Assign cluster to session
 
-    for (let i = 0; i < teachers.length; i++) { // Iterate over teachers
-      const teacher = teachers[i]; // Assign teacher to session
-      console.log(teacher);
       const session = {
-        clusterID: `${clusterType}-${branch}-${batch}`,
+        clusterID: cluster.clusterID,
         period: `${format(currentDate, 'MMM d, yyyy')} - ${format(addDays(currentDate, 13), 'MMM d, yyyy')}`,
         startDate: new Date(currentDate),
         sessionEndDate: sessionEndDate,
         branch: branch,
         batch: batch,
-        clusterType: clusterType,
+        clusterType: cluster.clusterType,
         teacher: teacher.name, // Convert teacher._id to ObjectId
         status: 'pending',
       };
       sessions.push(session);
+
+      teacherIndex = (teacherIndex + 1) % teachers.length; // Update teacher index in a cyclic manner
+      clusterIndex = (clusterIndex + 1) % clusters.length; // Update cluster index in a cyclic manner
     }
 
     currentDate = addDays(currentDate, 14); // Increment current date by 14 days
-    clusterIndex = (clusterIndex + 1) % teachers.length; // Update cluster index in a cyclic manner
   }
 
   return sessions;
 };
+
+
 
 // Get all sessions
 router.get('/', async (req, res) => {

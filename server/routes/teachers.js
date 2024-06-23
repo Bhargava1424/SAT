@@ -141,6 +141,17 @@ router.get('/director-gmail/:branch', async (req, res) => {
   }
 });
 
+// Get all teachers by branch
+router.get('/branch/:branch', async (req, res) => {
+  try {
+    const teachers = await Teacher.find({ branch: req.params.branch, role: 'teacher' });
+    res.json(teachers);
+  } catch (error) {
+    res.status(500).json({ message: error.message });
+  }
+});
+
+
 // Request password reset
 router.post('/forgot-password', async (req, res) => {
   try {
