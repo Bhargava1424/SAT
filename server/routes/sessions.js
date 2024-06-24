@@ -24,32 +24,36 @@ const generateSessionsForOneYear = async (startDate, sessionEndDate, branch, bat
   let clusterIndex = 0; // Initialize cluster index
 
   while (currentDate <= sessionEndDate) {
+    const periodStartDate = new Date(currentDate);
+    const periodEndDate = addDays(currentDate, 13);
+
     for (let i = 0; i < teachers.length; i++) {
       const teacher = teachers[teacherIndex]; // Assign teacher to session
-      const cluster = clusters[clusterIndex]; // Assign cluster to session
+      const cluster = clusters[(clusterIndex + i) % clusters.length]; // Assign different cluster to each teacher
 
       const session = {
         clusterID: cluster.clusterID,
-        period: `${format(currentDate, 'MMM d, yyyy')} - ${format(addDays(currentDate, 13), 'MMM d, yyyy')}`,
-        startDate: new Date(currentDate),
-        sessionEndDate: sessionEndDate,
+        period: `${format(periodStartDate, 'MMM d, yyyy')} - ${format(periodEndDate, 'MMM d, yyyy')}`,
+        startDate: periodStartDate,
+        sessionEndDate: periodEndDate,
         branch: branch,
         batch: batch,
         clusterType: cluster.clusterType,
-        teacher: teacher.name, // Convert teacher._id to ObjectId
+        teacher: teacher.name, // Convert teacher._id to ObjectId if needed
         status: 'pending',
       };
       sessions.push(session);
 
       teacherIndex = (teacherIndex + 1) % teachers.length; // Update teacher index in a cyclic manner
-      clusterIndex = (clusterIndex + 1) % clusters.length; // Update cluster index in a cyclic manner
     }
 
+    clusterIndex = (clusterIndex + 1) % clusters.length; // Update cluster index in a cyclic manner for each period
     currentDate = addDays(currentDate, 14); // Increment current date by 14 days
   }
 
   return sessions;
 };
+
 
 
 
@@ -137,8 +141,6 @@ router.post('/reassign', async (req, res) => {
     if (!branch || !batch || !teachers) {
       return res.status(400).json({ message: 'Branch, batch, and teachers are required' });
     }
-
-    console.log(teachers);
 
     // Delete existing sessions for the remainder of the year
     const existingSession = await Session.findOne({
