@@ -139,23 +139,59 @@ const SessionAndAllotments = () => {
   };
 
   const handleConfirmReassignWithSelectedTeachers = async () => {
-    const requestOptions = {
-      method: 'POST',
-      headers: { 'Content-Type': 'application/json' },
-      body: JSON.stringify({
+    try {
+      const response = await axios.post('http://localhost:5000/sessions/reassign', {
         branch: modalBranch,
         batch: '2024-2026',
         teachers: selectedTeachers,
-      }),
-    };
-
-    try {
-      const response = await fetch('http://localhost:5000/sessions/reassign', requestOptions);
-      const result = await response.text();
-      console.log(result);
+      });
+      console.log(response.data);
     } catch (error) {
       console.error('Error:', error);
     }
+  };
+
+  const renderSessionsTable = (branch) => {
+    const branchSessions = branch === 'All' ? sessions : sessions.filter(session => session.branch === branch);
+    const branchPeriods = new Set(branchSessions.map(session => session.period));
+    const branchTeachers = new Set(branchSessions.map(session => session.teacher));
+
+    return (
+      <div key={branch} className="mb-12">
+        <h2 className="text-2xl font-bold my-4 text-center text-[#2D5990]">{branch === 'All' ? 'All Branches' : branch}</h2>
+        <table className="min-w-full bg-white border">
+          <thead>
+            <tr>
+              <th className="py-2 px-4 border">Period</th>
+              {[...branchTeachers].map((teacher, index) => (
+                <th key={index} className="py-2 px-4 border">{teacher}</th>
+              ))}
+            </tr>
+          </thead>
+          <tbody>
+            {[...branchPeriods].map((period, index) => (
+              <tr key={index}>
+                <td className="py-2 px-4 border">{period}</td>
+                {[...branchTeachers].map((teacher, teacherIndex) => {
+                  const session = branchSessions.find(session => session.period === period && session.teacher === teacher);
+                  return (
+                    <td key={teacherIndex} className="py-2 px-4 border">
+                      {session ? (
+                        <>
+                          <p>Cluster ID: {session.clusterID}</p>
+                          <p>Branch: {session.branch}</p>
+                          <p>Status: {session.status}</p>
+                        </>
+                      ) : 'N/A'}
+                    </td>
+                  );
+                })}
+              </tr>
+            ))}
+          </tbody>
+        </table>
+      </div>
+    );
   };
 
   return (
@@ -195,40 +231,13 @@ const SessionAndAllotments = () => {
           Manage Sessions
         </button>
       </div>
-      <div className="mb-12">
-        {/* Table */}
-        <table className="min-w-full bg-white border">
-          <thead>
-            <tr>
-              <th className="py-2 px-4 border">Period</th>
-              {allTeachers.map((teacher, index) => (
-                <th key={index} className="py-2 px-4 border">{teacher}</th>
-              ))}
-            </tr>
-          </thead>
-          <tbody>
-            {periods.map((period, index) => (
-              <tr key={index}>
-                <td className="py-2 px-4 border">{period}</td>
-                {allTeachers.map((teacher, teacherIndex) => {
-                  const session = sessions.find(session => session.period === period && session.teacher === teacher);
-                  return (
-                    <td key={teacherIndex} className="py-2 px-4 border">
-                      {session ? (
-                        <>
-                          <p>Cluster ID: {session.clusterID}</p>
-                          <p>Branch: {session.branch}</p>
-                          <p>Status: {session.status}</p>
-                        </>
-                      ) : 'N/A'}
-                    </td>
-                  );
-                })}
-              </tr>
-            ))}
-          </tbody>
-        </table>
-      </div>
+
+      {/* Render tables */}
+      {selectedBranch === 'All' ? (
+        branches.map(branch => renderSessionsTable(branch.branchCode))
+      ) : (
+        renderSessionsTable(selectedBranch)
+      )}
 
       {/* Modal with Close Button */}
       <Modal isOpen={isModalOpen} onClose={() => setIsModalOpen(false)}>
