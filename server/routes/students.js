@@ -189,6 +189,15 @@ async function getStudent(req, res, next) {
   res.student = student;
   next();
 }
+// Get students by cluster ID
+router.get('/cluster/:clusterID', async (req, res) => {
+  try {
+    const students = await Student.find({ clusterID: req.params.clusterID });
+    res.json(students);
+  } catch (err) {
+    res.status(500).json({ message: err.message });
+  }
+});
 
 router.get('/pendingStudents/:sessionId', async (req, res) => {
   try {

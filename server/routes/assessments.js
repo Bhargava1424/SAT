@@ -3,8 +3,9 @@ const router = express.Router();
 const Assessment = require('../models/Assessment');
 const Student = require('../models/Student');
 const Teacher = require('../models/Teacher');
+const Session = require('../models/Session');
 
-// Get all assessment
+// Get all assessments
 router.get('/', async (req, res) => {
     try {
         const assessments = await Assessment.find();
@@ -28,29 +29,29 @@ router.get('/:applicationNumber', async (req, res) => {
 router.post('/:teacher/:sessionId/:applicationNumber', async (req, res) => {
     const assessment = new Assessment(req.body);
     try {
-        teacher = req.params.teacher;
-        sessionId = req.params.sessionId;
-        applicationNumber = req.params.applicationNumber;
+        const teacher = req.params.teacher;
+        const sessionId = req.params.sessionId;
+        const applicationNumber = req.params.applicationNumber;
         
         const newAssessment = await assessment.save();
 
-        assessmentId = newAssessment.assessmentId;
+        const currentSession = await Session.findById(sessionId);
+        if (!currentSession) {
+            return res.status(404).json({ message: 'Session not found' });
+        }
 
-        assessment.sessionId = currentSession._id; // Associate assessment with the current session
+        const student = await Student.findOne({ applicationNumber: applicationNumber });
+        if (!student) {
+            return res.status(404).json({ message: 'Student not found' });
+        }
 
-        student = await Student.find({ applicationNumber: req.body.applicationNumber });
+        // Add assessment to student's assessment array
+        student.assessmentResults.push(newAssessment._id);
+        await student.save();
 
-        // adding assesment to student assesments array 
-        assessmentResults = Student.assessmentResults;
-        assessmentResults.push(assessmentId);
-        Student.assessmentResults = assessmentResults;
-        Student.save();
-
-        // adding assesment to session assesments array
-        sessionAssessments = currentSession.assessments;
-        sessionAssessments.push(assessmentId);
-        currentSession.assessments = sessionAssessments;
-        currentSession.save();
+        // Add assessment to session's assessment array
+        currentSession.assessments.push(newAssessment._id);
+        await currentSession.save();
 
         res.status(201).json(newAssessment);
     } catch (err) {
@@ -63,7 +64,7 @@ router.put('/:assessmentId', getAssessment, async (req, res) => {
     if (req.body.assessment != null) {
         res.assessment.assessment = req.body.assessment;
     }
-    if (req.body.reviewer != null) { // Allow updating the reviewer
+    if (req.body.reviewer != null) {
         res.assessment.reviewer = req.body.reviewer;
     }
 
@@ -76,7 +77,7 @@ router.put('/:assessmentId', getAssessment, async (req, res) => {
 });
 
 // Delete assessment by ID
-router.delete('/:assessmentId', getAssessment, async (req, res) => { // Corrected parameter to assessmentId
+router.delete('/:assessmentId', getAssessment, async (req, res) => {
     try {
         await res.assessment.remove();
         res.json({ message: 'Assessment deleted!' });
@@ -89,7 +90,7 @@ router.delete('/:assessmentId', getAssessment, async (req, res) => { // Correcte
 async function getAssessment(req, res, next) {
     let assessment;
     try {
-        assessment = await Assessment.findOne({ assessmentId: req.params.assessmentId });
+        assessment = await Assessment.findOne({ _id: req.params.assessmentId });
         if (assessment == null) {
             return res.status(404).json({ message: 'Cannot find assessment' });
         }
@@ -98,11 +99,6 @@ async function getAssessment(req, res, next) {
     }
     res.assessment = assessment;
     next();
-}
-
-// Helper function to get the current session (you'll need to implement this)
-async function getCurrentSession() {
-    // Logic to get the current session based on date
 }
 
 module.exports = router;

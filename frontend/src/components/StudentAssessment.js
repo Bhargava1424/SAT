@@ -42,7 +42,7 @@ const checkIfAssessmentExists = (name) => {
 };
 
 const StudentAssessment = () => {
-  const { name, sessionId } = useParams();
+  const { name, sessionId, applicationNumber } = useParams();
   const [responses, setResponses] = useState(modules.map(module => module.questions.map(() => null)));
   const [assessmentExists, setAssessmentExists] = useState(false);
 
@@ -65,8 +65,10 @@ const StudentAssessment = () => {
     // Save responses to the server
     console.log(responses);
     try {
-      const teacher = sessionStorage.getItem('teacher');
-      
+      const teacher = sessionStorage.getItem('name');
+      console.log(teacher);
+      console.log(sessionId);
+      console.log(applicationNumber);
       const response = await axios.post(`http://localhost:5000/assessment/${teacher}/${sessionId}/${applicationNumber}`, responses);
       // Handle the response from the server (e.g., display success message)
       console.log(response.data);
