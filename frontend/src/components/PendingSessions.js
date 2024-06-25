@@ -6,14 +6,33 @@ import axios from 'axios';
 const PendingStudents = () => {
   const navigate = useNavigate();
   const [hoveredStudent, setHoveredStudent] = useState(null);
-  const [pendingStudents, setPendingStudents] = useState([]);
+  const [pendingStudents, setPendingStudents] = useState([]); 
+  const [teacherSessions, setTeacherSessions] = useState([]);
+
+  useEffect(() => {
+    const getTeacherSessions = async () => {
+      try {
+        const teacherName = sessionStorage.getItem('name');
+        console.log(teacherName);
+        // Fetch the session information for the teacher
+        const getTeacherSessionsResponse = await axios.get(`http://localhost:5000/sessions/teacher/${teacherName}`);
+        console.log(getTeacherSessionsResponse.data);
+        setTeacherSessions(getTeacherSessionsResponse.data)
+        
+      } catch (error) {
+        console.error('Error fetching sessions', error);
+      }
+    };
+
+    getTeacherSessions();
+  }, []);
 
   useEffect(() => {
     const fetchPendingStudents = async () => {
       try {
-        const teacherName = sessionStorage.getItem('name');
+        const sessionId = "66796de39ce14002d7f63bed"
         // Fetch the session information for the teacher
-        const pendingStudentsResponse = await axios.get(`http://localhost:5000/students/pendingStudents/${teacherName}`);
+        const pendingStudentsResponse = await axios.get(`http://localhost:5000/students/pendingStudents/${sessionId}`);
         const pendingStudentsData = pendingStudentsResponse.data;
         setPendingStudents(pendingStudentsData)
         
@@ -25,8 +44,8 @@ const PendingStudents = () => {
     fetchPendingStudents();
   }, []);
 
-  const handleAssessNow = (name) => {
-    navigate(`/assessment/${name}`);
+  const handleAssessNow = (name, sessionId) => {
+    navigate(`/assessment/${name}/${sessionId}`);
   };
 
   const handleMouseEnter = (student) => {
@@ -62,7 +81,7 @@ const PendingStudents = () => {
               <div className="p-4">
                 <h2 className="text-lg md:text-xl font-bold text-[#2D5990] mb-1">{student.firstName} {student.surName}</h2>
                 <button
-                  onClick={() => handleAssessNow(student.firstName)}
+                  onClick={() => handleAssessNow(student.firstName, "66796de39ce14002d7f63bed")}
                   className="w-full bg-gradient-to-r from-[#2D5990] to-[#00A0E3] hover:from-[#00A0E3] hover:to-[#2D5990] text-white font-bold py-2 px-4 rounded-full focus:outline-none focus:shadow-outline transition-colors duration-300 transform hover:scale-105"
                 >
                   Assess Now

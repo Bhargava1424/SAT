@@ -24,6 +24,14 @@ const assessmentSchema = new mongoose.Schema({
         default: uuidv4,
         unique: true
     },
+    assessedBy: {
+        type: String,
+        required: true
+    },
+    branch: {
+        type: String,
+        required: true
+    },
     // New field:
     sessionId: {
         type: String,

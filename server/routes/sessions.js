@@ -72,6 +72,18 @@ router.get('/', async (req, res) => {
   }
 });
 
+// Get sessions of teacher 
+router.get('/teacher/:teacher', async (req, res) => {
+  try {
+    console.log(req.params.teacher);
+    const teacher = req.params.teacher;
+    const sessions = await Session.find({ teacher: teacher });
+    res.json(sessions);
+  } catch (err) {
+    res.status(500).json({ message: err.message });
+  }
+});
+
 // Get a specific session by ID
 router.get('/:id', getSession, (req, res) => {
   res.json(res.session);
@@ -96,6 +108,8 @@ router.get('/current/:teacher', async (req, res) => {
     res.status(500).json({ message: err.message });
   }
 });
+
+
 
 // Update a session
 router.patch('/:id', getSession, async (req, res) => {

@@ -1,5 +1,4 @@
 const mongoose = require('mongoose');
-const { Teacher } = require('./Teacher');
 const feedback = require('./Feedback');
 
 const sessionSchema = new mongoose.Schema({

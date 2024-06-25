@@ -46,19 +46,6 @@ router.get('/', async (req, res) => {
   }
 });
 
-// routes/student.js
-
-// Get students by cluster ID
-router.get('/cluster/:clusterID', async (req, res) => {
-  try {
-    const students = await Student.find({ clusterID: req.params.clusterID });
-    res.json(students);
-  } catch (err) {
-    res.status(500).json({ message: err.message });
-  }
-});
-
-
 // // Function to fetch students from the other database (replace with your logic)
 // async function fetchStudentsFromOtherDB() {
 //   try {
@@ -203,9 +190,9 @@ async function getStudent(req, res, next) {
   next();
 }
 
-router.get('/pendingStudents/:teacher', async (req, res) => {
+router.get('/pendingStudents/:sessionId', async (req, res) => {
   try {
-    const teacher = req.params.teacher;
+    const sessionId = req.params.sessionId;
     
     // Get the current date
     const currentDate = new Date();
@@ -213,10 +200,7 @@ router.get('/pendingStudents/:teacher', async (req, res) => {
     
     // Query to get sessions for the teacher within the period
     const session = await Session.findOne({
-      teacher: teacher,
-      status: 'pending',
-      startDate: { $lte: currentDate },
-      sessionEndDate: { $gte: currentDate }
+      _id: sessionId,
     });
 
     if (!session) {
@@ -229,13 +213,13 @@ router.get('/pendingStudents/:teacher', async (req, res) => {
     // Get assessments for this session
     const assessments = await Assessment.find({ sessionID: String(session._id) });
 
-    console.log('Assessments:', assessments);
-    console.log(String(session._id));
     // Extract application numbers of assessed students
     const assessedStudentApplicationNumbers = assessments.map(assessment => assessment.applicationNumber);
 
     // Filter out assessed students from session students
     const pendingStudents = sessionStudents.filter(student => !assessedStudentApplicationNumbers.includes(student.applicationNumber));
+
+    console.log('Pending Students:', pendingStudents);
 
     res.status(200).json(pendingStudents);
   } catch (error) {
