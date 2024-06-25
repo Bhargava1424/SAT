@@ -1,7 +1,7 @@
 const mongoose = require('mongoose');
 const { v4: uuidv4 } = require('uuid');
 
-const feedbackSchema = new mongoose.Schema({
+const assessmentSchema = new mongoose.Schema({
     studentName: {
         type: String,
         required: true
@@ -15,19 +15,20 @@ const feedbackSchema = new mongoose.Schema({
         default: Date.now,
         required: true
     },
-    feedback: {
+    assessment: {
         type: String,
         required: true
     },
-    reviewer: {
-        type: String,
-        required: true
-    },
-    feedbackId: {
+    assessmentId: {
         type: String,
         default: uuidv4,
         unique: true
     },
+    // New field:
+    sessionId: {
+        type: String,
+        ref: 'Session'
+    }
 });
 
-module.exports = mongoose.model('Feedback', feedbackSchema);
+module.exports = mongoose.model('Assessment', assessmentSchema);

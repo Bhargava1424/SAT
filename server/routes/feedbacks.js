@@ -27,7 +27,7 @@ router.post('/', async (req, res) => {
     const feedback = new Feedback(req.body);
     try {
         // Get the current session ID
-        const currentSession = await getCurrentSession(); // Assuming you have a getCurrentSession helper
+        const currentSession = await getCurrentSession(req.body.sessionId); // Assuming you have a getCurrentSession helper
         if (!currentSession) {
             return res.status(400).json({ message: 'No active session found to associate feedback with.' });
         }

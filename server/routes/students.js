@@ -5,6 +5,7 @@ const router = express.Router();
 const Student = require('../models/Student');
 const Cluster = require('../models/Cluster');
 const Session = require('../models/Session');
+const Assessment = require('../models/Assessment');
 const MongoClient = require('mongodb').MongoClient;
 const Teacher = require('../models/Teacher');
 const {fetchStudentsFromOtherDB, assignCluster, assignSet} = require('../utils/services')
@@ -188,5 +189,45 @@ async function getStudent(req, res, next) {
   res.student = student;
   next();
 }
+
+router.get('/pendingStudents/:teacher', async (req, res) => {
+  try {
+    const teacher = req.params.teacher;
+    
+    // Get the current date
+    const currentDate = new Date();
+    console.log('Current Date:', currentDate);
+    
+    // Query to get sessions for the teacher within the period
+    const session = await Session.findOne({
+      teacher: teacher,
+      status: 'pending',
+      startDate: { $lte: currentDate },
+      sessionEndDate: { $gte: currentDate }
+    });
+
+    if (!session) {
+      return res.status(404).json({ message: 'No pending sessions found for this teacher.' });
+    }
+
+    // Get students who are part of this session's cluster
+    const sessionStudents = await Student.find({ clusterID: session.clusterID });
+
+    // Get assessments for this session
+    const assessments = await Assessment.find({ sessionID: String(session._id) });
+
+    console.log('Assessments:', assessments);
+    console.log(String(session._id));
+    // Extract application numbers of assessed students
+    const assessedStudentApplicationNumbers = assessments.map(assessment => assessment.applicationNumber);
+
+    // Filter out assessed students from session students
+    const pendingStudents = sessionStudents.filter(student => !assessedStudentApplicationNumbers.includes(student.applicationNumber));
+
+    res.status(200).json(pendingStudents);
+  } catch (error) {
+    res.status(500).json({ error: error.message });
+  }
+});
 
 module.exports = router ;

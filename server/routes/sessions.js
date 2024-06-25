@@ -6,6 +6,7 @@ const Session = require('../models/Session');
 const { addDays, format, isSameDay, nextMonday } = require('date-fns');
 const Cluster = require('../models/Cluster');
 const Student = require('../models/Student');
+const Assessment = require('../models/Assessment');
 const {createClusters} = require('../utils/services'); 
 const mongoose = require('mongoose');
 const { ObjectId } = mongoose.Types;
@@ -55,12 +56,16 @@ const generateSessionsForOneYear = async (startDate, sessionEndDate, branch, bat
 };
 
 
-
-
 // Get all sessions
 router.get('/', async (req, res) => {
   try {
     const sessions = await Session.find();
+    
+    sessions.forEach(async (session) => {
+      const assessment = await Assessment.find({ sessionId: session._id });
+      session.assessment = assessment;
+    });
+
     res.json(sessions);
   } catch (err) {
     res.status(500).json({ message: err.message });
@@ -73,10 +78,11 @@ router.get('/:id', getSession, (req, res) => {
 });
 
 // Get the current session
-router.get('/current', async (req, res) => {
+router.get('/current/:teacher', async (req, res) => {
   try {
     const today = new Date();
     const currentSession = await Session.findOne({
+      teacher: req.params.teacher,
       startDate: { $lte: today },
       $expr: { $gt: [addDays(new Date("$startDate"), 13), today] }
     });

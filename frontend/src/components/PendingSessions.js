@@ -1,6 +1,8 @@
-import React, { useState } from 'react';
+import React, { useEffect, useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 import Navbar from './Navbar';
+import axios from 'axios';
+
 
 // Dummy data for students
 const students = [
@@ -22,9 +24,25 @@ const students = [
   // Add more students as needed
 ];
 
-const PendingSessions = () => {
+const PendingStudents = () => {
   const navigate = useNavigate();
   const [hoveredStudent, setHoveredStudent] = useState(null);
+  const [pendingStudents, setPendingStudents] = useState([]);
+  
+  useEffect(() => {
+    const fetchPendingStudents = async () => {
+      try {
+        const teacherName = sessionStorage.getItem('name')
+        const response = await axios.get(`http://localhost:5000/students/pendingStudents/${teacherName}`);
+        console.log(response.data);
+        setPendingStudents(response.data);
+      } catch (error) {
+        console.error('Error fetching students', error);
+      }
+    };
+  
+    fetchPendingStudents();
+  }, []);
 
   const handleAssessNow = (name) => {
     navigate(`/assessment/${name}`);
@@ -43,7 +61,7 @@ const PendingSessions = () => {
       <Navbar />
       <div className="container py-8 px-4 sm:px-6 md:px-8 lg:px-10 xl:px-32 bg-gradient-to-br from-blue-100 to-blue-200 mx-auto my-6 rounded-3xl shadow-lg">
         <h1 className="text-3xl md:text-4xl lg:text-5xl font-bold mb-8 text-center text-[#2D5990] flex items-center justify-center">
-          Pending Assessment Sessions
+          Pending Assessment Students
         </h1>
         <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 xl:grid-cols-5 gap-6">
           {students.map(student => (
@@ -77,4 +95,4 @@ const PendingSessions = () => {
   );
 };
 
-export default PendingSessions;
+export default PendingStudents;

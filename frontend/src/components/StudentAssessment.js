@@ -1,5 +1,6 @@
 import React, { useState, useEffect } from 'react';
 import { useParams } from 'react-router-dom';
+import axios from 'axios';
 
 const modules = [
   {
@@ -60,11 +61,21 @@ const StudentAssessment = () => {
     return responses.every(module => module.every(response => response !== null));
   };
 
-  const handleSubmit = () => {
-    if (assessmentExists) {
-      alert('Assessment has already been submitted.');
-      return;
+  const saveResponses = async() => {
+    // Save responses to the server
+    console.log(responses);
+    try {
+      const response = await axios.post('http://localhost:5000/assessment', responses);
+    } catch (error) {
+      console.error('Error fetching branches data', error);
     }
+  };
+
+  const handleSubmit = () => {
+    // if (assessmentExists) {
+    //   alert('Assessment has already been submitted.');
+    //   return;
+    // }
 
     if (isAllAnswered()) {
       const payload = modules.map((module, moduleIndex) => ({
@@ -74,6 +85,9 @@ const StudentAssessment = () => {
           answer: responses[moduleIndex][questionIndex],
         })),
       }));
+
+      saveResponses();
+
       alert('Assessment Submitted');
       console.log(payload);
       window.location.href = '/dashboard';

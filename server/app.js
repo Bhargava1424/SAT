@@ -12,6 +12,7 @@ const studentRouter = require('./routes/students.js');
 const clusterRouter = require('./routes/clusters.js');
 const sessionRouter = require('./routes/sessions.js');
 const feedbackRouter = require('./routes/feedbacks.js');
+const assessmentRouter = require('./routes/assessments.js');
 const ecaRouter = require('./routes/ecas.js');
 const receptionistRouter = require('./routes/receptionist.js'); // New receptionist routes
 const branchRouter = require('./routes/branches.js');
@@ -36,6 +37,7 @@ app.use('/students', studentRouter);
 app.use('/clusters', clusterRouter);
 app.use('/sessions', sessionRouter);
 app.use('/feedbacks', feedbackRouter);
+app.use('/assessments', assessmentRouter);
 app.use('/eca', ecaRouter);
 app.use('/receptionist', receptionistRouter); // New route for receptionist actions
 app.use('/branches', branchRouter); 
