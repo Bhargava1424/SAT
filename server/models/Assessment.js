@@ -2,10 +2,6 @@ const mongoose = require('mongoose');
 const { v4: uuidv4 } = require('uuid');
 
 const assessmentSchema = new mongoose.Schema({
-    studentName: {
-        type: String,
-        required: true
-    },
     applicationNumber: {
         type: String,
         required: true
@@ -16,7 +12,7 @@ const assessmentSchema = new mongoose.Schema({
         required: true
     },
     assessment: {
-        type: String,
+        type: Object,
         required: true
     },
     assessmentId: {
@@ -35,7 +31,9 @@ const assessmentSchema = new mongoose.Schema({
     // New field:
     sessionId: {
         type: String,
-        ref: 'Session'
+        ref: 'Session',
+        unique: true,
+        required: true
     }
 });
 

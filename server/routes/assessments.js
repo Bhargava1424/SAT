@@ -26,13 +26,28 @@ router.get('/:applicationNumber', async (req, res) => {
 });
 
 // Submit new assessment
-router.post('/:teacher/:sessionId/:applicationNumber', async (req, res) => {
-    const assessment = new Assessment(req.body);
+router.post('/', async (req, res) => {
+    console.log(req.body);
     try {
-        const teacher = req.params.teacher;
-        const sessionId = req.params.sessionId;
-        const applicationNumber = req.params.applicationNumber;
-        
+        const teacher = req.body.teacher;
+        const sessionId = req.body.sessionId;
+        const applicationNumber = req.body.applicationNumber;
+        const assessmentData = req.body.assessment;
+
+        // Use await to get teacher details
+        const teacherDetails = await Teacher.findOne({ name: teacher });
+        console.log("teacher", teacherDetails);
+
+        const assessment = new Assessment();
+        assessment.assessment = assessmentData;
+        assessment.applicationNumber = applicationNumber;
+        assessment.sessionId = sessionId;
+        assessment.date = new Date();
+        assessment.assessedBy = teacher;
+        assessment.branch = teacherDetails.branch;
+
+        console.log(assessment);
+
         const newAssessment = await assessment.save();
 
         const currentSession = await Session.findById(sessionId);
@@ -46,11 +61,15 @@ router.post('/:teacher/:sessionId/:applicationNumber', async (req, res) => {
         }
 
         // Add assessment to student's assessment array
-        student.assessmentResults.push(newAssessment._id);
+        studentAssessments = student.assessmentResults
+        studentAssessments.push(newAssessment._id)
+        student.assessmentResults = studentAssessments
         await student.save();
 
         // Add assessment to session's assessment array
-        currentSession.assessments.push(newAssessment._id);
+        const currentSessionAssignments = currentSession.assessmentIds;
+        currentSessionAssignments.push(newAssessment._id);
+        currentSession.assessmentIds = currentSessionAssignments;
         await currentSession.save();
 
         res.status(201).json(newAssessment);

@@ -69,7 +69,12 @@ const StudentAssessment = () => {
       console.log(teacher);
       console.log(sessionId);
       console.log(applicationNumber);
-      const response = await axios.post(`http://localhost:5000/assessment/${teacher}/${sessionId}/${applicationNumber}`, responses);
+      const response = await axios.post(`http://localhost:5000/assessments`, {
+        assessment: responses,
+        teacher:teacher,
+        sessionId:sessionId,
+        applicationNumber:applicationNumber
+      });
       // Handle the response from the server (e.g., display success message)
       console.log(response.data);
     } catch (error) {

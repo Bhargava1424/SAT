@@ -34,6 +34,10 @@ const sessionSchema = new mongoose.Schema({
     type: String,
     required: true
   },
+  assessmentIds: {
+    type: Array,
+    default: []
+  },
   status: {
     type: String,
     enum: ['pending', 'complete', 'incomplete'],
