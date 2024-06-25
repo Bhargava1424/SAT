@@ -2,6 +2,7 @@ const express = require('express');
 const router = express.Router();
 const Assessment = require('../models/Assessment');
 const Student = require('../models/Student');
+const Teacher = require('../models/Teacher');
 
 // Get all assessment
 router.get('/', async (req, res) => {
@@ -24,27 +25,33 @@ router.get('/:applicationNumber', async (req, res) => {
 });
 
 // Submit new assessment
-router.post('/', async (req, res) => {
+router.post('/:teacher/:sessionId/:applicationNumber', async (req, res) => {
     const assessment = new Assessment(req.body);
     try {
-        // Get the current session ID
-        const currentSession = await getCurrentSession(req.body.sessionId); // Assuming you have a getCurrentSession helper
-        if (!currentSession) {
-            return res.status(400).json({ message: 'No active session found to associate assessment with.' });
-        }
+        teacher = req.params.teacher;
+        sessionId = req.params.sessionId;
+        applicationNumber = req.params.applicationNumber;
+        
+        const newAssessment = await assessment.save();
+
+        assessmentId = newAssessment.assessmentId;
+
         assessment.sessionId = currentSession._id; // Associate assessment with the current session
 
         student = await Student.find({ applicationNumber: req.body.applicationNumber });
 
         // adding assesment to student assesments array 
         assessmentResults = Student.assessmentResults;
-        assessmentResults.push(assessment);
-        
+        assessmentResults.push(assessmentId);
         Student.assessmentResults = assessmentResults;
-        
         Student.save();
-        
-        const newAssessment = await assessment.save();
+
+        // adding assesment to session assesments array
+        sessionAssessments = currentSession.assessments;
+        sessionAssessments.push(assessmentId);
+        currentSession.assessments = sessionAssessments;
+        currentSession.save();
+
         res.status(201).json(newAssessment);
     } catch (err) {
         res.status(400).json({ message: err.message });
