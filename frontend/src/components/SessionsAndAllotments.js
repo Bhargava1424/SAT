@@ -1,10 +1,10 @@
-// SessionAndAllotments.js
 import React, { useState, useEffect } from 'react';
 import axios from 'axios';
 import DatePicker from 'react-datepicker';
 import 'react-datepicker/dist/react-datepicker.css';
 import Navbar from './Navbar';
 import Modal from './Modal';
+import { format, parse, isAfter, compareAsc, isSameDay, isBefore } from 'date-fns';
 
 const SessionAndAllotments = () => {
   const [startDate, setStartDate] = useState(new Date());
@@ -12,7 +12,6 @@ const SessionAndAllotments = () => {
   const [isModalOpen, setIsModalOpen] = useState(false);
   const [branches, setBranches] = useState([]);
   const [sessions, setSessions] = useState([]);
-  const [periods, setPeriods] = useState([]);
   const [allTeachers, setAllTeachers] = useState([]);
 
   useEffect(() => {
@@ -34,14 +33,11 @@ const SessionAndAllotments = () => {
         const response = await axios.get('http://localhost:5000/sessions');
         setSessions(response.data);
 
-        const periodsSet = new Set();
         const teachersSet = new Set();
         response.data.forEach((session) => {
-          periodsSet.add(session.period);
           teachersSet.add(session.teacher);
         });
 
-        setPeriods([...periodsSet]);
         setAllTeachers([...teachersSet]);
       } catch (error) {
         console.error('Error fetching sessions', error);
@@ -55,10 +51,57 @@ const SessionAndAllotments = () => {
     setSelectedBranch(event.target.value);
   };
 
+  const filterAndSortSessions = (branchSessions) => {
+    const sessionsByTeacher = {};
+
+    branchSessions.forEach((session) => {
+      if (!sessionsByTeacher[session.teacher]) {
+        sessionsByTeacher[session.teacher] = [];
+      }
+      sessionsByTeacher[session.teacher].push(session);
+    });
+
+    const filteredSortedSessions = {};
+
+    Object.keys(sessionsByTeacher).forEach((teacher) => {
+      const teacherSessions = sessionsByTeacher[teacher];
+
+      const beforeSessions = teacherSessions.filter((session) => {
+        const [startPeriod] = session.period.split(' - ');
+        const sessionStartDate = parse(startPeriod, 'MMM d, yyyy', new Date());
+        return isBefore(sessionStartDate, startDate);
+      }).sort((a, b) => {
+        const [startPeriodA] = a.period.split(' - ');
+        const [startPeriodB] = b.period.split(' - ');
+        const sessionStartDateA = parse(startPeriodA, 'MMM d, yyyy', new Date());
+        const sessionStartDateB = parse(startPeriodB, 'MMM d, yyyy', new Date());
+        return compareAsc(sessionStartDateA, sessionStartDateB);
+      }).slice(-4);
+
+      const afterSessions = teacherSessions.filter((session) => {
+        const [startPeriod] = session.period.split(' - ');
+        const sessionStartDate = parse(startPeriod, 'MMM d, yyyy', new Date());
+        return isSameDay(sessionStartDate, startDate) || isAfter(sessionStartDate, startDate);
+      }).sort((a, b) => {
+        const [startPeriodA] = a.period.split(' - ');
+        const [startPeriodB] = b.period.split(' - ');
+        const sessionStartDateA = parse(startPeriodA, 'MMM d, yyyy', new Date());
+        const sessionStartDateB = parse(startPeriodB, 'MMM d, yyyy', new Date());
+        return compareAsc(sessionStartDateA, sessionStartDateB);
+      }).slice(0, 3);
+
+      filteredSortedSessions[teacher] = [...beforeSessions, ...afterSessions];
+    });
+
+    return filteredSortedSessions;
+  };
+
   const renderSessionsTable = (branch) => {
     const branchSessions = branch === 'All' ? sessions : sessions.filter((session) => session.branch === branch);
-    const branchPeriods = new Set(branchSessions.map((session) => session.period));
+    const sortedSessionsByTeacher = filterAndSortSessions(branchSessions);
+
     const branchTeachers = new Set(branchSessions.map((session) => session.teacher));
+    const branchPeriods = Array.from(new Set(Object.values(sortedSessionsByTeacher).flat().map(session => session.period))).slice(0, 7);
 
     return (
       <div key={branch} className="mb-12">
@@ -77,15 +120,13 @@ const SessionAndAllotments = () => {
             </tr>
           </thead>
           <tbody>
-            {[...branchPeriods].map((period, index) => (
-              <tr key={index}>
+            {branchPeriods.map((period, index) => (
+              <tr key={index} className={periodIncludesStartDate(period) ? 'bg-green-200' : ''}>
                 <td className="py-2 px-4 border">{period}</td>
                 {[...branchTeachers].map((teacher, teacherIndex) => {
-                  const session = branchSessions.find(
-                    (session) => session.period === period && session.teacher === teacher
-                  );
+                  const session = sortedSessionsByTeacher[teacher]?.find((session) => session.period === period);
                   return (
-                    <td key={teacherIndex} className="py-2 px-4 border">
+                    <td key={teacherIndex} className={`py-2 px-4 border`}>
                       {session ? (
                         <>
                           <p>Cluster ID: {session.clusterID}</p>
@@ -104,6 +145,13 @@ const SessionAndAllotments = () => {
         </table>
       </div>
     );
+  };
+
+  const periodIncludesStartDate = (period) => {
+    const [startPeriod, endPeriod] = period.split(' - ');
+    const sessionStartDate = parse(startPeriod, 'MMM d, yyyy', new Date());
+    const sessionEndDate = parse(endPeriod, 'MMM d, yyyy', new Date());
+    return isSameDay(sessionStartDate, startDate) || (isBefore(sessionStartDate, startDate) && isAfter(sessionEndDate, startDate));
   };
 
   return (
@@ -144,7 +192,9 @@ const SessionAndAllotments = () => {
         </button>
       </div>
 
-      {selectedBranch === 'All' ? branches.map((branch) => renderSessionsTable(branch.branchCode)) : renderSessionsTable(selectedBranch)}
+      {selectedBranch === 'All'
+        ? branches.map((branch) => renderSessionsTable(branch.branchCode))
+        : renderSessionsTable(selectedBranch)}
 
       <Modal isOpen={isModalOpen} onClose={() => setIsModalOpen(false)} branches={branches} />
     </div>
