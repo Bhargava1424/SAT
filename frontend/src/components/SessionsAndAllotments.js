@@ -1,9 +1,11 @@
+// src/components/SessionAndAllotments.js
 import React, { useState, useEffect } from 'react';
 import axios from 'axios';
 import DatePicker from 'react-datepicker';
 import 'react-datepicker/dist/react-datepicker.css';
 import Navbar from './Navbar';
 import Modal from './Modal';
+import StudentListModal from './StudentListModal';
 import { format, parse, isAfter, compareAsc, isSameDay, isBefore } from 'date-fns';
 
 const SessionAndAllotments = () => {
@@ -13,6 +15,8 @@ const SessionAndAllotments = () => {
   const [branches, setBranches] = useState([]);
   const [sessions, setSessions] = useState([]);
   const [allTeachers, setAllTeachers] = useState([]);
+  const [isStudentListModalOpen, setIsStudentListModalOpen] = useState(false);
+  const [selectedClusterID, setSelectedClusterID] = useState(null);
 
   useEffect(() => {
     const fetchBranches = async () => {
@@ -126,7 +130,14 @@ const SessionAndAllotments = () => {
                 {[...branchTeachers].map((teacher, teacherIndex) => {
                   const session = sortedSessionsByTeacher[teacher]?.find((session) => session.period === period);
                   return (
-                    <td key={teacherIndex} className={`py-2 px-4 border`}>
+                    <td 
+                      key={teacherIndex} 
+                      className={`py-2 px-4 border`}
+                      onClick={() => {
+                        setSelectedClusterID(session.clusterID);
+                        setIsStudentListModalOpen(true);
+                      }}
+                    >
                       {session ? (
                         <>
                           <p>Cluster ID: {session.clusterID}</p>
@@ -155,7 +166,7 @@ const SessionAndAllotments = () => {
   };
 
   return (
-    <div className="container mx-auto px-4">
+    <div className="container mx-auto px-4 pb-8">
       <Navbar />
       <h1 className="text-4xl font-bold my-8 text-center text-[#2D5990]">
         Sessions and Allotments
@@ -197,6 +208,11 @@ const SessionAndAllotments = () => {
         : renderSessionsTable(selectedBranch)}
 
       <Modal isOpen={isModalOpen} onClose={() => setIsModalOpen(false)} branches={branches} />
+      <StudentListModal
+        isOpen={isStudentListModalOpen}
+        onClose={() => setIsStudentListModalOpen(false)}
+        clusterID={selectedClusterID}
+      />
     </div>
   );
 };

@@ -46,6 +46,19 @@ router.get('/', async (req, res) => {
   }
 });
 
+// routes/student.js
+
+// Get students by cluster ID
+router.get('/cluster/:clusterID', async (req, res) => {
+  try {
+    const students = await Student.find({ clusterID: req.params.clusterID });
+    res.json(students);
+  } catch (err) {
+    res.status(500).json({ message: err.message });
+  }
+});
+
+
 // // Function to fetch students from the other database (replace with your logic)
 // async function fetchStudentsFromOtherDB() {
 //   try {

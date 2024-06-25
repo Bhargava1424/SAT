@@ -43,13 +43,14 @@ const checkIfAssessmentExists = (name) => {
 
 const StudentAssessment = () => {
   const { name } = useParams();
+  const { teacher, sessionId, applicationNumber } = useParams();
   const [responses, setResponses] = useState(modules.map(module => module.questions.map(() => null)));
   const [assessmentExists, setAssessmentExists] = useState(false);
 
   useEffect(() => {
-    const exists = checkIfAssessmentExists(name);
+    const exists = checkIfAssessmentExists(teacher, sessionId, applicationNumber);
     setAssessmentExists(exists);
-  }, [name]);
+  }, [teacher, sessionId, applicationNumber]);
 
   const handleOptionChange = (moduleIndex, questionIndex, value) => {
     const newResponses = [...responses];
@@ -61,13 +62,16 @@ const StudentAssessment = () => {
     return responses.every(module => module.every(response => response !== null));
   };
 
-  const saveResponses = async() => {
+  const saveResponses = async () => {
     // Save responses to the server
     console.log(responses);
     try {
-      const response = await axios.post('http://localhost:5000/assessment', responses);
+      const response = await axios.post(`http://localhost:5000/assessment/${teacher}/${sessionId}/${applicationNumber}`, responses);
+      // Handle the response from the server (e.g., display success message)
+      console.log(response.data);
     } catch (error) {
-      console.error('Error fetching branches data', error);
+      console.error('Error saving assessment:', error);
+      // Handle the error (e.g., display error message)
     }
   };
 
@@ -90,7 +94,6 @@ const StudentAssessment = () => {
 
       alert('Assessment Submitted');
       console.log(payload);
-      window.location.href = '/dashboard';
     } else {
       alert('Please answer all the questions in all modules.');
     }
