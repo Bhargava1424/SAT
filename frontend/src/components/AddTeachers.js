@@ -298,7 +298,7 @@ const AddTeachers = () => {
                 onChange={handleChange}
                 className="input input-bordered w-full bg-white my-1 md:my-2 rounded-xl text-xs md:text-sm focus:ring-2 focus:ring-blue-500"
               />
-              {form.role === 'teacher' && (
+              {/* {form.role === 'teacher' && (
                 <select
                   name="subject"
                   value={form.subject}
@@ -312,7 +312,7 @@ const AddTeachers = () => {
                     </option>
                   ))}
                 </select>
-              )}
+              )} */}
             </div>
             <button
               type="submit"
@@ -335,7 +335,7 @@ const AddTeachers = () => {
                   <th className="px-2 md:px-4 py-2 text-center border-b border-gray-600 border-r text-sm md:text-base">Email</th>
                   <th className="px-2 md:px-4 py-2 text-center border-b border-gray-600 border-r text-sm md:text-base">Phone Number</th>
                   <th className="px-2 md:px-4 py-2 text-center border-b border-gray-600 border-r text-sm md:text-base">Branch</th>
-                  <th className="px-2 md:px-4 py-2 text-center border-b border-gray-600 border-r text-sm md:text-base">Subject</th>
+                  {/* <th className="px-2 md:px-4 py-2 text-center border-b border-gray-600 border-r text-sm md:text-base">Subject</th> */}
                   <th className="px-2 md:px-4 py-2 text-center border-b border-gray-600 text-sm md:text-base">Actions</th>
                 </tr>
               </thead>
@@ -353,7 +353,7 @@ const AddTeachers = () => {
                     <td className="px-2 md:px-4 py-1 md:py-2 border-b border-gray-600 border-r text-sm md:text-base">{teacher.email}</td>
                     <td className="px-2 md:px-4 py-1 md:py-2 border-b border-gray-600 border-r text-sm md:text-base">{teacher.phoneNumber}</td>
                     <td className="px-2 md:px-4 py-1 md:py-2 border-b border-gray-600 border-r text-sm md:text-base">{teacher.branch}</td>
-                    <td className="px-2 md:px-4 py-1 md:py-2 border-b border-gray-600 border-r text-sm md:text-base">{teacher.subject || 'N/A'}</td>
+                    {/* <td className="px-2 md:px-4 py-1 md:py-2 border-b border-gray-600 border-r text-sm md:text-base">{teacher.subject || 'N/A'}</td> */}
                     <td className="px-2 md:px-4 py-1 md:py-2 border-b border-gray-600 text-sm md:text-base">
                       <button
                         className="bg-[#2D5990] text-white px-2 py-1 rounded-md"
@@ -444,7 +444,7 @@ const AddTeachers = () => {
               onChange={handleChange}
               className="input input-bordered w-full bg-white my-1 md:my-2 rounded-xl text-xs md:text-sm focus:ring-2 focus:ring-blue-500"
             />
-            {form.role === 'teacher' && (
+            {/* {form.role === 'teacher' && (
               <select
                 name="subject"
                 value={form.subject}
@@ -458,7 +458,7 @@ const AddTeachers = () => {
                   </option>
                 ))}
               </select>
-            )}
+            )} */}
           </div>
           <button
             type="submit"

@@ -277,11 +277,11 @@ const Dashboard = () => {
                   >
                     Primary Contact {sortColumn === 'primaryContact' && <span>{sortDirection === 'asc' ? '▲' : '▼'}</span>}
                   </th>
-                  {role !== 'teacher' && (
+                  {/* {role !== 'teacher' && (
                     <th className="px-2 py-2 text-center border-b border-gray-600 border-r cursor-pointer text-xs md:text-base">
                       Generate Report
                     </th>
-                  )}
+                  )} */}
                 </tr>
               </thead>
               <tbody>
@@ -308,13 +308,13 @@ const Dashboard = () => {
                     <td className="px-2 py-1 md:py-2 border-b border-gray-600 border-r md:text-base text-xs">{student.applicationNumber}</td>
                     <td className="px-2 py-1 md:py-2 border-b border-gray-600 border-r md:text-base text-xs">{student.batch}</td>
                     <td className="px-2 py-1 md:py-2 border-b border-gray-600 border-r md:text-base text-xs">{student.primaryContact}</td>
-                    {role !== 'teacher' && (
+                    {/* {role !== 'teacher' && (
                       <td className="px-2 py-1 md:py-2 border-b border-gray-600 text-center">
                         <button className="btn btn-sm text-white rounded-full transition-all duration-300 bg-[#00A0E3] hover:bg-[#2D5990] transform hover:scale-105">
                           Generate Report
                         </button>
                       </td>
-                    )}
+                    )} */}
                   </tr>
                 ))}
               </tbody>
