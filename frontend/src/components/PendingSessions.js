@@ -4,6 +4,7 @@ import Navbar from './Navbar';
 import axios from 'axios';
 import DatePicker from 'react-datepicker';
 import 'react-datepicker/dist/react-datepicker.css';
+import profileImage from '../assets/profile.jpg';
 
 const PendingStudents = () => {
   const navigate = useNavigate();
@@ -98,7 +99,7 @@ const PendingStudents = () => {
               >
                 <div>
                   <img
-                    src={student.photo || 'default-image-url'}
+                    src={student.photo || profileImage}
                     alt={student.firstName}
                     className="w-full h-48 object-cover"
                   />

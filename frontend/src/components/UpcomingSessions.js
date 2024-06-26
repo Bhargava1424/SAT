@@ -2,6 +2,7 @@
   import { useNavigate } from 'react-router-dom';
   import Navbar from './Navbar';
   import axios from 'axios';
+  import profileImage from '../assets/profile.jpg';
 
   const UpcomingSessions = () => {
     const navigate = useNavigate();
@@ -47,7 +48,7 @@
               >
                 <div>
                   <img
-                    src={student.photo || 'default-image-url'} 
+                    src={student.photo || profileImage} 
                     alt={student.firstName}
                     className="w-full h-48 object-cover"
                   />
