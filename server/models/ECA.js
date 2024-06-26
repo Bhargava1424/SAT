@@ -49,7 +49,7 @@ const ecaSchema = new mongoose.Schema({
   },
   parentFeedback: {
     type: String,
-    maxLength: 50,
+    maxLength: 500,
   },
   date: {
     type: Date,
@@ -59,10 +59,6 @@ const ecaSchema = new mongoose.Schema({
     type: String,
     default: uuidv4,
     unique: true,
-  },
-  // New field:
-  googleDriveLink: {
-    type: String, 
   },
 });
 

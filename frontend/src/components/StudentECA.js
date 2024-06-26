@@ -68,8 +68,7 @@ const StudentECA = () => {
       communicationRating,
       participationRatings,
       parentFeedback,
-      date: new Date().toISOString(),
-      googleDriveLink
+      date: new Date().toISOString()
     };
 
     let url;
@@ -220,18 +219,6 @@ const StudentECA = () => {
               />
             </div>
 
-            <div>
-              <label htmlFor="googleDriveLink" className="block text-lg font-semibold mb-2">Google Drive Link (Optional):</label>
-              <input
-                type="text"
-                id="googleDriveLink"
-                value={googleDriveLink}
-                onChange={handleLinkChange}
-                className="w-full p-2 border rounded bg-gray-100 focus:outline-none focus:ring-2 focus:ring-blue-500"
-                placeholder="Paste Google Drive link here (make sure it's public)"
-              />
-            </div>
-
             <button
               type="submit"
               disabled={!formValid}
@@ -256,12 +243,6 @@ const StudentECA = () => {
                   <p key={key}>{`${key}: ${value}`}</p>
                 ))}
               </div>
-              {eca.googleDriveLink && (
-                <div>
-                  <p>Google Drive Link: <a href={eca.googleDriveLink} target="_blank" rel="noopener noreferrer">{eca.googleDriveLink}</a></p>
-                  <img src={eca.googleDriveLink} alt="ECA Photo" className="mt-2 w-48 h-32 rounded" />
-                </div>
-              )}
               <div className="flex justify-around mt-4">
                 <button onClick={() => handleEdit(eca)} className="px-4 py-2 bg-blue-500 text-white rounded hover:bg-blue-700">
                   Edit
