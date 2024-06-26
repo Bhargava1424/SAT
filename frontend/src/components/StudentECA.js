@@ -214,7 +214,7 @@ const StudentECA = () => {
                 id="parentFeedback"
                 value={parentFeedback}
                 onChange={handleFeedbackChange}
-                maxLength="50"
+                maxLength="500"
                 className="w-full p-2 border rounded bg-gray-100 focus:outline-none focus:ring-2 focus:ring-blue-500"
                 placeholder="Enter verdict after speaking with parents..."
               />

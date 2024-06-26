@@ -102,6 +102,7 @@ const StudentAssessment = () => {
 
       alert('Assessment Submitted');
       console.log(payload);
+      window.location.href = '/pendingSessions';
     } else {
       alert('Please answer all the questions in all modules.');
     }
