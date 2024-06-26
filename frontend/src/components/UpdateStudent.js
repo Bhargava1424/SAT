@@ -190,6 +190,26 @@ const UpdateStudent = () => {
     return buttons;
   };
 
+  const handleLinkSubmitted = (link) => {
+    // Update the student in the database with the new link
+    fetch(`http://localhost:5000/students/${currentStudent._id}`, {
+      method: 'PATCH',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ googleDriveLink: link }),
+    })
+      .then(response => {
+        if (response.ok) {
+          // You might want to refresh the student data here
+          fetchStudents();
+          closeModal();
+        } else {
+          // Handle the error
+          console.error('Error updating student:', response.status);
+        }
+      })
+      .catch(error => console.error('Error updating student:', error));
+  };
+
   if (isLoading) {
     return (
       <div className="fixed top-0 left-0 right-0 bottom-0 w-full h-screen z-50 overflow-hidden bg-gray-700 opacity-75 flex flex-col items-center justify-center">
@@ -216,16 +236,16 @@ const UpdateStudent = () => {
                 className="w-full md:w-auto px-4 py-1 md:py-2 bg-white border border-gray-300 rounded-full text-gray-700 focus:outline-none focus:ring-2 focus:ring-blue-500 transition-all duration-300"
               />
             </div>
-  
+
             <div className="w-full md:absolute md:left-1/2 md:transform md:-translate-x-1/2 md:w-auto">
               <h2 className="text-md md:text-2xl font-bold text-center md:text-left text-[#2D5990]">UPDATE STUDENT</h2>
             </div>
-  
+
             <div className="flex-none w-full md:w-auto">
               <div className="flex justify-center md:inline-flex md:text-base text-xs">{getPageButtons()}</div>
             </div>
           </div>
-  
+
           <div className="overflow-x-auto">
             <table className="w-full table-auto bg-white border-collapse border border-gray-500">
               <thead className="bg-[#2D5990] text-white">
@@ -263,7 +283,7 @@ const UpdateStudent = () => {
                   <th className="px-2 py-2 text-center border-b border-gray-600 cursor-pointer text-xs md:text-base">Upload Photo</th>
                 </tr>
               </thead>
-              <tbody>
+              <tbody className="bg-gray-50">
                 {currentStudents.map((student) => (
                   <tr
                     key={student._id}
@@ -278,6 +298,9 @@ const UpdateStudent = () => {
                     <td className="px-2 py-1 md:py-2 border-b border-gray-600 border-r md:text-base text-xs">{student.batch}</td>
                     <td className="px-2 py-1 md:py-2 border-b border-gray-600 border-r md:text-base text-xs">{student.primaryContact}</td>
                     <td className="px-2 py-1 md:py-2 border-b border-gray-600 text-center">
+                      {student.googleDriveLink && (
+                        <img src={student.googleDriveLink} alt="Student Photo" className="w-16 h-16 rounded-full" />
+                      )}
                       <button 
                         className="btn btn-sm text-white rounded-full transition-all duration-300 bg-[#00A0E3] hover:bg-[#2D5990] transform hover:scale-105"
                         onClick={() => handleUploadClick(student)}
@@ -300,6 +323,7 @@ const UpdateStudent = () => {
               student={currentStudent}
               closeModal={closeModal}
               isOpen={modalOpen}
+              onLinkSubmitted={handleLinkSubmitted} // Pass the function to handle link submission
             />
           )}
         </div>

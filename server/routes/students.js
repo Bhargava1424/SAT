@@ -143,7 +143,12 @@ router.post('/', async (req, res) => {
 
 // Update a student by ID
 router.patch('/:id', getStudent, async (req, res) => {
-  // ... update student fields ...
+  const { googleDriveLink } = req.body;
+
+  if (googleDriveLink) {
+    res.student.photo = googleDriveLink; // Update the googleDriveLink field 
+  }
+
   try {
     const updatedStudent = await res.student.save();
     res.json(updatedStudent);
@@ -231,6 +236,69 @@ router.get('/pendingStudents/:sessionId', async (req, res) => {
     console.log('Pending Students:', pendingStudents);
 
     res.status(200).json(pendingStudents);
+  } catch (error) {
+    res.status(500).json({ error: error.message });
+  }
+});
+
+router.get('/completedStudents/:sessionId', async (req, res) => {
+  try {
+    const sessionId = req.params.sessionId;
+    
+    // Get the current date
+    const currentDate = new Date();
+    console.log('Current Date:', currentDate);
+    
+    // Query to get sessions for the teacher within the period
+    const session = await Session.findOne({
+      _id: sessionId,
+    });
+
+    if (!session) {
+      return res.status(404).json({ message: 'No completed sessions found for this teacher.' });
+    }
+
+    // Get students who are part of this session's cluster
+    const sessionStudents = await Student.find({ clusterID: session.clusterID });
+
+    // Get assessments for this session
+    const assessments = await Assessment.find({ sessionID: String(session._id) });
+
+    // Extract application numbers of assessed students
+    const assessedStudentApplicationNumbers = assessments.map(assessment => assessment.applicationNumber);
+
+    // Filter out assessed students from session students
+    const completedStudents = sessionStudents.filter(student => assessedStudentApplicationNumbers.includes(student.applicationNumber));
+
+    console.log('Completed Students:', completedStudents);
+
+    res.status(200).json(completedStudents);
+  } catch (error) {
+    res.status(500).json({ error: error.message });
+  }
+});
+
+router.get('/upcomingStudents/:teacherName', async (req, res) => {
+  try {
+    const teacherName = req.params.teacherName;
+
+    // Get all upcoming sessions for the teacher
+    const upcomingSessions = await Session.find({
+      teacher: teacherName,
+      startDate: { $gt: new Date() } // Sessions starting after current date
+    }).sort({ startDate: 1 });
+
+    if (upcomingSessions.length === 0) {
+      return res.status(404).json({ message: 'No upcoming sessions found' });
+    }
+
+    // Get the first upcoming session
+    const firstSession = upcomingSessions[0]; 
+
+    // Find students in the session's cluster
+    const upcomingStudents = await Student.find({ clusterID: firstSession.clusterID });
+
+    res.json(upcomingStudents);
   } catch (error) {
     res.status(500).json({ error: error.message });
   }

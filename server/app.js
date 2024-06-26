@@ -16,7 +16,7 @@ const assessmentRouter = require('./routes/assessments.js');
 const ecaRouter = require('./routes/ecas.js');
 const receptionistRouter = require('./routes/receptionist.js'); // New receptionist routes
 const branchRouter = require('./routes/branches.js');
-const driveRouter = require('./routes/drive.js');
+// const driveRouter = require('./routes/drive.js');
 
 const port = process.env.PORT || 5000;
 
@@ -41,7 +41,7 @@ app.use('/assessments', assessmentRouter);
 app.use('/eca', ecaRouter);
 app.use('/receptionist', receptionistRouter); // New route for receptionist actions
 app.use('/branches', branchRouter); 
-app.use('/', driveRouter);
+// app.use('/', driveRouter);
 
 console.log('Server started');
 

@@ -8,7 +8,7 @@ import 'react-datepicker/dist/react-datepicker.css';
 const PendingStudents = () => {
   const navigate = useNavigate();
   const [hoveredStudent, setHoveredStudent] = useState(null);
-  const [pendingStudents, setPendingStudents] = useState([]); 
+  const [pendingStudents, setPendingStudents] = useState([]);
   const [teacherSessions, setTeacherSessions] = useState([]);
   const [sessionDate, setSessionDate] = useState(new Date());
   const [currentSession, setCurrentSession] = useState(null);
@@ -17,19 +17,13 @@ const PendingStudents = () => {
     const getTeacherSessions = async () => {
       try {
         const teacherName = sessionStorage.getItem('name');
-        console.log(teacherName);
-        // Fetch the session information for the teacher
-        const getTeacherSessionsResponse = await axios.get(`http://localhost:5000/sessions/teacher/${teacherName}`);
-        console.log(getTeacherSessionsResponse.data);
-        setTeacherSessions(getTeacherSessionsResponse.data);
-
-        // Find the session that matches the sessionDate
-        const session = getTeacherSessionsResponse.data.find(session => 
-          new Date(session.startDate) <= sessionDate && new Date(session.sessionEndDate) >= sessionDate
+        const response = await axios.get(`http://localhost:5000/sessions/teacher/${teacherName}`);
+        setTeacherSessions(response.data);
+        // Find the session that matches the sessionDate (using the start date)
+        const session = response.data.find(session => 
+          new Date(session.startDate) <= sessionDate
         );
-        console.log(session);
         setCurrentSession(session);
-
       } catch (error) {
         console.error('Error fetching sessions', error);
       }
@@ -42,9 +36,10 @@ const PendingStudents = () => {
     const fetchPendingStudents = async () => {
       try {
         if (currentSession) {
-          const pendingStudentsResponse = await axios.get(`http://localhost:5000/students/pendingStudents/${currentSession._id}`);
-          const pendingStudentsData = pendingStudentsResponse.data;
-          setPendingStudents(pendingStudentsData);
+          const response = await axios.get(`http://localhost:5000/students/pendingStudents/${currentSession._id}`);
+          setPendingStudents(response.data);
+        } else {
+          setPendingStudents([]); // Clear pending students if no session is found
         }
       } catch (error) {
         console.error('Error fetching students', error);
@@ -81,7 +76,7 @@ const PendingStudents = () => {
             className="px-4 py-2 border rounded-md bg-white"
           />
         </div>
-        {currentSession && (
+        {currentSession ? (
           <div className="mb-8">
             <h2 className="text-2xl font-bold text-[#2D5990]">Current Session Details</h2>
             <p><strong>Session ID:</strong> {currentSession._id}</p>
@@ -89,34 +84,40 @@ const PendingStudents = () => {
             <p><strong>Start Date:</strong> {new Date(currentSession.startDate).toLocaleDateString()}</p>
             <p><strong>End Date:</strong> {new Date(currentSession.sessionEndDate).toLocaleDateString()}</p>
           </div>
+        ) : (
+          <p className="text-center text-gray-500">No session found for the selected date.</p>
         )}
-        <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 xl:grid-cols-5 gap-6">
-          {pendingStudents.map(student => (
-            <div
-              key={student.id}
-              className="bg-white rounded-xl shadow-xl overflow-hidden transition-all duration-300 transform hover:scale-105 hover:shadow-2xl"
-              onMouseEnter={() => handleMouseEnter(student)}
-              onMouseLeave={handleMouseLeave}
-            >
-              <div>
-                <img
-                  src={student.photo || 'default-image-url'} // Replace 'default-image-url' with a valid URL or a default image URL
-                  alt={student.firstName}
-                  className="w-full h-48 object-cover"
-                />
+        {pendingStudents.length > 0 ? (
+          <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 xl:grid-cols-5 gap-6">
+            {pendingStudents.map(student => (
+              <div
+                key={student.id}
+                className="bg-white rounded-xl shadow-xl overflow-hidden transition-all duration-300 transform hover:scale-105 hover:shadow-2xl"
+                onMouseEnter={() => handleMouseEnter(student)}
+                onMouseLeave={handleMouseLeave}
+              >
+                <div>
+                  <img
+                    src={student.photo || 'default-image-url'}
+                    alt={student.firstName}
+                    className="w-full h-48 object-cover"
+                  />
+                </div>
+                <div className="p-4">
+                  <h2 className="text-lg md:text-xl font-bold text-[#2D5990] mb-1">{student.firstName} {student.surName}</h2>
+                  <button
+                    onClick={() => handleAssessNow(student.firstName, currentSession._id, student.applicationNumber)}
+                    className="w-full bg-gradient-to-r from-[#2D5990] to-[#00A0E3] hover:from-[#00A0E3] hover:to-[#2D5990] text-white font-bold py-2 px-4 rounded-full focus:outline-none focus:shadow-outline transition-colors duration-300 transform hover:scale-105"
+                  >
+                    Assess Now
+                  </button>
+                </div>
               </div>
-              <div className="p-4">
-                <h2 className="text-lg md:text-xl font-bold text-[#2D5990] mb-1">{student.firstName} {student.surName}</h2>
-                <button
-                  onClick={() => handleAssessNow(student.firstName, currentSession._id, student.applicationNumber)}
-                  className="w-full bg-gradient-to-r from-[#2D5990] to-[#00A0E3] hover:from-[#00A0E3] hover:to-[#2D5990] text-white font-bold py-2 px-4 rounded-full focus:outline-none focus:shadow-outline transition-colors duration-300 transform hover:scale-105"
-                >
-                  Assess Now
-                </button>
-              </div>
-            </div>
-          ))}
-        </div>
+            ))}
+          </div>
+        ) : (
+          <p className="text-center text-gray-500">No pending students found for this session.</p>
+        )}
       </div>
     </div>
   );

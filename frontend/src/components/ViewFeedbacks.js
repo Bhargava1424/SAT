@@ -34,24 +34,24 @@ function ViewFeedbacks() {
     const userBranch = sessionStorage.getItem('branch');
 
     try {
-        const response = await fetch('http://localhost:5000/students');
-        const data = await response.json();
+      const response = await fetch('http://localhost:5000/students'); // Assuming your student data is at this endpoint
+      const data = await response.json();
 
-        // Filter students based on branch for specific roles
-        let filteredStudents = data;
-        if (role === 'director' || role === 'teacher' || role === 'vice president') {
-            filteredStudents = data.filter(student => student.branch === userBranch);
-        }
+      // Filter students based on branch for specific roles
+      let filteredStudents = data;
+      if (role === 'director' || role === 'teacher' || role === 'vice president') {
+        filteredStudents = data.filter(student => student.branch === userBranch);
+      }
 
-        setStudents(filteredStudents);
+      setStudents(filteredStudents);
 
-        if (!response.ok) {
-            throw new Error(data.error || 'An error occurred while fetching data');
-        }
+      if (!response.ok) {
+        throw new Error(data.error || 'An error occurred while fetching data');
+      }
     } catch (error) {
-        setError('Error fetching students: ' + error.message);
+      setError('Error fetching students: ' + error.message);
     } finally {
-        setIsLoading(false);
+      setIsLoading(false);
     }
   }, []);
 
@@ -79,66 +79,59 @@ function ViewFeedbacks() {
     setNewFeedback(event.target.value);
   };
 
-// Update feedback by feedbackId
-const saveEdit = async () => {
-  if (!editFeedback || !editFeedback.feedbackId) {
-    setError('Feedback ID is missing.');
-    return;
-  }
+  // Update feedback by feedbackId
+  const saveEdit = async () => {
+    if (!editFeedback || !editFeedback.feedbackId) {
+      setError('Feedback ID is missing.');
+      return;
+    }
 
-  const updatedFeedback = {
-    feedback: editText,
-    reviewer: sessionStorage.getItem('name') // Assume the reviewer might be updated as well
+    const updatedFeedback = {
+      feedback: editText,
+      reviewer: sessionStorage.getItem('name') // Assume the reviewer might be updated as well
+    };
+
+    try {
+      const response = await fetch(`http://localhost:5000/feedbacks/${editFeedback.feedbackId}`, {
+        method: 'PUT',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify(updatedFeedback)
+      });
+
+      if (!response.ok) {
+        const errorData = await response.json();
+        throw new Error(errorData.error || 'Failed to update feedback');
+      }
+
+      // setEditFeedback(null); // Reset after successful update
+      // setViewingDateFeedback(null);
+      // fetchFeedbacks(); // Refresh data
+      window.location.reload();
+    } catch (error) {
+      setError('Error updating feedback: ' + error.message);
+    }
   };
 
-  try {
-    const response = await fetch(`http://localhost:5000/feedbacks/${editFeedback.feedbackId}`, {
-      method: 'PUT',
-      headers: {
-        'Content-Type': 'application/json',
-      },
-      body: JSON.stringify(updatedFeedback)
-    });
+  const fetchFeedbacks = async (applicationNumber) => {
+    try {
+      const response = await fetch(`http://localhost:5000/feedbacks/${applicationNumber}`);
+      const data = await response.json();
 
-    if (!response.ok) {
-      const errorData = await response.json();
-      throw new Error(errorData.error || 'Failed to update feedback');
-    }
-
-    // setEditFeedback(null); // Reset after successful update
-    // setViewingDateFeedback(null);
-    // fetchFeedbacks(); // Refresh data
-    window.location.reload();
-  } catch (error) {
-    setError('Error updating feedback: ' + error.message);
-  }
-};
-
-  
-  
-  
-
-
-const fetchFeedbacks = async (applicationNumber) => {
-  try {
-    const response = await fetch(`http://localhost:5000/feedbacks/${applicationNumber}`);
-    const data = await response.json();
-
-    if (response.ok) {
-      if (data.length === 0) { // Assuming 'data' is an array
-        alert("No Feedbacks given for this Student");
+      if (response.ok) {
+        if (data.length === 0) { 
+          alert("No Feedbacks given for this Student");
+        }
+        return data;
+      } else {
+        throw new Error(data.error || 'An error occurred while fetching feedback data');
       }
-      return data;
-    } else {
-      throw new Error(data.error || 'An error occurred while fetching feedback data');
+    } catch (error) {
+      setError('Error fetching feedbacks: ' + error.message);
+      return [];
     }
-  } catch (error) {
-    setError('Error fetching feedbacks: ' + error.message);
-    return [];
-  }
-};
-
-  
+  };
 
   const toggleFeedbackView = async (applicationNumber) => {
     const student = students.find(item => item.applicationNumber === applicationNumber);
@@ -152,22 +145,17 @@ const fetchFeedbacks = async (applicationNumber) => {
       setError('Student not found for the provided application number.');
     }
   };
-  
-  
 
   const viewFeedbackByDate = (feedback) => {
     const student = students.find(item => item.applicationNumber === feedback.applicationNumber);
     if (student) {
-      setViewingDateFeedback(feedback); // This contains all feedback details, including feedbackId
+      setViewingDateFeedback(feedback); 
       setEditText(feedback.feedback);
-      setEditFeedback(feedback); // Now, editFeedback contains the entire feedback object, including feedbackId
+      setEditFeedback(feedback); 
     } else {
       setError('Student not found for the provided application number.');
     }
   };
-  
-  
-  
 
   const addFeedback = (applicationNumber) => {
     const student = students.find(item => item.applicationNumber === applicationNumber);
@@ -178,84 +166,59 @@ const fetchFeedbacks = async (applicationNumber) => {
       console.error('Student not found for the provided application number:', applicationNumber);
     }
   };
-  
-// Submit new feedback
-const submitNewFeedback = async () => {
-  if (!newFeedback) {
-    alert("Feedback cannot be empty");
-    return;
-  }
 
-  const student = students.find(item => `${item.firstName} ${item.surName}` === selectedStudentName);
-  const applicationNumber = student?.applicationNumber;
-  const name = sessionStorage.getItem('name'); // Ensure this is retrieved correctly
+  // Submit new feedback
+  const submitNewFeedback = async () => {
+    if (!newFeedback) {
+      alert("Feedback cannot be empty");
+      return;
+    }
 
-  if (!applicationNumber) {
-    console.error('Application number not found for student:', selectedStudentName);
-    return;
-  }
+    const student = students.find(item => `${item.firstName} ${item.surName}` === selectedStudentName);
+    const applicationNumber = student?.applicationNumber;
+    const name = sessionStorage.getItem('name'); 
 
-  const payload = {
-    studentName: selectedStudentName,
-    feedback: newFeedback,
-    date: new Date().toISOString(), // current date and time
-    applicationNumber: applicationNumber,
-    reviewer: name
+    if (!applicationNumber) {
+      console.error('Application number not found for student:', selectedStudentName);
+      return;
+    }
+
+    const payload = {
+      studentName: selectedStudentName,
+      feedback: newFeedback,
+      date: new Date().toISOString(), 
+      applicationNumber: applicationNumber,
+      reviewer: name
+    };
+
+    try {
+      const response = await fetch('http://localhost:5000/feedbacks', {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json'
+        },
+        body: JSON.stringify(payload)
+      });
+
+      if (!response.ok) {
+        throw new Error('Failed to submit feedback');
+      }
+
+      // You should probably replace this with your actual email sending logic
+      // await fetchAndSendEmail(student.branch);
+
+      fetchFeedbacks(); // Refresh the students list to include new feedback
+      setAddingFeedback(false);
+      setNewFeedback('');
+    } catch (error) {
+      console.error('Error:', error);
+    }
   };
 
-  try {
-    const response = await fetch('http://localhost:5000/feedbacks', {
-      method: 'POST',
-      headers: {
-        'Content-Type': 'application/json'
-      },
-      body: JSON.stringify(payload)
-    });
-
-    if (!response.ok) {
-      throw new Error('Failed to submit feedback');
-    }
-    await fetchAndSendEmail(student.branch);
-
-    fetchFeedbacks(); // Refresh the students list to include new feedback
-    setAddingFeedback(false);
-    setNewFeedback('');
-  } catch (error) {
-    console.error('Error:', error);
-  }
-};
-
-// Fetch director's Gmail and send an email
-const fetchAndSendEmail = async (branch) => {
-    try {
-        const gmailResponse = await fetch(`http://localhost:5000/teachers/director-gmail/${branch}`);
-        const { gmail } = await gmailResponse.json();
-
-        if (gmailResponse.ok) {
-            // Send an email notification to the director's Gmail
-            // await fetch('http://localhost:5000/send-email', {
-            //     method: 'POST',
-            //     headers: {
-            //         'Content-Type': 'application/json'
-            //     },
-            //     body: JSON.stringify({
-            //         to: gmail,
-            //         subject: 'New Feedback Submitted',
-            //         body: `A new feedback has been submitted by for student ${selectedStudentName}.`
-            //     })
-            // });
-            console.log('Email sending triggered: ',{gmail});
-        } else {
-            throw new Error('Failed to fetch director’s Gmail');
-        }
-    } catch (error) {
-        console.error('Error sending email:', error);
-    }
-};
-
-  
-  
-  
+  // Fetch director's Gmail and send an email (You need to implement this)
+  const fetchAndSendEmail = async (branch) => {
+    // ... your email sending logic here ...
+  };
 
   const addAssessment = (applicationNumber) => {
     const student = students.find(item => item.applicationNumber === applicationNumber);
@@ -266,7 +229,6 @@ const fetchAndSendEmail = async (branch) => {
       console.error('Student not found for the provided application number:', applicationNumber);
     }
   };
-  
 
   if (isLoading) {
     return (
@@ -356,7 +318,7 @@ const fetchAndSendEmail = async (branch) => {
                   <div key={fb.date} className="flex justify-between items-center mb-2 p-2 border-b items-center bg-gray-100 rounded shadow text-xs md:text-lg">
                     <span className='mr-2'>Dated:</span>
                     <button onClick={() => viewFeedbackByDate(fb)} className="text-blue-500 hover:text-blue-700 flex justify-center">
-                      {new Date(fb.date).toLocaleDateString()} {/* Format the date */}
+                      {new Date(fb.date).toLocaleDateString()} 
                     </button>
                   </div>
                 ))}
@@ -364,7 +326,6 @@ const fetchAndSendEmail = async (branch) => {
             </div>
           </Modal>
         )}
-
 
         {viewingDateFeedback && (
           <Modal onClose={() => {
