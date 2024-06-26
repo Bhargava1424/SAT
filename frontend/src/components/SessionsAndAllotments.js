@@ -17,6 +17,7 @@ const SessionAndAllotments = () => {
   const [allTeachers, setAllTeachers] = useState([]);
   const [isStudentListModalOpen, setIsStudentListModalOpen] = useState(false);
   const [selectedClusterID, setSelectedClusterID] = useState(null);
+  const [selectedSessionID, setSelectedSessionID] = useState(null);
 
   useEffect(() => {
     const fetchBranches = async () => {
@@ -135,6 +136,7 @@ const SessionAndAllotments = () => {
                       className={`py-2 px-4 border`}
                       onClick={() => {
                         setSelectedClusterID(session.clusterID);
+                        setSelectedSessionID(session._id);
                         setIsStudentListModalOpen(true);
                       }}
                     >
@@ -212,6 +214,7 @@ const SessionAndAllotments = () => {
         isOpen={isStudentListModalOpen}
         onClose={() => setIsStudentListModalOpen(false)}
         clusterID={selectedClusterID}
+        sessionID={selectedSessionID}
       />
     </div>
   );

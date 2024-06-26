@@ -2,14 +2,14 @@
 import React, { useState, useEffect } from 'react';
 import axios from 'axios';
 
-const StudentListModal = ({ isOpen, onClose, clusterID }) => {
+const StudentListModal = ({ isOpen, onClose, clusterID, sessionID }) => {
   const [students, setStudents] = useState([]);
 
   useEffect(() => {
     if (clusterID) {
       const fetchStudents = async () => {
         try {
-          const response = await axios.get(`http://localhost:5000/students/cluster/${clusterID}`);
+          const response = await axios.get(`http://localhost:5000/students/cluster/${clusterID}/session/${sessionID}`);
           setStudents(response.data);
         } catch (error) {
           console.error('Error fetching students', error);

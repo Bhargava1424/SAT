@@ -195,10 +195,28 @@ async function getStudent(req, res, next) {
   next();
 }
 // Get students by cluster ID
-router.get('/cluster/:clusterID', async (req, res) => {
+router.get('/cluster/:clusterID/session/:sessionID', async (req, res) => {
   try {
     const students = await Student.find({ clusterID: req.params.clusterID });
-    res.json(students);
+
+    // Get assessed students from the sessions 
+    const assessments = await Assessment.find({ sessionId: req.params.sessionID });
+    console.log('Assessments:', assessments);
+    const assessedStudentApplicationNumbers = assessments.map(assessment => assessment.applicationNumber);
+    console.log('Assessed Students:', assessedStudentApplicationNumbers);
+    
+    // Student who are assessed add completed beside their name in the list
+    const studentsWithAssessmentStatus = students.map(student => {
+      if (assessedStudentApplicationNumbers.includes(student.applicationNumber)) {
+        const assessment = assessments.find(assessment => assessment.applicationNumber === student.applicationNumber);
+        const completionDate = new Date(assessment.date);
+        const formattedDate = completionDate.toDateString().substring(4);
+        student.surName = student.surName + (' (Completed) - ' + formattedDate);
+      }
+      return student; // Return the modified student object
+    });
+    console.log('Students with Assessment Status:', studentsWithAssessmentStatus);
+    res.json(studentsWithAssessmentStatus);
   } catch (err) {
     res.status(500).json({ message: err.message });
   }
