@@ -207,7 +207,9 @@ router.get('/cluster/:clusterID/session/:sessionID', async (req, res) => {
     
     // Student who are assessed add completed beside their name in the list
     const studentsWithAssessmentStatus = students.map(student => {
+      console.log('Student: checked');
       if (assessedStudentApplicationNumbers.includes(student.applicationNumber)) {
+        
         const assessment = assessments.find(assessment => assessment.applicationNumber === student.applicationNumber);
         const completionDate = new Date(assessment.date);
         const formattedDate = completionDate.toDateString().substring(4);
@@ -242,15 +244,21 @@ router.get('/pendingStudents/:sessionId', async (req, res) => {
     // Get students who are part of this session's cluster
     const sessionStudents = await Student.find({ clusterID: session.clusterID });
 
+    console.log(session._id);
+    console.log(String(session._id));
+
+
     // Get assessments for this session
-    const assessments = await Assessment.find({ sessionID: String(session._id) });
+    const assessments = await Assessment.find({ sessionId: String(session._id) });
+    console.log('Assessments:', assessments);
 
     // Extract application numbers of assessed students
     const assessedStudentApplicationNumbers = assessments.map(assessment => assessment.applicationNumber);
+    console.log('Assessed Students:', assessedStudentApplicationNumbers);
+
 
     // Filter out assessed students from session students
     const pendingStudents = sessionStudents.filter(student => !assessedStudentApplicationNumbers.includes(student.applicationNumber));
-
     console.log('Pending Students:', pendingStudents);
 
     res.status(200).json(pendingStudents);
@@ -280,7 +288,7 @@ router.get('/completedStudents/:sessionId', async (req, res) => {
     const sessionStudents = await Student.find({ clusterID: session.clusterID });
 
     // Get assessments for this session
-    const assessments = await Assessment.find({ sessionID: String(session._id) });
+    const assessments = await Assessment.find({ sessionId: String(session._id) });
 
     // Extract application numbers of assessed students
     const assessedStudentApplicationNumbers = assessments.map(assessment => assessment.applicationNumber);

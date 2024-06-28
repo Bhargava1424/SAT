@@ -34,10 +34,7 @@ const teacherSchema = new mongoose.Schema({
     type: String,
     enum: ['admin', 'director', 'vice president', 'teacher', 'receptionist'],
     default: 'teacher',
-  },
-  subjects: [{
-    type: String, 
-  }] // Subjects array
+  }
 });
 
 module.exports = mongoose.model('Teacher', teacherSchema);

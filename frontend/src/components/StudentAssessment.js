@@ -6,31 +6,39 @@ const modules = [
   {
     title: 'Classroom Behavior',
     questions: [
-      'How disciplined is the student during class?',
-      'How active is the student in class participation?',
-      'How punctual is the student in completing homework?',
-      'How attentive is the student during class?',
-      'How well does the student respond during class?',
-      'How well does the student maintain notes for your subject?',
+      { weight: 1, question: 'How disciplined is the student during class?' },
+      { weight: 0.9, question: 'How active is the student in class participation?' },
+      { weight: 0.9, question: 'How punctual is the student in completing homework?' },
+      { weight: 0.7, question: 'How attentive is the student during class?' },
+      { weight: 0.4, question: 'How well does the student respond during class?' },
+      { weight: 0.2, question: 'How well does the student maintain notes for your subject?' },
     ],
   },
   {
     title: 'Study Hour Behavior',
     extraItem: 'Please consider the following when evaluating the student\'s study hour behavior:',
     questions: [
-      'How frequently does the student approach you with questions?',
-      'How efficient is the student in completing work during sessions?',
-      'How focused is the student during study hours?',
-      'How often does the student disturb others in the name of discussions during study hours?',
+      { weight: 0.7, question: 'How frequently does the student approach you with questions?' },
+      { weight: 0.7, question: 'How efficient is the student in completing work during sessions?' },
+      { weight: 0.9, question: 'How focused is the student during study hours?' },
+      { weight: 1, question: 'How often does the student disturb others in the name of discussions during study hours?' },
     ],
   },
   {
     title: 'Examination Behavior',
     extraItem: 'Please consider the following when evaluating the student\'s examination behavior:',
     questions: [
-      'How disciplined/attentive is the student during exams?',
-      'How enthusiastic is the student about clearing doubts after exams?',
-      'How focused and determined is the student in finishing exams till the end?',
+      { weight: 0.8, question: 'How disciplined/attentive is the student during exams?' },
+      { weight: 1, question: 'How enthusiastic is the student about clearing doubts after exams?' },
+      { weight: 0.9, question: 'How focused and determined is the student in finishing exams till the end?' },
+    ],
+  },
+  {
+    title: 'Miscellaneous',
+    questions: [
+      { weight: 1, question: 'How good is the student’s behavior with fellow students?' },
+      { weight: 1, question: 'How good is the student’s behavior with teaching and non-teaching staff during study hours/break times?' },
+      { weight: 0.1, question: 'How punctual is the student after short breaks?' },
     ],
   },
 ];
@@ -47,7 +55,7 @@ const StudentAssessment = () => {
   const [assessmentExists, setAssessmentExists] = useState(false);
 
   useEffect(() => {
-    const exists = checkIfAssessmentExists(NamedNodeMap);
+    const exists = checkIfAssessmentExists(name);
     setAssessmentExists(exists);
   }, [name]);
 
@@ -62,18 +70,22 @@ const StudentAssessment = () => {
   };
 
   const saveResponses = async () => {
-    // Save responses to the server
-    console.log(responses);
+    const teacher = sessionStorage.getItem('name');
+    const payload = modules.map((module, moduleIndex) => ({
+      module: module.title,
+      responses: module.questions.map((question, questionIndex) => ({
+        question: question.question,
+        weight: question.weight,
+        answer: responses[moduleIndex][questionIndex],
+      })),
+    }));
+
     try {
-      const teacher = sessionStorage.getItem('name');
-      console.log(teacher);
-      console.log(sessionId);
-      console.log(applicationNumber);
       const response = await axios.post(`http://localhost:5000/assessments`, {
-        assessment: responses,
-        teacher:teacher,
-        sessionId:sessionId,
-        applicationNumber:applicationNumber
+        assessment: payload,
+        teacher,
+        sessionId,
+        applicationNumber,
       });
       // Handle the response from the server (e.g., display success message)
       console.log(response.data);
@@ -84,24 +96,14 @@ const StudentAssessment = () => {
   };
 
   const handleSubmit = () => {
-    // if (assessmentExists) {
-    //   alert('Assessment has already been submitted.');
-    //   return;
-    // }
+    if (assessmentExists) {
+      alert('Assessment has already been submitted.');
+      return;
+    }
 
     if (isAllAnswered()) {
-      const payload = modules.map((module, moduleIndex) => ({
-        module: module.title,
-        responses: module.questions.map((question, questionIndex) => ({
-          question,
-          answer: responses[moduleIndex][questionIndex],
-        })),
-      }));
-
       saveResponses();
-
       alert('Assessment Submitted');
-      console.log(payload);
       window.location.href = '/pendingSessions';
     } else {
       alert('Please answer all the questions in all modules.');
@@ -134,7 +136,7 @@ const StudentAssessment = () => {
             {module.extraItem && <p className="text-gray-600 mb-4">{module.extraItem}</p>}
             {module.questions.map((question, questionIndex) => (
               <div key={questionIndex} className="mb-8">
-                <p className="text-lg font-semibold mb-4">{question}</p>
+                <p className="text-lg font-semibold mb-4">{question.question}</p>
                 <div className="flex justify-between bg-gray-100 rounded-lg p-4">
                   {[...Array(10).keys()].map(i => (
                     <label

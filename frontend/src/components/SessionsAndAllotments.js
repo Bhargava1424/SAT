@@ -1,4 +1,3 @@
-// src/components/SessionAndAllotments.js
 import React, { useState, useEffect } from 'react';
 import axios from 'axios';
 import DatePicker from 'react-datepicker';
@@ -18,6 +17,7 @@ const SessionAndAllotments = () => {
   const [isStudentListModalOpen, setIsStudentListModalOpen] = useState(false);
   const [selectedClusterID, setSelectedClusterID] = useState(null);
   const [selectedSessionID, setSelectedSessionID] = useState(null);
+
 
   useEffect(() => {
     const fetchBranches = async () => {
@@ -113,12 +113,12 @@ const SessionAndAllotments = () => {
         <h2 className="text-2xl font-bold my-4 text-center text-[#2D5990]">
           {branch === 'All' ? 'All Branches' : branch}
         </h2>
-        <table className="min-w-full bg-white border">
+        <table className="min-w-full bg-white border border-collapse shadow-lg rounded-lg overflow-hidden">
           <thead>
-            <tr>
-              <th className="py-2 px-4 border">Period</th>
+            <tr className="bg-[#00A0E3] text-white">
+              <th className="py-4 px-6 border-b font-semibold">Period</th>
               {[...branchTeachers].map((teacher, index) => (
-                <th key={index} className="py-2 px-4 border">
+                <th key={index} className="py-4 px-6 border-b font-semibold">
                   {teacher}
                 </th>
               ))}
@@ -126,26 +126,36 @@ const SessionAndAllotments = () => {
           </thead>
           <tbody>
             {branchPeriods.map((period, index) => (
-              <tr key={index} className={periodIncludesStartDate(period) ? 'bg-green-200' : ''}>
-                <td className="py-2 px-4 border">{period}</td>
+              <tr
+                key={index}
+                className={`transition duration-300 ${
+                  periodIncludesStartDate(period) ? 'bg-green-100' : 'hover:bg-gray-100'
+                }`}
+              >
+                <td className="py-4 px-6 border-b text-center font-medium">{period}</td>
                 {[...branchTeachers].map((teacher, teacherIndex) => {
-                  const session = sortedSessionsByTeacher[teacher]?.find((session) => session.period === period);
+                  const session = sortedSessionsByTeacher[teacher]?.find(
+                    (session) => session.period === period
+                  );
                   return (
-                    <td 
-                      key={teacherIndex} 
-                      className={`py-2 px-4 border`}
+                    <td
+                      key={teacherIndex}
+                      className={`py-4 px-6 border-b text-center cursor-pointer transition duration-300 transform hover:scale-105`}
                       onClick={() => {
-                        setSelectedClusterID(session.clusterID);
-                        setSelectedSessionID(session._id);
+                        setSelectedClusterID(session?.clusterID);
+                        setSelectedSessionID(session?._id);
+
                         setIsStudentListModalOpen(true);
                       }}
+                      title={session ? `Cluster ID: ${session.clusterID}\nBranch: ${session.branch}\nStatus: ${session.status}` : 'N/A'}
                     >
                       {session ? (
-                        <>
-                          <p>Cluster ID: {session.clusterID}</p>
-                          <p>Branch: {session.branch}</p>
-                          <p>Status: {session.status}</p>
-                        </>
+                        <div>
+                          <p><strong>session ID:</strong> {session._id}</p>
+                          <p><strong>Cluster ID:</strong> {session.clusterID}</p>
+                          <p><strong>Branch:</strong> {session.branch}</p>
+                          <p><strong>Status:</strong> {session.status}</p>
+                        </div>
                       ) : (
                         'N/A'
                       )}
@@ -167,38 +177,44 @@ const SessionAndAllotments = () => {
     return isSameDay(sessionStartDate, startDate) || (isBefore(sessionStartDate, startDate) && isAfter(sessionEndDate, startDate));
   };
 
+  const handleSuccess = () => {
+    setIsModalOpen(false);
+    alert('Reassignment successful!');
+    window.location.reload();
+  };
+
   return (
     <div className="container mx-auto px-4 pb-8">
       <Navbar />
       <h1 className="text-4xl font-bold my-8 text-center text-[#2D5990]">
         Sessions and Allotments
       </h1>
-      <div className="my-6 flex justify-center items-center">
-        <label className="mr-4 text-xl font-medium text-[#2D5990]">
-          Select Start Date:
-        </label>
-        <DatePicker
-          selected={startDate}
-          onChange={(date) => setStartDate(date)}
-          className="border-2 border-[#00A0E3] bg-white rounded-lg p-3 focus:outline-none focus:ring-2 focus:ring-[#00A0E3]"
-        />
-        <label className="ml-8 mr-4 text-xl font-medium text-[#2D5990]">
-          Select Branch:
-        </label>
-        <select
-          value={selectedBranch}
-          onChange={handleBranchChange}
-          className="border-2 border-[#00A0E3] bg-white rounded-lg p-3 focus:outline-none focus:ring-2 focus:ring-[#00A0E3]"
-        >
-          <option value="All">All</option>
-          {branches.map((branch) => (
-            <option key={branch._id} value={branch.branchCode}>
-              {branch.branchCode}
-            </option>
-          ))}
-        </select>
+      <div className="my-6 flex justify-center items-center space-x-8">
+        <div className="flex items-center space-x-2">
+          <label className="text-xl font-medium text-[#2D5990]">Select Start Date:</label>
+          <DatePicker
+            selected={startDate}
+            onChange={(date) => setStartDate(date)}
+            className="border-2 border-[#00A0E3] bg-white rounded-lg p-3 focus:outline-none focus:ring-2 focus:ring-[#00A0E3]"
+          />
+        </div>
+        <div className="flex items-center space-x-2">
+          <label className="text-xl font-medium text-[#2D5990]">Select Branch:</label>
+          <select
+            value={selectedBranch}
+            onChange={handleBranchChange}
+            className="border-2 border-[#00A0E3] bg-white rounded-lg p-3 focus:outline-none focus:ring-2 focus:ring-[#00A0E3]"
+          >
+            <option value="All">All</option>
+            {branches.map((branch) => (
+              <option key={branch._id} value={branch.branchCode}>
+                {branch.branchCode}
+              </option>
+            ))}
+          </select>
+        </div>
         <button
-          className="bg-[#2D5990] text-white font-medium py-2 px-4 rounded-lg ml-4 hover:bg-[#00A0E3] focus:outline-none focus:ring-2 focus:ring-[#00A0E3]"
+          className="bg-[#2D5990] text-white font-medium py-2 px-4 rounded-lg hover:bg-[#00A0E3] focus:outline-none focus:ring-2 focus:ring-[#00A0E3]"
           onClick={() => setIsModalOpen(true)}
         >
           Manage Sessions
@@ -209,7 +225,12 @@ const SessionAndAllotments = () => {
         ? branches.map((branch) => renderSessionsTable(branch.branchCode))
         : renderSessionsTable(selectedBranch)}
 
-      <Modal isOpen={isModalOpen} onClose={() => setIsModalOpen(false)} branches={branches} />
+      <Modal
+        isOpen={isModalOpen} 
+        onClose={() => setIsModalOpen(false)} 
+        branches={branches}
+        onSuccess={handleSuccess}
+      />
       <StudentListModal
         isOpen={isStudentListModalOpen}
         onClose={() => setIsStudentListModalOpen(false)}

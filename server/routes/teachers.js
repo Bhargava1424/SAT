@@ -33,7 +33,6 @@ router.post('/', async (req, res) => {
       branch: req.body.branch,
       teacherID: req.body.teacherID,
       role: req.body.role,
-      subject: req.body.subject,
     });
     const newTeacher = await teacher.save();
     res.status(201).json(newTeacher);
@@ -46,7 +45,7 @@ router.post('/', async (req, res) => {
 router.patch('/:id', getTeacher, async (req, res) => {
   console.log(req.body); // Log the request body
 
-  const updates = ['name', 'email', 'gmail', 'phoneNumber', 'branch', 'teacherID', 'role', 'subject'];
+  const updates = ['name', 'email', 'gmail', 'phoneNumber', 'branch', 'teacherID', 'role'];
   updates.forEach(update => {
     if (req.body[update] != null) {
       res.teacher[update] = req.body[update];

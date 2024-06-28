@@ -38,6 +38,7 @@ const PendingStudents = () => {
       try {
         if (currentSession) {
           const response = await axios.get(`http://localhost:5000/students/pendingStudents/${currentSession._id}`);
+          console.log(currentSession._id);
           setPendingStudents(response.data);
         } else {
           setPendingStudents([]); // Clear pending students if no session is found
@@ -92,7 +93,7 @@ const PendingStudents = () => {
           <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 xl:grid-cols-5 gap-6">
             {pendingStudents.map(student => (
               <div
-                key={student.id}
+                key={student.id || student.applicationNumber} // Use a unique identifier
                 className="bg-white rounded-xl shadow-xl overflow-hidden transition-all duration-300 transform hover:scale-105 hover:shadow-2xl"
                 onMouseEnter={() => handleMouseEnter(student)}
                 onMouseLeave={handleMouseLeave}
@@ -106,6 +107,7 @@ const PendingStudents = () => {
                 </div>
                 <div className="p-4">
                   <h2 className="text-lg md:text-xl font-bold text-[#2D5990] mb-1">{student.firstName} {student.surName}</h2>
+                  <h2 className="text-lg md:text-xl font-bold text-[#2D5990] mb-1">{student.applicationNumber}</h2>
                   <button
                     onClick={() => handleAssessNow(student.firstName, currentSession._id, student.applicationNumber)}
                     className="w-full bg-gradient-to-r from-[#2D5990] to-[#00A0E3] hover:from-[#00A0E3] hover:to-[#2D5990] text-white font-bold py-2 px-4 rounded-full focus:outline-none focus:shadow-outline transition-colors duration-300 transform hover:scale-105"

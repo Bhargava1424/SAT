@@ -14,6 +14,7 @@ import AddAttendance from './components/AddAttendance';
 import StudentAssessment from './components/StudentAssessment';
 import StudentECA from './components/StudentECA';
 import ForgotPasswordPage from './components/ForgotPasswordPage'; // Import the ForgotPasswordPage component
+import StudentReport from './components/StudentReport';
 
 function App() {
   const { user } = useAuth();
@@ -40,6 +41,7 @@ function App() {
           <Route path="/upcomingSessions" element={userHasRequiredRole(['teacher']) ? <UpcomingSessions /> : <Navigate replace to="/" />} />
           <Route path="/viewFeedbacks" element={userHasRequiredRole(['admin', 'vice president', 'director']) ? <ViewFeedbacks /> : <Navigate replace to="/" />} />
           <Route path="/addAttendance" element={userHasRequiredRole(['admin', 'receptionist']) ? <AddAttendance /> : <Navigate replace to="/" />} />
+          <Route path="/studentReport/:applicationNumber" element={userHasRequiredRole(['admin', 'director', 'vice president']) ? <StudentReport /> : <Navigate replace to="/" />} />
         </Routes>
       </div>
     </Router>

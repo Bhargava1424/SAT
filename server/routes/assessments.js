@@ -27,7 +27,6 @@ router.get('/:applicationNumber', async (req, res) => {
 
 // Submit new assessment
 router.post('/', async (req, res) => {
-    console.log(req.body);
     try {
         const teacher = req.body.teacher;
         const sessionId = req.body.sessionId;
@@ -36,7 +35,6 @@ router.post('/', async (req, res) => {
 
         // Use await to get teacher details
         const teacherDetails = await Teacher.findOne({ name: teacher });
-        console.log("teacher", teacherDetails);
 
         const assessment = new Assessment();
         assessment.assessment = assessmentData;
@@ -45,8 +43,6 @@ router.post('/', async (req, res) => {
         assessment.date = new Date();
         assessment.assessedBy = teacher;
         assessment.branch = teacherDetails.branch;
-
-        console.log(assessment);
 
         const newAssessment = await assessment.save();
 
