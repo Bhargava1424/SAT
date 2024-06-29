@@ -34,7 +34,7 @@ function ViewFeedbacks() {
     const userBranch = sessionStorage.getItem('branch');
 
     try {
-      const response = await fetch('http://localhost:5000/students'); // Assuming your student data is at this endpoint
+      const response = await fetch(process.env.REACT_APP_BASE_URL + '/students'); // Assuming your student data is at this endpoint
       const data = await response.json();
 
       // Filter students based on branch for specific roles
@@ -92,7 +92,7 @@ function ViewFeedbacks() {
     };
 
     try {
-      const response = await fetch(`http://localhost:5000/feedbacks/${editFeedback.feedbackId}`, {
+      const response = await fetch(`http://localhost:5001/feedbacks/${editFeedback.feedbackId}`, {
         method: 'PUT',
         headers: {
           'Content-Type': 'application/json',
@@ -116,7 +116,7 @@ function ViewFeedbacks() {
 
   const fetchFeedbacks = async (applicationNumber) => {
     try {
-      const response = await fetch(`http://localhost:5000/feedbacks/${applicationNumber}`);
+      const response = await fetch(`http://localhost:5001/feedbacks/${applicationNumber}`);
       const data = await response.json();
 
       if (response.ok) {
@@ -192,7 +192,7 @@ function ViewFeedbacks() {
     };
 
     try {
-      const response = await fetch('http://localhost:5000/feedbacks', {
+      const response = await fetch(process.env.REACT_APP_BASE_URL + '/feedbacks', {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json'

@@ -13,7 +13,7 @@ const StudentListModal = ({ isOpen, onClose, clusterID, sessionID }) => {
     if (clusterID) {
       const fetchStudents = async () => {
         try {
-          const response = await axios.get(`http://localhost:5000/students/cluster/${clusterID}/session/${sessionId}`);
+          const response = await axios.get(`http://localhost:5001/students/cluster/${clusterID}/session/${sessionId}`);
           setStudents(response.data);
         } catch (error) {
           console.error('Error fetching students', error);

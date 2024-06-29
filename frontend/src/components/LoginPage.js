@@ -22,7 +22,7 @@ const LoginPage = () => {
     const handleLogin = async (e) => {
         e.preventDefault();
         try {
-            const response = await fetch('http://localhost:5000/teachers/login', {
+            const response = await fetch(process.env.REACT_APP_BASE_URL + '/teachers/login', {
                 method: 'POST',
                 headers: {
                     'Content-Type': 'application/json'
@@ -46,7 +46,7 @@ const LoginPage = () => {
     const handleForgotPassword = async (e) => {
         e.preventDefault();
         try {
-            const response = await fetch('http://localhost:5000/teachers/forgot-password', {
+            const response = await fetch(process.env.REACT_APP_BASE_URL + '/teachers/forgot-password', {
                 method: 'POST',
                 headers: {
                     'Content-Type': 'application/json'

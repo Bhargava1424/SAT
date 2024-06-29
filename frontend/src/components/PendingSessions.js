@@ -18,7 +18,7 @@ const PendingStudents = () => {
     const getTeacherSessions = async () => {
       try {
         const teacherName = sessionStorage.getItem('name');
-        const response = await axios.get(`http://localhost:5000/sessions/teacher/${teacherName}`);
+        const response = await axios.get(`http://localhost:5001/sessions/teacher/${teacherName}`);
         setTeacherSessions(response.data);
         // Find the session that matches the sessionDate (using the start date)
         const session = response.data.find(session => 
@@ -37,7 +37,7 @@ const PendingStudents = () => {
     const fetchPendingStudents = async () => {
       try {
         if (currentSession) {
-          const response = await axios.get(`http://localhost:5000/students/pendingStudents/${currentSession._id}`);
+          const response = await axios.get(`http://localhost:5001/students/pendingStudents/${currentSession._id}`);
           console.log(currentSession._id);
           setPendingStudents(response.data);
         } else {

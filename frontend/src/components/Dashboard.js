@@ -41,7 +41,7 @@ const Dashboard = () => {
     const userBranch = sessionStorage.getItem('branch');
 
     try {
-        const response = await fetch('http://localhost:5000/students');
+        const response = await fetch(process.env.REACT_APP_BASE_URL + '/students');
         const data = await response.json();
         
         // Filter students based on branch for specific roles

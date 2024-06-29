@@ -22,7 +22,7 @@ const SessionAndAllotments = () => {
   useEffect(() => {
     const fetchBranches = async () => {
       try {
-        const response = await axios.get('http://localhost:5000/branches');
+        const response = await axios.get(process.env.REACT_APP_BASE_URL + '/branches');
         setBranches(response.data);
       } catch (error) {
         console.error('Error fetching branches data', error);
@@ -35,7 +35,7 @@ const SessionAndAllotments = () => {
   useEffect(() => {
     const fetchSessions = async () => {
       try {
-        const response = await axios.get('http://localhost:5000/sessions');
+        const response = await axios.get(process.env.REACT_APP_BASE_URL + '/sessions');
         setSessions(response.data);
 
         const teachersSet = new Set();

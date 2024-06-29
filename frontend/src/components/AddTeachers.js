@@ -53,7 +53,7 @@ const AddTeachers = () => {
 
   useEffect(() => {
     const fetchBranches = async () => {
-      const response = await fetch('http://localhost:5000/branches');
+      const response = await fetch(process.env.REACT_APP_BASE_URL + '/branches')
       const data = await response.json();
       setBranches(data);
     };
@@ -63,7 +63,7 @@ const AddTeachers = () => {
 
   useEffect(() => {
     const fetchTeachers = async () => {
-      const response = await fetch('http://localhost:5000/teachers');
+      const response = await fetch(process.env.REACT_APP_BASE_URL + '/teachers');
       const data = await response.json();
 
       let branchFilteredTeachers = role === 'admin' ? data : data.filter(teacher => teacher.branch === userBranch);
@@ -118,7 +118,7 @@ const AddTeachers = () => {
     }
 
     try {
-      const response = await fetch('http://localhost:5000/teachers', {
+      const response = await fetch(process.env.REACT_APP_BASE_URL + '/teachers', {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json'
@@ -162,7 +162,7 @@ const AddTeachers = () => {
     }
 
     try {
-      const response = await fetch(`http://localhost:5000/teachers/${selectedTeacher._id}`, {
+      const response = await fetch(`http://localhost:5001/teachers/${selectedTeacher._id}`, {
         method: 'PATCH',
         headers: {
           'Content-Type': 'application/json'

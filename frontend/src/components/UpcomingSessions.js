@@ -13,7 +13,7 @@
       const fetchUpcomingStudents = async () => {
         try {
           const teacherName = sessionStorage.getItem('name');
-          const response = await axios.get(`http://localhost:5000/students/upcomingStudents/${teacherName}`);
+          const response = await axios.get(`http://localhost:5001/students/upcomingStudents/${teacherName}`);
           setUpcomingStudents(response.data);
         } catch (error) {
           console.error('Error fetching upcoming students', error);

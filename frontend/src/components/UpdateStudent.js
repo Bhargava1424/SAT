@@ -39,7 +39,7 @@ const UpdateStudent = () => {
   const fetchStudents = async () => {
     setIsLoading(true);
     try {
-      const response = await fetch('http://localhost:5000/students');
+      const response = await fetch(process.env.REACT_APP_BASE_URL + '/students');
       const data = await response.json();
       if (response.ok) {
         setStudents(data);
@@ -192,7 +192,7 @@ const UpdateStudent = () => {
 
   const handleLinkSubmitted = (link) => {
     // Update the student in the database with the new link
-    fetch(`http://localhost:5000/students/${currentStudent._id}`, {
+    fetch(`http://localhost:5001/students/${currentStudent._id}`, {
       method: 'PATCH',
       headers: { 'Content-Type': 'application/json' },
       body: JSON.stringify({ googleDriveLink: link }),

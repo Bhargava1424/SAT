@@ -40,10 +40,10 @@
     
       try {
         const teacherResponse = await axios.get(
-          `http://localhost:5000/teachers/branch/${event.target.value}`
+          `http://localhost:5001/teachers/branch/${event.target.value}`
         );
         const studentResponse = await axios.get(
-          `http://localhost:5000/students/count-by-branch/${event.target.value}`
+          `http://localhost:5001/students/count-by-branch/${event.target.value}`
         );
     
         // Filter teachers with role 'teacher'
@@ -59,7 +59,7 @@
     const handleReassignClick = async () => {
       setReassignSessionButton(false);
       try {
-        const response = await axios.get(`http://localhost:5000/teachers/branch/${modalBranch}`);
+        const response = await axios.get(`http://localhost:5001/teachers/branch/${modalBranch}`);
         const filteredTeachers = response.data.filter((teacher) => teacher.role === 'teacher');
         setTeachers(filteredTeachers);
         setConfirmReassign(true);
@@ -87,7 +87,7 @@
     const handleConfirmReassignWithSelectedTeachers = async () => {
       setIsLoading(true);
       try {
-        const response = await axios.post('http://localhost:5000/sessions/reassign', {
+        const response = await axios.post(process.env.REACT_APP_BASE_URL + '/sessions/reassign', {
           branch: modalBranch,
           batch: '2024-2026',
           teachers: selectedTeachers,

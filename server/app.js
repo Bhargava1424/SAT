@@ -18,7 +18,7 @@ const receptionistRouter = require('./routes/receptionist.js'); // New reception
 const branchRouter = require('./routes/branches.js');
 // const driveRouter = require('./routes/drive.js');
 
-const port = process.env.PORT || 5000;
+const port = process.env.PORT || 5001;
 
 mongoose.connect(process.env.MONGODB_URI, {
     useNewUrlParser: true,
@@ -27,7 +27,9 @@ mongoose.connect(process.env.MONGODB_URI, {
 .then(() => console.log('Connected to MongoDB'))
 .catch(error => console.error('Could not connect to MongoDB', error));
 
-app.use(cors());
+app.use(cors({
+    origin: process.env.BaseURL // Replace 'http://example.com' with the address you want to whitelist
+}));
 app.use(bodyParser.json());
 app.use(express.json());
 

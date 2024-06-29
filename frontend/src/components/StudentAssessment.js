@@ -81,7 +81,7 @@ const StudentAssessment = () => {
     }));
 
     try {
-      const response = await axios.post(`http://localhost:5000/assessments`, {
+      const response = await axios.post(`http://localhost:5001/assessments`, {
         assessment: payload,
         teacher,
         sessionId,
