@@ -28,7 +28,7 @@ mongoose.connect(process.env.MONGODB_URI, {
 .catch(error => console.error('Could not connect to MongoDB', error));
 
 app.use(cors({
-    origin: process.env.BaseURL // Replace 'http://example.com' with the address you want to whitelist
+    referer: process.env.BaseURL + '/' // Replace 'http://example.com' with the address you want to whitelist
 }));
 app.use(bodyParser.json());
 app.use(express.json());

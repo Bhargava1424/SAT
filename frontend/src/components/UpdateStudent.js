@@ -322,6 +322,7 @@ const UpdateStudent = () => {
             <UploadModal
               student={currentStudent}
               closeModal={closeModal}
+              onClose={closeModal}
               isOpen={modalOpen}
               onLinkSubmitted={handleLinkSubmitted} // Pass the function to handle link submission
             />

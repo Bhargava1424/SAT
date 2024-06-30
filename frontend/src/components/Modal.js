@@ -185,6 +185,10 @@
                 {teachers.length > 0 && (
                   <>
                     <div className="mt-6">
+                    <p className="bg-blue-100 border-l-4 border-blue-500 text-blue-700 p-4 rounded-lg shadow-md mt-4">
+                      <strong>Important Note:</strong> Hold <kbd className="bg-gray-200 rounded px-1">Ctrl</kbd> (or <kbd className="bg-gray-200 rounded px-1">Cmd</kbd> on Mac) to select multiple teachers. Hold <kbd className="bg-gray-200 rounded px-1">Shift</kbd> to select a range of teachers.
+                    </p>
+
                       <label className="text-lg font-medium text-[#2D5990]">Select Teachers:</label>
                       <select
                         multiple
@@ -199,16 +203,19 @@
                         ))}
                       </select>
                     </div>
-                    {selectedTeachers.length > 0 && (
-                      <div className="mt-4">
-                        <h3 className="text-lg font-medium text-[#2D5990]">Selected Teachers:</h3>
-                        <ul className="list-disc list-inside">
-                          {selectedTeachers.map((teacher) => (
-                            <li key={teacher._id}>{teacher.name}</li>
-                          ))}
-                        </ul>
-                      </div>
-                    )}
+                    <div>
+                      {selectedTeachers.length > 0 && (
+                        <div className="mt-4">
+                          <h3 className="text-lg font-medium text-[#2D5990]">Selected Teachers:</h3>
+                          <ul className="list-disc list-inside">
+                            {selectedTeachers.map((teacher) => (
+                              <li key={teacher._id}>{teacher.name}</li>
+                            ))}
+                          </ul>
+                        </div>
+                      )}
+
+                    </div>
                     <button
                       className="w-full bg-[#2D5990] text-white font-medium py-3 px-6 rounded-lg hover:bg-[#00A0E3] focus:outline-none focus:ring-2 focus:ring-[#00A0E3] transition-all duration-300 mt-4"
                       onClick={handleConfirmReassignWithSelectedTeachers}
