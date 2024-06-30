@@ -40,10 +40,10 @@
     
       try {
         const teacherResponse = await axios.get(
-          `http://localhost:5001/teachers/branch/${event.target.value}`
+          process.env.REACT_APP_BASE_URL + `/teachers/branch/${event.target.value}`
         );
         const studentResponse = await axios.get(
-          `http://localhost:5001/students/count-by-branch/${event.target.value}`
+          process.env.REACT_APP_BASE_URL + `/students/count-by-branch/${event.target.value}`
         );
     
         // Filter teachers with role 'teacher'
@@ -59,7 +59,7 @@
     const handleReassignClick = async () => {
       setReassignSessionButton(false);
       try {
-        const response = await axios.get(`http://localhost:5001/teachers/branch/${modalBranch}`);
+        const response = await axios.get(process.env.REACT_APP_BASE_URL + `/teachers/branch/${modalBranch}`);
         const filteredTeachers = response.data.filter((teacher) => teacher.role === 'teacher');
         setTeachers(filteredTeachers);
         setConfirmReassign(true);

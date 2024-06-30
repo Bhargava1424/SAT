@@ -21,7 +21,7 @@ const StudentECA = () => {
   const navigate = useNavigate();
 
   useEffect(() => {
-    fetch(`http://localhost:5001/eca/${applicationNumber}`)
+    fetch(process.env.REACT_APP_BASE_URL + `/eca/${applicationNumber}`)
       .then(response => response.json())
       .then(data => {
         if (data.length > 0) {
@@ -75,7 +75,7 @@ const StudentECA = () => {
     let method;
 
     if (editMode) {
-      url = `http://localhost:5001/eca/${currentEditingId}`; // Use currentEditingId here
+      url = process.env.REACT_APP_BASE_URL + `/eca/${currentEditingId}`; // Use currentEditingId here
       method = 'PATCH';
     } else {
       url = process.env.REACT_APP_BASE_URL + '/eca';

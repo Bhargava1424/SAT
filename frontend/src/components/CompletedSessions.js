@@ -19,7 +19,7 @@ const CompletedSessions = () => {
       try {
         const teacherName = sessionStorage.getItem('name');
         // Fetch the session information for the teacher
-        const getTeacherSessionsResponse = await axios.get(`http://localhost:5001/sessions/teacher/${teacherName}`);
+        const getTeacherSessionsResponse = await axios.get(process.env.REACT_APP_BASE_URL + `/sessions/teacher/${teacherName}`);
         setTeacherSessions(getTeacherSessionsResponse.data);
 
         // Find the session that matches the sessionDate (using the start date)
@@ -41,7 +41,7 @@ const CompletedSessions = () => {
     const fetchCompletedStudents = async () => {
       try {
         if (currentSession) {
-          const completedStudentsResponse = await axios.get(`http://localhost:5001/students/completedStudents/${currentSession._id}`);
+          const completedStudentsResponse = await axios.get(process.env.REACT_APP_BASE_URL + `/students/completedStudents/${currentSession._id}`);
           const completedStudentsData = completedStudentsResponse.data;
           setCompletedStudents(completedStudentsData);
         }

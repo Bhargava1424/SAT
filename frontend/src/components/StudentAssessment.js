@@ -81,7 +81,7 @@ const StudentAssessment = () => {
     }));
 
     try {
-      const response = await axios.post(`http://localhost:5001/assessments`, {
+      const response = await axios.post(process.env.REACT_APP_BASE_URL + `/assessments`, {
         assessment: payload,
         teacher,
         sessionId,

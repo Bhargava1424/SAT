@@ -2209,7 +2209,7 @@ const UpdateStudent = () => {
   const fetchStudents = async () => {
     setIsLoading(true);
     try {
-      const response = await fetch('http://localhost:5000/students');
+      const response = await fetch(process.env.REACT_APP_BASE_URL + '/students');
       const data = await response.json();
       if (response.ok) {
         setStudents(data);
@@ -2569,7 +2569,7 @@ const UploadModal = ({ student, closeModal }) => {
         formData.append('applicationNumber', student.applicationNumber);
     
         // Correct API endpoint where the server handles the file upload
-        const uploadUrl = 'http://localhost:5000/upload-to-drive'; 
+        const uploadUrl = process.env.REACT_APP_BASE_URL + '/upload-to-drive'; 
     
         try {
             const response = await fetch(uploadUrl, {
@@ -2665,7 +2665,7 @@ const LoginPage = () => {
     const handleLogin = async (e) => {
         e.preventDefault();
         try {
-            const response = await fetch('http://localhost:5000/teachers/login', {
+            const response = await fetch(process.env.REACT_APP_BASE_URL + '/teachers/login', {
                 method: 'POST',
                 headers: {
                     'Content-Type': 'application/json'
@@ -2689,7 +2689,7 @@ const LoginPage = () => {
     const handleForgotPassword = async (e) => {
         e.preventDefault();
         try {
-            const response = await fetch('http://localhost:5000/teachers/forgot-password', {
+            const response = await fetch(process.env.REACT_APP_BASE_URL + '/teachers/forgot-password', {
                 method: 'POST',
                 headers: {
                     'Content-Type': 'application/json'
@@ -3277,7 +3277,7 @@ function ViewFeedbacks() {
     const userBranch = sessionStorage.getItem('branch');
 
     try {
-        const response = await fetch('http://localhost:5000/students');
+        const response = await fetch(process.env.REACT_APP_BASE_URL + '/students');
         const data = await response.json();
 
         // Filter students based on branch for specific roles
@@ -3335,7 +3335,7 @@ const saveEdit = async () => {
   };
 
   try {
-    const response = await fetch(`http://localhost:5000/feedbacks/${editFeedback.feedbackId}`, {
+    const response = await fetch(process.env.REACT_APP_BASE_URL + `/feedbacks/${editFeedback.feedbackId}`, {
       method: 'PUT',
       headers: {
         'Content-Type': 'application/json',
@@ -3364,7 +3364,7 @@ const saveEdit = async () => {
 
 const fetchFeedbacks = async (applicationNumber) => {
   try {
-    const response = await fetch(`http://localhost:5000/feedbacks/${applicationNumber}`);
+    const response = await fetch(process.env.REACT_APP_BASE_URL + `/feedbacks/${applicationNumber}`);
     const data = await response.json();
 
     if (response.ok) {
@@ -3447,7 +3447,7 @@ const submitNewFeedback = async () => {
   };
 
   try {
-    const response = await fetch('http://localhost:5000/feedbacks', {
+    const response = await fetch(process.env.REACT_APP_BASE_URL + '/feedbacks', {
       method: 'POST',
       headers: {
         'Content-Type': 'application/json'
@@ -3471,12 +3471,12 @@ const submitNewFeedback = async () => {
 // Fetch director's Gmail and send an email
 const fetchAndSendEmail = async (branch) => {
     try {
-        const gmailResponse = await fetch(`http://localhost:5000/teachers/director-gmail/${branch}`);
+        const gmailResponse = await fetch(process.env.REACT_APP_BASE_URL + `/teachers/director-gmail/${branch}`);
         const { gmail } = await gmailResponse.json();
 
         if (gmailResponse.ok) {
             // Send an email notification to the director's Gmail
-            // await fetch('http://localhost:5000/send-email', {
+            // await fetch(process.env.REACT_APP_BASE_URL + '/send-email', {
             //     method: 'POST',
             //     headers: {
             //         'Content-Type': 'application/json'
@@ -3865,7 +3865,7 @@ const ForgotPasswordPage = () => {
     const handleForgotPassword = async (e) => {
         e.preventDefault();
         try {
-            const response = await fetch('http://localhost:5000/teachers/forgot-password', {
+            const response = await fetch(process.env.REACT_APP_BASE_URL + '/teachers/forgot-password', {
                 method: 'POST',
                 headers: {
                     'Content-Type': 'application/json'
@@ -3937,7 +3937,7 @@ const AddTeachers = () => {
 
     useEffect(() => {
         const fetchBranches = async () => {
-            const response = await fetch('http://localhost:5000/branches');
+            const response = await fetch(process.env.REACT_APP_BASE_URL + '/branches');
             const data = await response.json();
             setBranches(data);
         };
@@ -3947,7 +3947,7 @@ const AddTeachers = () => {
 
     useEffect(() => {
         const fetchTeachers = async () => {
-            const response = await fetch('http://localhost:5000/teachers');
+            const response = await fetch(process.env.REACT_APP_BASE_URL + '/teachers');
             const data = await response.json();
             const role = sessionStorage.getItem('role');
             const userBranch = sessionStorage.getItem('branch');
@@ -4009,7 +4009,7 @@ const AddTeachers = () => {
         }
 
         try {
-            const response = await fetch('http://localhost:5000/teachers', {
+            const response = await fetch(process.env.REACT_APP_BASE_URL + '/teachers', {
                 method: 'POST',
                 headers: {
                     'Content-Type': 'application/json'
@@ -4248,7 +4248,7 @@ const StudentECA = () => {
 
   useEffect(() => {
     // Fetch ECA entries when the component mounts
-    fetch(`http://localhost:5000/eca/${studentName}`)
+    fetch(process.env.REACT_APP_BASE_URL + `/eca/${studentName}`)
       .then(response => response.json())
       .then(data => setEcas(data))
       .catch(error => console.error('Error:', error));
@@ -4287,7 +4287,7 @@ const StudentECA = () => {
       date: new Date().toISOString(),
     };
 
-    const url = editMode ? `http://localhost:5000/eca/${currentEditingId}` : 'http://localhost:5000/eca';
+    const url = editMode ? process.env.REACT_APP_BASE_URL + `/eca/${currentEditingId}` : process.env.REACT_APP_BASE_URL + '/eca';
     const method = editMode ? 'PATCH' : 'POST';
 
     fetch(url, {
@@ -4523,7 +4523,7 @@ const Dashboard = () => {
     const userBranch = sessionStorage.getItem('branch');
 
     try {
-        const response = await fetch('http://localhost:5000/students');
+        const response = await fetch(process.env.REACT_APP_BASE_URL + '/students');
         const data = await response.json();
         
         // Filter students based on branch for specific roles
@@ -4859,7 +4859,7 @@ const SessionAndAllotments = () => {
   useEffect(() => {
     const fetchData = async () => {
       try {
-        const response = await axios.get('http://localhost:5000/sessions');
+        const response = await axios.get(process.env.REACT_APP_BASE_URL + '/sessions');
         setSessions(response.data);
       } catch (error) {
         console.error('Error fetching session data', error);
@@ -7449,7 +7449,7 @@ const UpdateStudent = () => {
   const fetchStudents = async () => {
     setIsLoading(true);
     try {
-      const response = await fetch('http://localhost:5000/students');
+      const response = await fetch(process.env.REACT_APP_BASE_URL + '/students');
       const data = await response.json();
       if (response.ok) {
         setStudents(data);
@@ -7763,10 +7763,10 @@ const Modal = ({ isOpen, onClose, branches }) => {
   
     try {
       const teacherResponse = await axios.get(
-        `http://localhost:5000/teachers/branch/${event.target.value}`
+        process.env.REACT_APP_BASE_URL + `/teachers/branch/${event.target.value}`
       );
       const studentResponse = await axios.get(
-        `http://localhost:5000/students/count-by-branch/${event.target.value}`
+        process.env.REACT_APP_BASE_URL + `/students/count-by-branch/${event.target.value}`
       );
   
       // Filter teachers with role 'teacher'
@@ -7782,7 +7782,7 @@ const Modal = ({ isOpen, onClose, branches }) => {
 
   const handleReassignClick = async () => {
     try {
-      const response = await axios.get(`http://localhost:5000/teachers/branch/${modalBranch}`);
+      const response = await axios.get(process.env.REACT_APP_BASE_URL + `/teachers/branch/${modalBranch}`);
       const filteredTeachers = response.data.filter((teacher) => teacher.role === 'teacher');
       setTeachers(filteredTeachers);
       setConfirmReassign(true);
@@ -7809,7 +7809,7 @@ const Modal = ({ isOpen, onClose, branches }) => {
 
   const handleConfirmReassignWithSelectedTeachers = async () => {
     try {
-      const response = await axios.post('http://localhost:5000/sessions/reassign', {
+      const response = await axios.post(process.env.REACT_APP_BASE_URL + '/sessions/reassign', {
         branch: modalBranch,
         batch: '2024-2026',
         teachers: selectedTeachers,
@@ -8037,7 +8037,7 @@ const UploadModal = ({ student, closeModal }) => {
         formData.append('applicationNumber', student.applicationNumber);
     
         // Correct API endpoint where the server handles the file upload
-        const uploadUrl = 'http://localhost:5000/upload-to-drive'; 
+        const uploadUrl = process.env.REACT_APP_BASE_URL + '/upload-to-drive'; 
     
         try {
             const response = await fetch(uploadUrl, {
@@ -8133,7 +8133,7 @@ const LoginPage = () => {
     const handleLogin = async (e) => {
         e.preventDefault();
         try {
-            const response = await fetch('http://localhost:5000/teachers/login', {
+            const response = await fetch(process.env.REACT_APP_BASE_URL + '/teachers/login', {
                 method: 'POST',
                 headers: {
                     'Content-Type': 'application/json'
@@ -8157,7 +8157,7 @@ const LoginPage = () => {
     const handleForgotPassword = async (e) => {
         e.preventDefault();
         try {
-            const response = await fetch('http://localhost:5000/teachers/forgot-password', {
+            const response = await fetch(process.env.REACT_APP_BASE_URL + '/teachers/forgot-password', {
                 method: 'POST',
                 headers: {
                     'Content-Type': 'application/json'
@@ -8378,7 +8378,7 @@ const StudentListModal = ({ isOpen, onClose, clusterID }) => {
     if (clusterID) {
       const fetchStudents = async () => {
         try {
-          const response = await axios.get(`http://localhost:5000/students/cluster/${clusterID}`);
+          const response = await axios.get(process.env.REACT_APP_BASE_URL + `/students/cluster/${clusterID}`);
           setStudents(response.data);
         } catch (error) {
           console.error('Error fetching students', error);
@@ -8689,7 +8689,7 @@ const PendingStudents = () => {
         const teacherName = sessionStorage.getItem('name');
         console.log(teacherName);
         // Fetch the session information for the teacher
-        const getTeacherSessionsResponse = await axios.get(`http://localhost:5000/sessions/teacher/${teacherName}`);
+        const getTeacherSessionsResponse = await axios.get(process.env.REACT_APP_BASE_URL + `/sessions/teacher/${teacherName}`);
         console.log(getTeacherSessionsResponse.data);
         setTeacherSessions(getTeacherSessionsResponse.data)
         
@@ -8706,7 +8706,7 @@ const PendingStudents = () => {
       try {
         const sessionId = "66796de39ce14002d7f63bed"
         // Fetch the session information for the teacher
-        const pendingStudentsResponse = await axios.get(`http://localhost:5000/students/pendingStudents/${sessionId}`);
+        const pendingStudentsResponse = await axios.get(process.env.REACT_APP_BASE_URL + `/students/pendingStudents/${sessionId}`);
         const pendingStudentsData = pendingStudentsResponse.data;
         setPendingStudents(pendingStudentsData)
         
@@ -8812,7 +8812,7 @@ function ViewFeedbacks() {
     const userBranch = sessionStorage.getItem('branch');
 
     try {
-        const response = await fetch('http://localhost:5000/students');
+        const response = await fetch(process.env.REACT_APP_BASE_URL + '/students');
         const data = await response.json();
 
         // Filter students based on branch for specific roles
@@ -8870,7 +8870,7 @@ const saveEdit = async () => {
   };
 
   try {
-    const response = await fetch(`http://localhost:5000/feedbacks/${editFeedback.feedbackId}`, {
+    const response = await fetch(process.env.REACT_APP_BASE_URL + `/feedbacks/${editFeedback.feedbackId}`, {
       method: 'PUT',
       headers: {
         'Content-Type': 'application/json',
@@ -8899,7 +8899,7 @@ const saveEdit = async () => {
 
 const fetchFeedbacks = async (applicationNumber) => {
   try {
-    const response = await fetch(`http://localhost:5000/feedbacks/${applicationNumber}`);
+    const response = await fetch(process.env.REACT_APP_BASE_URL + `/feedbacks/${applicationNumber}`);
     const data = await response.json();
 
     if (response.ok) {
@@ -8982,7 +8982,7 @@ const submitNewFeedback = async () => {
   };
 
   try {
-    const response = await fetch('http://localhost:5000/feedbacks', {
+    const response = await fetch(process.env.REACT_APP_BASE_URL + '/feedbacks', {
       method: 'POST',
       headers: {
         'Content-Type': 'application/json'
@@ -9006,12 +9006,12 @@ const submitNewFeedback = async () => {
 // Fetch director's Gmail and send an email
 const fetchAndSendEmail = async (branch) => {
     try {
-        const gmailResponse = await fetch(`http://localhost:5000/teachers/director-gmail/${branch}`);
+        const gmailResponse = await fetch(process.env.REACT_APP_BASE_URL + `/teachers/director-gmail/${branch}`);
         const { gmail } = await gmailResponse.json();
 
         if (gmailResponse.ok) {
             // Send an email notification to the director's Gmail
-            // await fetch('http://localhost:5000/send-email', {
+            // await fetch(process.env.REACT_APP_BASE_URL + '/send-email', {
             //     method: 'POST',
             //     headers: {
             //         'Content-Type': 'application/json'
@@ -9312,7 +9312,7 @@ const StudentAssessment = () => {
     try {
       const teacher = sessionStorage.getItem('teacher');
       
-      const response = await axios.post(`http://localhost:5000/assessment/${teacher}/${sessionId}/${applicationNumber}`, responses);
+      const response = await axios.post(process.env.REACT_APP_BASE_URL + `/assessment/${teacher}/${sessionId}/${applicationNumber}`, responses);
       // Handle the response from the server (e.g., display success message)
       console.log(response.data);
     } catch (error) {
@@ -9426,7 +9426,7 @@ const ForgotPasswordPage = () => {
     const handleForgotPassword = async (e) => {
         e.preventDefault();
         try {
-            const response = await fetch('http://localhost:5000/teachers/forgot-password', {
+            const response = await fetch(process.env.REACT_APP_BASE_URL + '/teachers/forgot-password', {
                 method: 'POST',
                 headers: {
                     'Content-Type': 'application/json'
@@ -9527,7 +9527,7 @@ const AddTeachers = () => {
 
   useEffect(() => {
     const fetchBranches = async () => {
-      const response = await fetch('http://localhost:5000/branches');
+      const response = await fetch(process.env.REACT_APP_BASE_URL + '/branches');
       const data = await response.json();
       setBranches(data);
     };
@@ -9537,7 +9537,7 @@ const AddTeachers = () => {
 
   useEffect(() => {
     const fetchTeachers = async () => {
-      const response = await fetch('http://localhost:5000/teachers');
+      const response = await fetch(process.env.REACT_APP_BASE_URL + '/teachers');
       const data = await response.json();
 
       let branchFilteredTeachers = role === 'admin' ? data : data.filter(teacher => teacher.branch === userBranch);
@@ -9597,7 +9597,7 @@ const AddTeachers = () => {
     }
 
     try {
-      const response = await fetch('http://localhost:5000/teachers', {
+      const response = await fetch(process.env.REACT_APP_BASE_URL + '/teachers', {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json'
@@ -9647,7 +9647,7 @@ const AddTeachers = () => {
     }
   
     try {
-      const response = await fetch(`http://localhost:5000/teachers/${selectedTeacher._id}`, {
+      const response = await fetch(process.env.REACT_APP_BASE_URL + `/teachers/${selectedTeacher._id}`, {
         method: 'PATCH',
         headers: {
           'Content-Type': 'application/json'
@@ -9974,7 +9974,7 @@ const StudentECA = () => {
 
   useEffect(() => {
     // Fetch ECA entries when the component mounts
-    fetch(`http://localhost:5000/eca/${studentName}`)
+    fetch(process.env.REACT_APP_BASE_URL + `/eca/${studentName}`)
       .then(response => response.json())
       .then(data => setEcas(data))
       .catch(error => console.error('Error:', error));
@@ -10013,7 +10013,7 @@ const StudentECA = () => {
       date: new Date().toISOString(),
     };
 
-    const url = editMode ? `http://localhost:5000/eca/${currentEditingId}` : 'http://localhost:5000/eca';
+    const url = editMode ? process.env.REACT_APP_BASE_URL + `/eca/${currentEditingId}` : process.env.REACT_APP_BASE_URL + '/eca';
     const method = editMode ? 'PATCH' : 'POST';
 
     fetch(url, {
@@ -10249,7 +10249,7 @@ const Dashboard = () => {
     const userBranch = sessionStorage.getItem('branch');
 
     try {
-        const response = await fetch('http://localhost:5000/students');
+        const response = await fetch(process.env.REACT_APP_BASE_URL + '/students');
         const data = await response.json();
         
         // Filter students based on branch for specific roles
@@ -10591,7 +10591,7 @@ const SessionAndAllotments = () => {
   useEffect(() => {
     const fetchBranches = async () => {
       try {
-        const response = await axios.get('http://localhost:5000/branches');
+        const response = await axios.get(process.env.REACT_APP_BASE_URL + '/branches');
         setBranches(response.data);
       } catch (error) {
         console.error('Error fetching branches data', error);
@@ -10604,7 +10604,7 @@ const SessionAndAllotments = () => {
   useEffect(() => {
     const fetchSessions = async () => {
       try {
-        const response = await axios.get('http://localhost:5000/sessions');
+        const response = await axios.get(process.env.REACT_APP_BASE_URL + '/sessions');
         setSessions(response.data);
 
         const teachersSet = new Set();

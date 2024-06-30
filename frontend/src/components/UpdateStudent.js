@@ -192,7 +192,7 @@ const UpdateStudent = () => {
 
   const handleLinkSubmitted = (link) => {
     // Update the student in the database with the new link
-    fetch(`http://localhost:5001/students/${currentStudent._id}`, {
+    fetch(process.env.REACT_APP_BASE_URL + `/students/${currentStudent._id}`, {
       method: 'PATCH',
       headers: { 'Content-Type': 'application/json' },
       body: JSON.stringify({ googleDriveLink: link }),

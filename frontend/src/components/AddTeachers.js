@@ -162,7 +162,7 @@ const AddTeachers = () => {
     }
 
     try {
-      const response = await fetch(`http://localhost:5001/teachers/${selectedTeacher._id}`, {
+      const response = await fetch(process.env.REACT_APP_BASE_URL + `/teachers/${selectedTeacher._id}`, {
         method: 'PATCH',
         headers: {
           'Content-Type': 'application/json'

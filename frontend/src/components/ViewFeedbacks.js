@@ -92,7 +92,7 @@ function ViewFeedbacks() {
     };
 
     try {
-      const response = await fetch(`http://localhost:5001/feedbacks/${editFeedback.feedbackId}`, {
+      const response = await fetch(process.env.REACT_APP_BASE_URL + `/feedbacks/${editFeedback.feedbackId}`, {
         method: 'PUT',
         headers: {
           'Content-Type': 'application/json',
@@ -116,7 +116,7 @@ function ViewFeedbacks() {
 
   const fetchFeedbacks = async (applicationNumber) => {
     try {
-      const response = await fetch(`http://localhost:5001/feedbacks/${applicationNumber}`);
+      const response = await fetch(process.env.REACT_APP_BASE_URL + `/feedbacks/${applicationNumber}`);
       const data = await response.json();
 
       if (response.ok) {
