@@ -4,10 +4,12 @@ import Navbar from './Navbar';
 
 function Modal({ children, onClose }) {
   return (
-    <div className="fixed inset-0 bg-black bg-opacity-50 flex justify-center items-center">
-      <div className="bg-white p-4 rounded max-h-screen overflow-auto">
+    <div className="fixed inset-0 bg-black bg-opacity-50 flex justify-center items-center z-50 transition-opacity duration-300 ease-in-out">
+      <div className="bg-white p-6 rounded-lg shadow-lg max-h-screen overflow-auto transform transition-transform duration-300 ease-in-out scale-95 hover:scale-100">
         {children}
-        <button onClick={onClose} className="mt-4 p-2 bg-[#00A0E3] text-white rounded">Close</button>
+        <button onClick={onClose} className="mt-4 px-4 py-2 bg-[#00A0E3] text-white rounded-md hover:bg-[#2D5990] transition duration-300">
+          Close
+        </button>
       </div>
     </div>
   );
@@ -34,10 +36,9 @@ function ViewFeedbacks() {
     const userBranch = sessionStorage.getItem('branch');
 
     try {
-      const response = await fetch(process.env.REACT_APP_BASE_URL + '/students'); // Assuming your student data is at this endpoint
+      const response = await fetch(process.env.REACT_APP_BASE_URL + '/students');
       const data = await response.json();
 
-      // Filter students based on branch for specific roles
       let filteredStudents = data;
       if (role === 'director' || role === 'teacher' || role === 'vice president') {
         filteredStudents = data.filter(student => student.branch === userBranch);
@@ -61,11 +62,12 @@ function ViewFeedbacks() {
 
   const handleSearch = (event) => {
     const value = event.target.value.toLowerCase();
-    const filteredData = students.filter(item =>
-      `${item.firstName} ${item.surName}`.toLowerCase().includes(value) ||
-      item.parentName.toLowerCase().includes(value) ||
-      item.applicationNumber.toString().includes(value) ||
-      item.branch.toLowerCase().includes(value)
+    const filteredData = students.filter(
+      item =>
+        `${item.firstName} ${item.surName}`.toLowerCase().includes(value) ||
+        item.parentName.toLowerCase().includes(value) ||
+        item.applicationNumber.toString().includes(value) ||
+        item.branch.toLowerCase().includes(value)
     );
     setSearchText(value);
     setStudents(filteredData);
@@ -79,7 +81,6 @@ function ViewFeedbacks() {
     setNewFeedback(event.target.value);
   };
 
-  // Update feedback by feedbackId
   const saveEdit = async () => {
     if (!editFeedback || !editFeedback.feedbackId) {
       setError('Feedback ID is missing.');
@@ -88,14 +89,14 @@ function ViewFeedbacks() {
 
     const updatedFeedback = {
       feedback: editText,
-      reviewer: sessionStorage.getItem('name') // Assume the reviewer might be updated as well
+      reviewer: sessionStorage.getItem('name')
     };
 
     try {
       const response = await fetch(process.env.REACT_APP_BASE_URL + `/feedbacks/${editFeedback.feedbackId}`, {
         method: 'PUT',
         headers: {
-          'Content-Type': 'application/json',
+          'Content-Type': 'application/json'
         },
         body: JSON.stringify(updatedFeedback)
       });
@@ -105,10 +106,15 @@ function ViewFeedbacks() {
         throw new Error(errorData.error || 'Failed to update feedback');
       }
 
-      // setEditFeedback(null); // Reset after successful update
-      // setViewingDateFeedback(null);
-      // fetchFeedbacks(); // Refresh data
-      window.location.reload();
+      // Update the UI optimistically
+      const updatedStudents = students.map(student =>
+        student.applicationNumber === editFeedback.applicationNumber
+          ? { ...student, feedbacks: student.feedbacks.map(fb => (fb.feedbackId === editFeedback.feedbackId ? { ...fb, feedback: editText } : fb)) }
+          : student
+      );
+      setStudents(updatedStudents);
+      setViewingDateFeedback(null);
+      setEditFeedback(null);
     } catch (error) {
       setError('Error updating feedback: ' + error.message);
     }
@@ -120,8 +126,8 @@ function ViewFeedbacks() {
       const data = await response.json();
 
       if (response.ok) {
-        if (data.length === 0) { 
-          alert("No Feedbacks given for this Student");
+        if (data.length === 0) {
+          alert('No Feedbacks given for this Student');
         }
         return data;
       } else {
@@ -140,21 +146,16 @@ function ViewFeedbacks() {
       setSelectedFeedbacks(feedbacks);
       setSelectedStudentName(`${student.firstName} ${student.surName}`);
       setViewingDateFeedback(null);
-      setEditFeedback(student); // Set the student being edited
+      setEditFeedback(student); // Store the student object for potential edits
     } else {
       setError('Student not found for the provided application number.');
     }
   };
 
   const viewFeedbackByDate = (feedback) => {
-    const student = students.find(item => item.applicationNumber === feedback.applicationNumber);
-    if (student) {
-      setViewingDateFeedback(feedback); 
-      setEditText(feedback.feedback);
-      setEditFeedback(feedback); 
-    } else {
-      setError('Student not found for the provided application number.');
-    }
+    setViewingDateFeedback(feedback);
+    setEditText(feedback.feedback);
+    setEditFeedback(feedback);
   };
 
   const addFeedback = (applicationNumber) => {
@@ -167,16 +168,15 @@ function ViewFeedbacks() {
     }
   };
 
-  // Submit new feedback
   const submitNewFeedback = async () => {
     if (!newFeedback) {
-      alert("Feedback cannot be empty");
+      alert('Feedback cannot be empty');
       return;
     }
 
     const student = students.find(item => `${item.firstName} ${item.surName}` === selectedStudentName);
     const applicationNumber = student?.applicationNumber;
-    const name = sessionStorage.getItem('name'); 
+    const name = sessionStorage.getItem('name');
 
     if (!applicationNumber) {
       console.error('Application number not found for student:', selectedStudentName);
@@ -186,7 +186,7 @@ function ViewFeedbacks() {
     const payload = {
       studentName: selectedStudentName,
       feedback: newFeedback,
-      date: new Date().toISOString(), 
+      date: new Date().toISOString(),
       applicationNumber: applicationNumber,
       reviewer: name
     };
@@ -204,10 +204,8 @@ function ViewFeedbacks() {
         throw new Error('Failed to submit feedback');
       }
 
-      // You should probably replace this with your actual email sending logic
-      // await fetchAndSendEmail(student.branch);
-
-      fetchFeedbacks(); // Refresh the students list to include new feedback
+      // Update UI optimistically by adding the new feedback to the selectedFeedbacks array
+      setSelectedFeedbacks([...selectedFeedbacks, payload]);
       setAddingFeedback(false);
       setNewFeedback('');
     } catch (error) {
@@ -215,9 +213,8 @@ function ViewFeedbacks() {
     }
   };
 
-  // Fetch director's Gmail and send an email (You need to implement this)
   const fetchAndSendEmail = async (branch) => {
-    // ... your email sending logic here ...
+    // Implement email sending logic here
   };
 
   const addAssessment = (applicationNumber) => {
@@ -233,124 +230,164 @@ function ViewFeedbacks() {
   if (isLoading) {
     return (
       <div className="fixed top-0 left-0 right-0 bottom-0 w-full h-screen z-50 overflow-hidden bg-gray-700 opacity-75 flex flex-col items-center justify-center">
-        <div className="loader ease-linear rounded-full border-4 border-t-4 border-gray-200 h-12 w-12 mb-4"></div>
+        <div className="loader ease-linear rounded-full border-8 border-t-8 border-gray-200 h-12 w-12 mb-4"></div>
         <h2 className="text-center text-white text-xl font-semibold">Loading...</h2>
         <p className="w-1/3 text-center text-white">This may take a few seconds, please don't close this page.</p>
       </div>
     );
   }
-  if (error) return <div>{error}</div>;
+  if (error) return <div className="text-red-500 p-4">{error}</div>;
 
   const role = sessionStorage.getItem('role');
 
   return (
-    <div className='bg-white min-h-screen'>
+    <div className="bg-gray-100 min-h-screen">
       <Navbar />
-      <div className="bg-gray-400 rounded-3xl mx-2 md:mx-6 px-4 md:px-32 py-6">
-        <div className="relative flex flex-col items-center justify-between mb-4 space-y-4">
-          <h2 className="text-xl md:text-2xl font-bold text-center">View Feedbacks</h2>
-          <input
-            type="text"
-            placeholder="Search..."
-            value={searchText}
-            onChange={handleSearch}
-            className="w-full md:w-auto px-4 py-2 bg-white border border-gray-300 rounded-md text-gray-700 focus:outline-none focus:ring-2 focus:ring-blue-500"
-          />
-        </div>
-
-        <div className="space-y-4 text-xs md:text-sm">
-          <div className={`grid ${role === 'vice president' ? 'grid-cols-7' : 'grid-cols-5'} gap-4 items-center bg-gray-100 p-3 rounded shadow text-xxs md:text-lg`}>
-            <div className="hidden md:flex justify-center">Profile</div>
-            <div className="flex justify-center">Student Name</div>
-            <div className="flex justify-center">Parent Name</div>
-            <div className="flex justify-center">Application No.</div>
-            <div className="flex justify-center">View Feedback</div>
-            {(role === 'vice president') && (
-              <>
-                <div className="flex justify-center">Add Feedback</div>
-                <div className="flex justify-center">Add & View Assessments</div>
-              </>
-            )}
+      <div className="container mx-auto px-4 md:px-12 py-8">
+        <div className="bg-white rounded-lg shadow-lg p-6">
+          <div className="flex flex-col md:flex-row md:items-center justify-between mb-6">
+            <h2 className="text-2xl md:text-3xl font-bold text-[#2D5990]">View Feedbacks</h2>
+            <input
+              type="text"
+              placeholder="Search..."
+              value={searchText}
+              onChange={handleSearch}
+              className="w-full md:w-auto px-4 py-2 mt-2 md:mt-0 bg-white border border-gray-300 rounded-md text-gray-700 focus:outline-none focus:ring-2 focus:ring-[#00A0E3] transition duration-300"
+            />
           </div>
-          {students.map(item => (
-            <div key={item.applicationNumber} className={`grid ${role === 'vice president' ? 'grid-cols-7' : 'grid-cols-5'} gap-6 items-center bg-gray-100 p-3 rounded shadow text-xxs md:text-lg`}>
-              <div className="hidden md:flex justify-center">
-                <img src={"/profileicon.jpeg"} alt="Profile" className="w-12 h-12 rounded-full flex items-center justify-center" />
+
+          <div className="overflow-x-auto">
+            <table className="table-auto w-full">
+              <thead className="bg-[#00A0E3] text-white">
+                <tr>
+                  <th className="px-4 py-2 hidden md:table-cell">Profile</th>
+                  <th className="px-4 py-2">Student Name</th>
+                  <th className="px-4 py-2">Parent Name</th>
+                  <th className="px-4 py-2">Application No.</th>
+                  <th className="px-4 py-2">View Feedback</th>
+                  {(role === 'vice president') && (
+                    <>
+                      <th className="px-4 py-2">Add Feedback</th>
+                      <th className="px-4 py-2">Add & View Assessments</th>
+                    </>
+                  )}
+                </tr>
+              </thead>
+              <tbody>
+                {students.map(item => (
+                  <tr key={item.applicationNumber} className="hover:bg-gray-100 transition duration-300">
+                    <td className="px-4 py-2 hidden md:table-cell">
+                      <img src={"/profileicon.jpeg"} alt="Profile" className="w-12 h-12 rounded-full mx-auto" />
+                    </td>
+                    <td className="px-4 py-2 text-center text-gray-700">{`${item.firstName} ${item.surName}`}</td>
+                    <td className="px-4 py-2 text-center text-gray-700">{item.parentName}</td>
+                    <td className="px-4 py-2 text-center text-gray-700">{item.applicationNumber}</td>
+                    <td className="px-4 py-2 text-center">
+                      <button
+                        onClick={() => toggleFeedbackView(item.applicationNumber)}
+                        className="bg-[#2D5990] text-white px-3 py-1 rounded-md hover:bg-[#00A0E3] transition duration-300"
+                      >
+                        {selectedFeedbacks.length > 0 && item.applicationNumber === editFeedback?.applicationNumber ? (
+                          'Hide'
+                        ) : (
+                          'View'
+                        )}
+                      </button>
+                    </td>
+                    {(role === 'vice president') && (
+                      <>
+                        <td className="px-4 py-2 text-center">
+                          <button
+                            onClick={() => addFeedback(item.applicationNumber)}
+                            className="bg-[#2D5990] text-white px-3 py-1 rounded-md hover:bg-[#00A0E3] transition duration-300"
+                          >
+                            Add
+                          </button>
+                        </td>
+                        <td className="px-4 py-2 text-center">
+                          <button
+                            onClick={() => addAssessment(item.applicationNumber)}
+                            className="bg-[#2D5990] text-white px-3 py-1 rounded-md hover:bg-[#00A0E3] transition duration-300"
+                          >
+                            Assess
+                          </button>
+                        </td>
+                      </>
+                    )}
+                  </tr>
+                ))}
+              </tbody>
+            </table>
+          </div>
+          {/* Feedback Modal */}
+          {selectedFeedbacks.length > 0 && !viewingDateFeedback && (
+            <Modal onClose={() => setSelectedFeedbacks([])}>
+              <div>
+                <h3 className="text-lg font-bold mb-4 text-[#2D5990]">Feedback for {selectedStudentName}</h3>
+                <div className="max-h-60 overflow-y-auto space-y-2">
+                  {selectedFeedbacks.map(fb => (
+                    <div
+                      key={fb.date}
+                      className="flex justify-between items-center mb-2 p-2 border-b items-center bg-gray-100 rounded shadow text-xs md:text-lg"
+                    >
+                      <span className="mr-2">Dated:</span>
+                      <button
+                        onClick={() => viewFeedbackByDate(fb)}
+                        className="text-[#00A0E3] hover:text-[#2D5990] transition duration-300"
+                      >
+                        {new Date(fb.date).toLocaleDateString()}
+                      </button>
+                    </div>
+                  ))}
+                </div>
               </div>
-              <div className="flex justify-center">{`${item.firstName} ${item.surName}`}</div>
-              <div className="flex justify-center">{item.parentName}</div>
-              <div className="flex justify-center">{item.applicationNumber}</div>
-              <div className="flex justify-center">
-                <button onClick={() => toggleFeedbackView(item.applicationNumber)} className="text-blue-500 hover:text-blue-700">
-                  <img src={selectedFeedbacks.length > 0 ? "/open.jpg" : "/close.jpg"} alt="View" className="h-4 w-4 md:w-8 md:h-6" />
+            </Modal>
+          )}
+
+          {/* Edit Feedback Modal */}
+          {viewingDateFeedback && (
+            <Modal
+              onClose={() => {
+                setViewingDateFeedback(null);
+                setEditFeedback(null);
+              }}
+            >
+              <h3 className="text-lg font-bold mb-4 text-[#2D5990]">Edit Feedback</h3>
+              <textarea
+                value={editText}
+                onChange={handleEditChange}
+                className="w-full p-2 border rounded bg-gray-200 resize-none focus:outline-none focus:ring-2 focus:ring-[#00A0E3]"
+              />
+              <button
+                onClick={saveEdit}
+                className="mt-4 px-4 py-2 bg-[#2D5990] text-white rounded-md hover:bg-[#00A0E3] transition duration-300 mr-4"
+              >
+                Save Changes
+              </button>
+            </Modal>
+          )}
+
+          {/* Add Feedback Modal */}
+          {addingFeedback && (
+            <Modal onClose={() => setAddingFeedback(false)}>
+              <div>
+                <h3 className="text-lg font-bold mb-4 text-[#2D5990]">Add Feedback for {selectedStudentName}</h3>
+                <textarea
+                  value={newFeedback}
+                  onChange={handleNewFeedbackChange}
+                  className="w-full p-2 border rounded bg-gray-200 resize-none mb-4 focus:outline-none focus:ring-2 focus:ring-[#00A0E3]"
+                  placeholder="Enter feedback here..."
+                />
+                <button
+                  onClick={submitNewFeedback}
+                  className="mt-4 px-4 py-2 bg-[#2D5990] text-white rounded-md hover:bg-[#00A0E3] transition duration-300"
+                >
+                  Submit
                 </button>
               </div>
-              {(role === 'vice president') && (
-                <>
-                  <div className="flex justify-center">
-                    <button
-                      onClick={() => addFeedback(item.applicationNumber)}
-                      className="text-blue-500 hover:text-blue-700"
-                    >
-                      <img src={'/plus.jpg'} alt="Add" className="h-3 w-3 md:h-6 md:w-6" />
-                    </button>
-                  </div>
-                  <div className="flex justify-center">
-                    <button
-                      onClick={() => addAssessment(item.applicationNumber)}
-                      className="text-blue-500 hover:text-blue-700"
-                    >
-                      <img src={'/edit.jpeg'} alt="Edit" className="h-4 w-6 md:h-6 md:w-8" />
-                    </button>
-                  </div>
-                </>
-              )}
-            </div>
-          ))}
+            </Modal>
+          )}
         </div>
-
-        {selectedFeedbacks.length > 0 && !viewingDateFeedback && (
-          <Modal onClose={() => setSelectedFeedbacks([])}>
-            <div>
-              <h3 className="text-lg font-bold mb-4">{selectedStudentName}</h3>
-              <div className="max-h-60 overflow-y-auto">
-                {selectedFeedbacks.map(fb => (
-                  <div key={fb.date} className="flex justify-between items-center mb-2 p-2 border-b items-center bg-gray-100 rounded shadow text-xs md:text-lg">
-                    <span className='mr-2'>Dated:</span>
-                    <button onClick={() => viewFeedbackByDate(fb)} className="text-blue-500 hover:text-blue-700 flex justify-center">
-                      {new Date(fb.date).toLocaleDateString()} 
-                    </button>
-                  </div>
-                ))}
-              </div>
-            </div>
-          </Modal>
-        )}
-
-        {viewingDateFeedback && (
-          <Modal onClose={() => {
-            setViewingDateFeedback(null);
-            setEditFeedback(null);
-          }}>
-            <textarea value={editText} onChange={handleEditChange} className="w-full p-2 border rounded bg-gray-200" />
-            <button onClick={saveEdit} className="mt-4 p-2 bg-[#2D5990] text-white rounded mr-4">Save Changes</button>
-          </Modal>
-        )}
-
-        {addingFeedback && (
-          <Modal onClose={() => setAddingFeedback(false)}>
-            <div>
-              <h3 className="text-lg font-bold mb-4">{selectedStudentName}</h3>
-              <textarea
-                value={newFeedback}
-                onChange={handleNewFeedbackChange}
-                className="w-full p-2 border rounded bg-gray-200 mb-4"
-                placeholder="Enter feedback here..."
-              />
-              <button onClick={submitNewFeedback} className="mt-4 p-2 bg-[#2D5990] text-white rounded mr-4">Submit</button>
-            </div>
-          </Modal>
-        )}
       </div>
     </div>
   );
