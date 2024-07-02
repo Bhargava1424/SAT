@@ -1,33 +1,8 @@
 import React, { useState, useEffect } from 'react';
 import Navbar from './Navbar';
 import { FaTimes } from 'react-icons/fa';
-
-const Modal = ({ isOpen, onClose, children }) => {
-  if (!isOpen) return null;
-
-  const handleOutsideClick = (e) => {
-    if (e.target === e.currentTarget) {
-      onClose();
-    }
-  };
-
-  return (
-    <div
-      className="fixed inset-0 flex items-center justify-center z-50 bg-black bg-opacity-50"
-      onClick={handleOutsideClick}
-    >
-      <div className="bg-white rounded-lg shadow-lg p-6 w-1/3 relative">
-        <button
-          className="absolute top-4 right-4 text-gray-600 hover:text-gray-900"
-          onClick={onClose}
-        >
-          <FaTimes size={24} />
-        </button>
-        {children}
-      </div>
-    </div>
-  );
-};
+import EditTeacherModal from './EditTeacherModal';
+import TeachersList from './TeachersList';
 
 const AddTeachers = () => {
   const [form, setForm] = useState({
@@ -42,14 +17,12 @@ const AddTeachers = () => {
   });
 
   const [teachers, setTeachers] = useState([]);
-  const [selectedRow, setSelectedRow] = useState(null);
   const [branches, setBranches] = useState([]);
   const [selectedTeacher, setSelectedTeacher] = useState(null);
   const [isEditModalOpen, setIsEditModalOpen] = useState(false);
 
   const role = sessionStorage.getItem('role');
   const userBranch = sessionStorage.getItem('branch');
-
 
   useEffect(() => {
     const fetchBranches = async () => {
@@ -295,52 +268,10 @@ const AddTeachers = () => {
           </form>
         </div>
 
-        <div className="w-full md:w-3/4 mt-4 md:mt-8 bg-white rounded-3xl shadow-lg p-4 md:p-6">
-          <h2 className="text-xl md:text-2xl font-bold mb-2 text-center text-[#2D5990]">Users List</h2>
-          <div className="overflow-x-auto">
-            <table className="w-full table-auto bg-white border-collapse border border-gray-500 mx-2 mb-4 rounded-lg shadow">
-              <thead className="bg-[#2D5990] text-white">
-                <tr>
-                  <th className="px-2 md:px-4 py-2 text-center border-b border-gray-600 border-r text-sm md:text-base">Teacher ID</th>
-                  <th className="px-2 md:px-4 py-2 text-center border-b border-gray-600 border-r text-sm md:text-base">Name</th>
-                  <th className="px-2 md:px-4 py-2 text-center border-b border-gray-600 border-r text-sm md:text-base">Role</th>
-                  <th className="px-2 md:px-4 py-2 text-center border-b border-gray-600 border-r text-sm md:text-base">Email</th>
-                  <th className="px-2 md:px-4 py-2 text-center border-b border-gray-600 border-r text-sm md:text-base">Phone Number</th>
-                  <th className="px-2 md:px-4 py-2 text-center border-b border-gray-600 border-r text-sm md:text-base">Branch</th>
-                  <th className="px-2 md:px-4 py-2 text-center border-b border-gray-600 text-sm md:text-base">Actions</th>
-                </tr>
-              </thead>
-              <tbody>
-                {teachers.map((teacher) => (
-                  <tr
-                    key={teacher._id}
-                    className={`cursor-pointer ${
-                      selectedRow === teacher._id ? 'bg-[#00A0E3] text-white' : 'even:bg-gray-200 hover:bg-gray-400'
-                    } transition-all duration-300`}
-                  >
-                    <td className="px-2 md:px-4 py-1 md:py-2 border-b border-gray-600 border-r text-sm md:text-base">{teacher.teacherID}</td>
-                    <td className="px-2 md:px-4 py-1 md:py-2 border-b border-gray-600 border-r text-sm md:text-base">{teacher.name}</td>
-                    <td className="px-2 md:px-4 py-1 md:py-2 border-b border-gray-600 border-r text-sm md:text-base">{teacher.role}</td>
-                    <td className="px-2 md:px-4 py-1 md:py-2 border-b border-gray-600 border-r text-sm md:text-base">{teacher.email}</td>
-                    <td className="px-2 md:px-4 py-1 md:py-2 border-b border-gray-600 border-r text-sm md:text-base">{teacher.phoneNumber}</td>
-                    <td className="px-2 md:px-4 py-1 md:py-2 border-b border-gray-600 border-r text-sm md:text-base">{teacher.branch}</td>
-                    <td className="px-2 md:px-4 py-1 md:py-2 border-b border-gray-600 text-sm md:text-base">
-                      <button
-                        className="bg-[#2D5990] text-white px-2 py-1 rounded-md"
-                        onClick={() => handleRowClick(teacher)}
-                      >
-                        Edit
-                      </button>
-                    </td>
-                  </tr>
-                ))}
-              </tbody>
-            </table>
-          </div>
-        </div>
+        <TeachersList teachers={teachers} onRowClick={handleRowClick} />
       </div>
 
-      <Modal isOpen={isEditModalOpen} onClose={() => setIsEditModalOpen(false)}>
+      <EditTeacherModal isOpen={isEditModalOpen} onClose={() => setIsEditModalOpen(false)}>
         <h2 className="text-xl md:text-2xl font-bold mb-4 text-center text-[#2D5990]">Edit User</h2>
         <form onSubmit={handleEditSubmit}>
           <div className="grid grid-cols-1 md:grid-cols-2 gap-2 md:gap-4">
@@ -413,7 +344,7 @@ const AddTeachers = () => {
               value={form.teacherID}
               onChange={handleChange}
               className="input input-bordered w-full bg-white my-1 md:my-2 rounded-xl text-xs md:text-sm focus:ring-2 focus:ring-blue-500"
-            /> 
+            />
           </div>
           <button
             type="submit"
@@ -422,7 +353,7 @@ const AddTeachers = () => {
             Update User
           </button>
         </form>
-      </Modal>
+      </EditTeacherModal>
     </div>
   );
 };
