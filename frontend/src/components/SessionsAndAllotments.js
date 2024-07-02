@@ -113,59 +113,69 @@ const SessionAndAllotments = () => {
         <h2 className="text-2xl font-bold my-4 text-center text-[#2D5990]">
           {branch === 'All' ? 'All Branches' : branch}
         </h2>
-        <table className="min-w-full bg-white border border-collapse shadow-lg rounded-lg overflow-hidden">
-          <thead>
-            <tr className="bg-[#00A0E3] text-white">
-              <th className="py-4 px-6 border-b font-semibold">Period</th>
-              {[...branchTeachers].map((teacher, index) => (
-                <th key={index} className="py-4 px-6 border-b font-semibold">
-                  {teacher}
-                </th>
-              ))}
-            </tr>
-          </thead>
-          <tbody>
-            {branchPeriods.map((period, index) => (
-              <tr
-                key={index}
-                className={`transition duration-300 ${
-                  periodIncludesStartDate(period) ? 'bg-green-100' : 'hover:bg-gray-100'
-                }`}
-              >
-                <td className="py-4 px-6 border-b text-center font-medium">{period}</td>
-                {[...branchTeachers].map((teacher, teacherIndex) => {
-                  const session = sortedSessionsByTeacher[teacher]?.find(
-                    (session) => session.period === period
-                  );
-                  return (
-                    <td
-                      key={teacherIndex}
-                      className={`py-4 px-6 border-b text-center cursor-pointer transition duration-300 transform hover:scale-105`}
-                      onClick={() => {
-                        setSelectedClusterID(session?.clusterID);
-                        setSelectedSessionID(session?._id);
-
-                        setIsStudentListModalOpen(true);
-                      }}
-                      title={session ? `Cluster ID: ${session.clusterID}\nBranch: ${session.branch}\nStatus: ${session.status}` : 'N/A'}
-                    >
-                      {session ? (
-                        <div>
-                          <p><strong>session ID:</strong> {session._id}</p>
-                          <p><strong>Cluster ID:</strong> {session.clusterID}</p>
-                          <p><strong>Branch:</strong> {session.branch}</p>
-                          <p><strong>Status:</strong> {session.status}</p>
-                        </div>
-                      ) : (
-                        'N/A'
-                      )}
-                    </td>
-                  );
-                })}
+        <div className="overflow-x-auto">
+          <table className="min-w-full bg-white border border-collapse shadow-lg rounded-lg overflow-hidden">
+            <thead>
+              <tr className="bg-[#00A0E3] text-white">
+                <th className="py-4 px-6 border-b font-semibold">Period</th>
+                {[...branchTeachers].map((teacher, index) => (
+                  <th key={index} className="py-4 px-6 border-b font-semibold">
+                    {teacher}
+                  </th>
+                ))}
               </tr>
-            ))}
-          </tbody>
-        </table>
+            </thead>
+            <tbody>
+              {branchPeriods.map((period, index) => (
+                <tr
+                  key={index}
+                  className={`transition duration-300 ${
+                    periodIncludesStartDate(period) ? 'bg-green-100' : 'hover:bg-gray-100'
+                  }`}
+                >
+                  <td className="py-4 px-6 border-b text-center font-medium whitespace-nowrap">
+                    {period}
+                  </td>
+                  {[...branchTeachers].map((teacher, teacherIndex) => {
+                    const session = sortedSessionsByTeacher[teacher]?.find(
+                      (session) => session.period === period
+                    );
+                    return (
+                      <td
+                        key={teacherIndex}
+                        className={`py-4 px-6 border-b text-center cursor-pointer transition duration-300 transform hover:scale-105 whitespace-nowrap`}
+                        onClick={() => {
+                          setSelectedClusterID(session?.clusterID);
+                          setSelectedSessionID(session?._id);
+
+                          setIsStudentListModalOpen(true);
+                        }}
+                        title={
+                          session
+                            ? `Cluster ID: ${session.clusterID}\nBranch: ${session.branch}\nStatus: ${session.status}`
+                            : 'N/A'
+                        }
+                      >
+                        {session ? (
+                          <div className="space-y-1">
+                            <p><strong>session ID:</strong> {session._id}</p>
+                            <p><strong>Cluster ID:</strong> {session.clusterID}</p>
+                            <p><strong>Branch:</strong> {session.branch}</p>
+                            <p><strong>Status:</strong> {session.status}</p>
+                          </div>
+                        ) : (
+                          'N/A'
+                        )}
+                      </td>
+                    );
+                  })}
+                </tr>
+              ))}
+            </tbody>
+          </table>
+        </div>
+
+
       </div>
     );
   };
