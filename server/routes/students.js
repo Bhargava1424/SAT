@@ -330,4 +330,60 @@ router.get('/upcomingStudents/:teacherName', async (req, res) => {
   }
 });
 
+// Get a specific student by applicationNumber
+router.get('/applicationNumber/:applicationNumber', async (req, res) => {
+  try {
+    const student = await Student.findOne({ applicationNumber: req.params.applicationNumber });
+    if (!student) {
+      return res.status(404).json({ message: 'Cannot find student' });
+    }
+    res.json(student);
+  } catch (err) {
+    res.status(500).json({ message: err.message });
+  }
+});
+
+// Update attendance for multiple students
+router.post('/updateAttendance', async (req, res) => {
+  const attendanceData = req.body;
+
+  try {
+    for (const record of attendanceData) {
+      const { applicationNumber, fnTotal, anTotal, exams } = record;
+
+      // Find the student by application number
+      const student = await Student.findOne({ applicationNumber: applicationNumber });
+
+      if (student) {
+        // Split the existing and new totals
+        const [existingFnNumerator, existingFnDenominator] = student.attendance.fnTotal ? student.attendance.fnTotal.split('/').map(Number) : [0, 0];
+        const [newFnNumerator, newFnDenominator] = fnTotal.split('/').map(Number);
+
+        const [existingAnNumerator, existingAnDenominator] = student.attendance.anTotal ? student.attendance.anTotal.split('/').map(Number) : [0, 0];
+        const [newAnNumerator, newAnDenominator] = anTotal.split('/').map(Number);
+
+        const [existingExamNumerator, existingExamDenominator] = student.attendance.exams ? student.attendance.exams.split('/').map(Number) : [0, 0];
+        const [newExamNumerator, newExamDenominator] = exams.split('/').map(Number);
+
+        // Calculate the new totals
+        const updatedFnTotal = `${existingFnNumerator + newFnNumerator}/${existingFnDenominator + newFnDenominator}`;
+        const updatedAnTotal = `${existingAnNumerator + newAnNumerator}/${existingAnDenominator + newAnDenominator}`;
+        const updatedExams = `${existingExamNumerator + newExamNumerator}/${existingExamDenominator + newExamDenominator}`;
+
+        // Update the student's attendance record
+        student.attendance.fnTotal = updatedFnTotal;
+        student.attendance.anTotal = updatedAnTotal;
+        student.attendance.exams = updatedExams;
+
+        await student.save();
+      }
+    }
+
+    res.status(200).json({ message: 'Attendance updated successfully' });
+  } catch (error) {
+    res.status(500).json({ message: 'Error updating attendance', error });
+  }
+});
+
+
 module.exports = router ;

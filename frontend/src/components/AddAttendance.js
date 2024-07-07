@@ -19,7 +19,7 @@ const AddAttendance = () => {
       const jsonData = XLSX.utils.sheet_to_json(worksheet, { header: 1 });
 
       const headers = jsonData[0];
-      const requiredHeaders = ['Application Number', 'Student Name', 'FN/Total', 'AN/Total'];
+      const requiredHeaders = ['Application Number', 'Student Name', 'FN/Total', 'AN/Total', 'Exams'];
 
       // Validate headers
       for (let header of requiredHeaders) {
@@ -31,10 +31,11 @@ const AddAttendance = () => {
 
       // Prepare the payload
       const dataPayload = jsonData.slice(1).map(row => ({
-        applicationNumber: row[0],
+        applicationNumber: String(row[0]), // Ensure application number is treated as a string
         studentName: row[1],
-        fnTotal: row[2],
-        anTotal: row[3]
+        fnTotal: String(row[2]), // Ensure these fields are treated as strings
+        anTotal: String(row[3]),
+        exams: String(row[4])
       }));
 
       console.log(dataPayload);
@@ -43,6 +44,32 @@ const AddAttendance = () => {
     };
 
     reader.readAsArrayBuffer(file);
+  };
+
+  const handleUpload = async () => {
+    if (!payload) {
+      setMessage('No data to upload');
+      return;
+    }
+
+    try {
+      const response = await fetch(`${process.env.REACT_APP_BASE_URL}/students/updateAttendance`, {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json'
+        },
+        body: JSON.stringify(payload)
+      });
+
+      const data = await response.json();
+      if (!response.ok) {
+        throw new Error(data.message || 'An error occurred while uploading data');
+      }
+      setMessage(data.message);
+    } catch (error) {
+      setMessage('Error uploading attendance data: ' + error.message);
+      console.error(error);
+    }
   };
 
   return (
@@ -60,6 +87,7 @@ const AddAttendance = () => {
                 <th className='border border-gray-800 px-2 py-1'>Student Name</th>
                 <th className='border border-gray-800 px-2 py-1'>FN/Total</th>
                 <th className='border border-gray-800 px-2 py-1'>AN/Total</th>
+                <th className='border border-gray-800 px-2 py-1'>Exams</th>
               </tr>
             </thead>
             <tbody>
@@ -68,42 +96,49 @@ const AddAttendance = () => {
                 <td className='border border-gray-800 px-2 py-1'>Ramesh</td>
                 <td className='border border-gray-800 px-2 py-1'>5/6</td>
                 <td className='border border-gray-800 px-2 py-1'>5/6</td>
+                <td className='border border-gray-800 px-2 py-1'>1/2</td>
               </tr>
               <tr className='bg-gray-100'>
                 <td className='border border-gray-800 px-2 py-1'>KPL2024900002</td>
                 <td className='border border-gray-800 px-2 py-1'>Suresh</td>
                 <td className='border border-gray-800 px-2 py-1'>4/6</td>
                 <td className='border border-gray-800 px-2 py-1'>3/6</td>
+                <td className='border border-gray-800 px-2 py-1'>2/2</td>
               </tr>
               <tr>
                 <td className='border border-gray-800 px-2 py-1'>KPL2024900003</td>
                 <td className='border border-gray-800 px-2 py-1'>Rahul</td>
                 <td className='border border-gray-800 px-2 py-1'>5/6</td>
                 <td className='border border-gray-800 px-2 py-1'>5/6</td>
+                <td className='border border-gray-800 px-2 py-1'>1/2</td>
               </tr>
               <tr className='bg-gray-100'>
                 <td className='border border-gray-800 px-2 py-1'>KPL2024900004</td>
                 <td className='border border-gray-800 px-2 py-1'>Shreya</td>
                 <td className='border border-gray-800 px-2 py-1'>2/6</td>
                 <td className='border border-gray-800 px-2 py-1'>2/6</td>
+                <td className='border border-gray-800 px-2 py-1'>0/2</td>
               </tr>
               <tr>
                 <td className='border border-gray-800 px-2 py-1'>KPL2024900005</td>
                 <td className='border border-gray-800 px-2 py-1'>Aryan</td>
                 <td className='border border-gray-800 px-2 py-1'>4/6</td>
                 <td className='border border-gray-800 px-2 py-1'>4/6</td>
+                <td className='border border-gray-800 px-2 py-1'>1/2</td>
               </tr>
               <tr className='bg-gray-100'>
                 <td className='border border-gray-800 px-2 py-1'>KPL2024900006</td>
                 <td className='border border-gray-800 px-2 py-1'>Vikram</td>
                 <td className='border border-gray-800 px-2 py-1'>6/6</td>
                 <td className='border border-gray-800 px-2 py-1'>3/6</td>
+                <td className='border border-gray-800 px-2 py-1'>2/2</td>
               </tr>
               <tr>
                 <td className='border border-gray-800 px-2 py-1'>KPL2024900007</td>
                 <td className='border border-gray-800 px-2 py-1'>Shastri</td>
                 <td className='border border-gray-800 px-2 py-1'>6/6</td>
                 <td className='border border-gray-800 px-2 py-1'>6/6</td>
+                <td className='border border-gray-800 px-2 py-1'>1/2</td>
               </tr>
             </tbody>
           </table>
@@ -118,6 +153,14 @@ const AddAttendance = () => {
           />
         </div>
         {message && <p className="text-center mt-4 text-green-500">{message}</p>}
+        {payload && <div className="text-center my-4">
+          <button 
+            onClick={handleUpload} 
+            className="px-4 py-2 bg-green-500 text-white rounded"
+          >
+            Upload Attendance Data
+          </button>
+        </div>}
         {payload && <pre className="bg-gray-200 p-4 mt-4 rounded">{JSON.stringify(payload, null, 2)}</pre>}
       </div>
     </div>
