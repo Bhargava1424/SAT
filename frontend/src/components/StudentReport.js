@@ -1,3 +1,4 @@
+// StudentReport.js
 import React, { useEffect, useState } from 'react';
 import { useParams } from 'react-router-dom';
 import { Line } from 'react-chartjs-2';
@@ -145,18 +146,18 @@ const StudentReport = () => {
   };
 
   return (
-    <div className="min-h-screen bg-gray-100 p-8">
+    <div className="min-h-screen bg-gray-100 p-4 md:p-8">
       <div className="max-w-6xl mx-auto">
-        <h2 className="text-3xl font-bold text-center my-6 text-[#2D5990]">
+        <h2 className="text-2xl md:text-3xl font-bold text-center my-4 md:my-6 text-[#2D5990]">
           Report of{' '}
           <span className="text-[#00A0E3]">
             {studentDetails ? `${studentDetails.firstName} ${studentDetails.surName}` : 'Loading...'}
           </span>
         </h2>
         {studentDetails ? (
-          <div className="bg-white p-6 rounded-lg shadow-lg mb-6 flex flex-col md:flex-row justify-between">
+          <div className="bg-white p-4 md:p-6 rounded-lg shadow-lg mb-4 md:mb-6 flex flex-col md:flex-row justify-between">
             <div className="mb-4 md:mb-0">
-              <h3 className="text-xl font-bold text-[#2D5990]">Student Details</h3>
+              <h3 className="text-lg md:text-xl font-bold text-[#2D5990]">Student Details</h3>
               <p className="text-gray-700">
                 <strong className="text-[#2D5990]">Student Name:</strong>{' '}
                 <span className="text-[#00A0E3] font-bold">{studentDetails.firstName} {studentDetails.surName}</span>
@@ -171,7 +172,7 @@ const StudentReport = () => {
               </p>
             </div>
             <div>
-              <h3 className="text-xl font-bold text-[#2D5990]">Attendance</h3>
+              <h3 className="text-lg md:text-xl font-bold text-[#2D5990]">Attendance</h3>
               <p className="text-gray-700">
                 <strong className="text-[#2D5990]">FN:</strong>{' '}
                 <span className="text-[#00A0E3] font-bold">{studentDetails.attendance.fnTotal}</span>
@@ -193,15 +194,15 @@ const StudentReport = () => {
           <p className="text-center text-gray-700">No assessments found for this student.</p>
         ) : (
           <div>
-            <div className="text-center mb-6">
+            <div className="text-center mb-4 md:mb-6">
               <p
-                className="text-xl font-bold cursor-pointer text-[#00A0E3] hover:underline"
+                className="text-lg md:text-xl font-bold cursor-pointer text-[#00A0E3] hover:underline"
                 onClick={handleWeightSignificanceClick}
               >
                 Overall Average: {overallAverage}
               </p>
             </div>
-            <div className="bg-white p-6 rounded-lg shadow-lg mb-6">
+            <div className="bg-white p-4 md:p-6 rounded-lg shadow-lg mb-4 md:mb-6">
               <Line data={data} options={options} />
             </div>
             {selectedAssessment && (
