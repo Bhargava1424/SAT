@@ -32,7 +32,7 @@ const AssessmentModal = ({ assessment, onClose }) => {
           <h2 className="text-xl md:text-2xl font-bold text-[#2D5990]">Assessment Details</h2>
           <button
             onClick={onClose}
-            className="text-red-600 font-bold text-xl md:text-2xl hover:text-red-800 transition-colors"
+            className="text-red-600 font-bold text-xl md:text-4xl hover:text-red-800 transition-colors"
           >
             &times;
           </button>
@@ -46,13 +46,13 @@ const AssessmentModal = ({ assessment, onClose }) => {
         <div>
           {assessment.assessment.map((module, index) => (
             <div key={index} className="mb-6">
-              <h3 className="text-lg md:text-xl font-semibold mb-2 text-[#2D5990]">
+              <h3 className="text-lg md:text-xl font-semibold mb-2 text-[#00A0E3]">
                 {module.module} - Average: {calculateModuleAverage(module)}
               </h3>
-              <ul className="list-disc list-inside text-gray-700">
+              <ul className="list-disc list-inside text-gray-700 text-nowrap">
                 {module.responses.map((response, idx) => (
                   <li key={idx}>
-                    <strong className="text-[#2D5990]">{response.question}</strong>: {response.answer} (Weight: {response.weight})
+                    <span className=' text-emerald-600 font-bold'>(Weight: {response.weight})</span> <span className='font-semibold'>{response.question}</span>: <span className='font-extrabold text-[#00A0E3]'>{response.answer}</span> 
                   </li>
                 ))}
               </ul>

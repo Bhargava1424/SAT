@@ -76,6 +76,7 @@ const PendingStudents = () => {
             onChange={date => setSessionDate(date)}
             dateFormat="yyyy/MM/dd"
             className="px-4 py-2 border rounded-md bg-white"
+            maxDate={new Date()}
           />
         </div>
         {currentSession ? (
