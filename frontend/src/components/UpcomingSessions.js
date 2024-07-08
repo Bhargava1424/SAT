@@ -55,8 +55,8 @@
                 </div>
                 <div className="p-4">
                   <h2 className="text-lg md:text-xl font-bold text-[#2D5990] mb-1">{student.firstName} {student.surName}</h2>
-                  <p className="text-sm md:text-base text-gray-600 bg-gray-100 rounded-lg p-2">
-                    This student will be listed in the Pending sessions in the upcoming session.
+                  <p className="text-sm content-end md:text-base text-gray-600 bg-gray-100 rounded-lg p-2">
+                  This student will be listed in the Pending sessions and upcoming sessions pages.
                   </p>
                 </div>
               </div>

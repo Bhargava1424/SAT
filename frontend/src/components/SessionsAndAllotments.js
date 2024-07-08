@@ -18,7 +18,6 @@ const SessionAndAllotments = () => {
   const [selectedClusterID, setSelectedClusterID] = useState(null);
   const [selectedSessionID, setSelectedSessionID] = useState(null);
 
-
   useEffect(() => {
     const fetchBranches = async () => {
       try {
@@ -104,22 +103,22 @@ const SessionAndAllotments = () => {
   const renderSessionsTable = (branch) => {
     const branchSessions = branch === 'All' ? sessions : sessions.filter((session) => session.branch === branch);
     const sortedSessionsByTeacher = filterAndSortSessions(branchSessions);
-
+  
     const branchTeachers = new Set(branchSessions.map((session) => session.teacher));
     const branchPeriods = Array.from(new Set(Object.values(sortedSessionsByTeacher).flat().map(session => session.period))).slice(0, 7);
-
+  
     return (
-      <div key={branch} className="mb-12">
-        <h2 className="text-2xl font-bold my-4 text-center text-[#2D5990]">
+      <div key={branch} className="mb-12 bg-gray-200 md:mx-4 md:p-6 p-1 rounded-lg shadow-lg overflow-x-auto">
+        <h2 className="text-3xl font-bold mb-6 text-center text-[#2D5990]">
           {branch === 'All' ? 'All Branches' : branch}
         </h2>
         <div className="overflow-x-auto">
-          <table className="min-w-full bg-white border border-collapse shadow-lg rounded-lg overflow-hidden">
+          <table className="min-w-full border border-collapse shadow-lg rounded-lg overflow-hidden">
             <thead>
-              <tr className="bg-[#00A0E3] text-white">
-                <th className="py-4 px-6 border-b font-semibold">Period</th>
+              <tr className="bg-[#2D5990] text-white">
+                <th className="py-4 px-6 border-b-2 font-semibold">Period</th>
                 {[...branchTeachers].map((teacher, index) => (
-                  <th key={index} className="py-4 px-6 border-b font-semibold">
+                  <th key={index} className="py-4 px-6 border-b-2 font-semibold">
                     {teacher}
                   </th>
                 ))}
@@ -130,7 +129,7 @@ const SessionAndAllotments = () => {
                 <tr
                   key={index}
                   className={`transition duration-300 ${
-                    periodIncludesStartDate(period) ? 'bg-green-100' : 'hover:bg-gray-100'
+                    periodIncludesStartDate(period) ? 'bg-[#00A0E3]' : 'hover:bg-[#F0F8FF]'
                   }`}
                 >
                   <td className="py-4 px-6 border-b text-center font-medium whitespace-nowrap">
@@ -143,11 +142,13 @@ const SessionAndAllotments = () => {
                     return (
                       <td
                         key={teacherIndex}
-                        className={`py-4 px-6 border-b text-center cursor-pointer transition duration-300 transform hover:scale-105 whitespace-nowrap`}
+                        className={`py-4 px-6 border-b text-center cursor-pointer transition duration-200 transform hover:scale-110 whitespace-nowrap ${
+                          session ? '' : 'bg-gray-200'
+                        }`}
                         onClick={() => {
                           setSelectedClusterID(session?.clusterID);
                           setSelectedSessionID(session?._id);
-
+  
                           setIsStudentListModalOpen(true);
                         }}
                         title={
@@ -158,10 +159,13 @@ const SessionAndAllotments = () => {
                       >
                         {session ? (
                           <div className="space-y-1">
-                            <p><strong>session ID:</strong> {session._id}</p>
-                            <p><strong>Cluster ID:</strong> {session.clusterID}</p>
-                            <p><strong>Branch:</strong> {session.branch}</p>
-                            <p><strong>Status:</strong> {session.status}</p>
+                            <p className={`px-2 py-1 rounded-lg ${
+                              session.status === 'pending' ? 'bg-red-200 text-red-700' :
+                              session.status === 'completed' ? 'bg-green-200 text-green-700' :
+                              session.status === 'upcoming' ? 'bg-gray-200 text-gray-700' : ''
+                            }`}>
+                              <strong>Status:</strong> {session.status}
+                            </p>
                           </div>
                         ) : (
                           'N/A'
@@ -174,8 +178,6 @@ const SessionAndAllotments = () => {
             </tbody>
           </table>
         </div>
-
-
       </div>
     );
   };
@@ -194,12 +196,12 @@ const SessionAndAllotments = () => {
   };
 
   return (
-    <div className="container mx-auto px-4 pb-8">
+    <div className="container pb-8 mx-auto px-4 sm:px-6 lg:px-8">
       <Navbar />
-      <h1 className="text-4xl font-bold my-8 text-center text-[#2D5990]">
+      <h1 className="text-3xl sm:text-4xl font-bold my-8 text-center text-[#2D5990]">
         Sessions and Allotments
       </h1>
-      <div className="my-6 flex justify-center items-center space-x-8">
+      <div className="my-6 flex flex-col sm:flex-row justify-center items-center space-y-4 sm:space-y-0 sm:space-x-8">
         <div className="flex items-center space-x-2">
           <label className="text-xl font-medium text-[#2D5990]">Select Start Date:</label>
           <DatePicker

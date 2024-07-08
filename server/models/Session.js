@@ -40,7 +40,7 @@ const sessionSchema = new mongoose.Schema({
   },
   status: {
     type: String,
-    enum: ['pending', 'complete', 'incomplete'],
+    enum: ['pending', 'completed', 'upcoming'],
     default: 'pending'
   }
 });
