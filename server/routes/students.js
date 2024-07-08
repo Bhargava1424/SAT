@@ -343,6 +343,8 @@ router.get('/applicationNumber/:applicationNumber', async (req, res) => {
   }
 });
 
+
+
 // Update attendance for multiple students
 router.post('/updateAttendance', async (req, res) => {
   const attendanceData = req.body;
@@ -351,31 +353,24 @@ router.post('/updateAttendance', async (req, res) => {
     for (const record of attendanceData) {
       const { applicationNumber, fnTotal, anTotal, exams } = record;
 
-      // Find the student by application number
       const student = await Student.findOne({ applicationNumber: applicationNumber });
-
       if (student) {
-        // Split the existing and new totals
-        const [existingFnNumerator, existingFnDenominator] = student.attendance.fnTotal ? student.attendance.fnTotal.split('/').map(Number) : [0, 0];
-        const [newFnNumerator, newFnDenominator] = fnTotal.split('/').map(Number);
+        const currentFnTotal = student.attendance.fnTotal ? student.attendance.fnTotal.split('/').map(Number) : [0, 0];
+        const currentAnTotal = student.attendance.anTotal ? student.attendance.anTotal.split('/').map(Number) : [0, 0];
+        const currentExams = student.attendance.exams ? student.attendance.exams.split('/').map(Number) : [0, 0];
 
-        const [existingAnNumerator, existingAnDenominator] = student.attendance.anTotal ? student.attendance.anTotal.split('/').map(Number) : [0, 0];
-        const [newAnNumerator, newAnDenominator] = anTotal.split('/').map(Number);
+        const newFnTotal = fnTotal.split('/').map(Number);
+        const newAnTotal = anTotal.split('/').map(Number);
+        const newExams = exams.split('/').map(Number);
 
-        const [existingExamNumerator, existingExamDenominator] = student.attendance.exams ? student.attendance.exams.split('/').map(Number) : [0, 0];
-        const [newExamNumerator, newExamDenominator] = exams.split('/').map(Number);
+        const updatedFnTotal = `${currentFnTotal[0] + newFnTotal[0]}/${currentFnTotal[1] + newFnTotal[1]}`;
+        const updatedAnTotal = `${currentAnTotal[0] + newAnTotal[0]}/${currentAnTotal[1] + newAnTotal[1]}`;
+        const updatedExams = `${currentExams[0] + newExams[0]}/${currentExams[1] + newExams[1]}`;
 
-        // Calculate the new totals
-        const updatedFnTotal = `${existingFnNumerator + newFnNumerator}/${existingFnDenominator + newFnDenominator}`;
-        const updatedAnTotal = `${existingAnNumerator + newAnNumerator}/${existingAnDenominator + newAnDenominator}`;
-        const updatedExams = `${existingExamNumerator + newExamNumerator}/${existingExamDenominator + newExamDenominator}`;
-
-        // Update the student's attendance record
-        student.attendance.fnTotal = updatedFnTotal;
-        student.attendance.anTotal = updatedAnTotal;
-        student.attendance.exams = updatedExams;
-
-        await student.save();
+        await Student.updateOne(
+          { applicationNumber: applicationNumber },
+          { $set: { 'attendance.fnTotal': updatedFnTotal, 'attendance.anTotal': updatedAnTotal, 'attendance.exams': updatedExams } }
+        );
       }
     }
 
@@ -384,6 +379,8 @@ router.post('/updateAttendance', async (req, res) => {
     res.status(500).json({ message: 'Error updating attendance', error });
   }
 });
+
+module.exports = router;
 
 
 module.exports = router ;
