@@ -38,8 +38,17 @@ router.get('/', async (req, res) => {
       await new Student(newStudent).save(); // Save the new student with assigned cluster
     }
 
+    // 4 . Studentsfromotherdb will have photo from existingStudents 
+    studentsFromOtherDB.forEach(student => {
+      const existingStudent = existingStudents.find(existing => existing.applicationNumber === student.applicationNumber);
+      if (existingStudent) {
+        student.photo = existingStudent.photo;
+      }
+    });
+
     // 5. Send all students from this app's database
     const allStudents = await Student.find();
+    
     res.json(studentsFromOtherDB); 
   } catch (err) {
     res.status(500).json({ message: err.message });

@@ -111,7 +111,7 @@ const AddAttendance = () => {
       <div className="flex justify-end mr-10">
         <button 
           onClick={downloadTemplate} 
-          className="px-6 py-3 bg-[#00A0E3] text-white rounded-lg hover:bg-[rgb(35,134,176)] transition duration-200"
+          className="px-6 py-3 bg-[#00A0E3] text-white rounded-lg hover:bg-[rgb(44,154,202)] transition duration-200"
         >
           Download Excel Template
         </button>

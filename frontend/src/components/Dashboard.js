@@ -25,6 +25,7 @@ const Dashboard = () => {
 
   useEffect(() => {
     fetchStudents();
+    console.log(students)
   }, []);
 
   const handleRowClick = (id) => {
@@ -70,7 +71,7 @@ const Dashboard = () => {
 
   const filteredStudents = students.filter((student) => {
     const searchTerms = searchQuery.toLowerCase().split(',').map((term) => term.trim());
-    const studentValues = Object.values(student).map((value) => value.toString().toLowerCase());
+    const studentValues = Object.values(student).map((value) => value ? value.toString().toLowerCase() : '');
 
     return searchTerms.every((term) => studentValues.some((value) => value.includes(term)));
   });
@@ -87,8 +88,8 @@ const Dashboard = () => {
 
   const sortedStudents = filteredStudents.sort((a, b) => {
     if (sortColumn) {
-      const valueA = a[sortColumn].toString().toLowerCase();
-      const valueB = b[sortColumn].toString().toLowerCase();
+      const valueA = a[sortColumn] ? a[sortColumn].toString().toLowerCase() : '';
+      const valueB = b[sortColumn] ? b[sortColumn].toString().toLowerCase() : '';
 
       if (valueA < valueB) {
         return sortDirection === 'asc' ? -1 : 1;
@@ -99,6 +100,7 @@ const Dashboard = () => {
     }
     return 0;
   });
+
 
   // Pagination logic
   const indexOfLastStudent = currentPage * studentsPerPage;
@@ -304,13 +306,19 @@ const Dashboard = () => {
                     <td className="px-2 py-1 md:py-2 border-b border-gray-600 border-r md:text-base text-xs">
                       <div className="flex items-center justify-center">
                         <img
-                          src={profileImage}
-                          alt="Profile"
+                          src={student.photo || profileImage}
+                          alt="Student Profile"
                           className="w-8 h-8 md:w-12 md:h-12 rounded-full transition-transform duration-300 transform hover:scale-110 cursor-pointer"
-                          onClick={() => handleImageClick(profileImage)}
+                          onClick={() => handleImageClick(student.photo || profileImage)}
+                          onError={(e) => {
+                            e.target.onerror = null; // Prevents looping
+                            e.target.src = profileImage;
+                          }}
                         />
                       </div>
                     </td>
+
+
                     <td className="px-2 py-1 md:py-2 border-b border-gray-600 border-r md:text-base text-xs">{student.surName} {student.firstName}</td>
                     <td className="px-2 py-1 md:py-2 border-b border-gray-600 border-r md:text-base text-xs">{student.parentName}</td>
                     <td className="px-2 py-1 md:py-2 border-b border-gray-600 border-r md:text-base text-xs">{student.applicationNumber}</td>
