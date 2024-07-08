@@ -270,4 +270,26 @@ async function getSession(req, res, next) {
   next();
 }
 
+
+// Route to get sessions by multiple IDs
+router.post('/byIds', async (req, res) => {
+  try {
+    const { sessionIds } = req.body;
+    if (!sessionIds || !sessionIds.length) {
+      return res.status(400).json({ message: 'Session IDs are required' });
+    }
+
+    const objectIds = sessionIds.map((id) => new mongoose.Types.ObjectId(id));
+
+    const sessions = await Session.find({
+      _id: { $in: objectIds },
+    });
+
+    res.json(sessions);
+  } catch (err) {
+    res.status(500).json({ message: err.message });
+  }
+});
+
+
 module.exports = router;

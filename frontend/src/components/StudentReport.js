@@ -1,4 +1,3 @@
-// StudentReport.js
 import React, { useEffect, useState } from 'react';
 import { useParams } from 'react-router-dom';
 import { Line } from 'react-chartjs-2';
@@ -28,6 +27,7 @@ ChartJS.register(
 const StudentReport = () => {
   const { applicationNumber } = useParams();
   const [assessments, setAssessments] = useState([]);
+  const [sessions, setSessions] = useState([]);
   const [studentDetails, setStudentDetails] = useState(null);
   const [error, setError] = useState('');
   const [selectedAssessment, setSelectedAssessment] = useState(null);
@@ -44,6 +44,8 @@ const StudentReport = () => {
           throw new Error(data.error || 'An error occurred while fetching data');
         }
         setAssessments(data);
+        const sessionIds = data.map((assessment) => assessment.sessionId);
+        fetchSessions(sessionIds);
       } catch (error) {
         setError('Error fetching assessments: ' + error.message);
       }
@@ -65,6 +67,28 @@ const StudentReport = () => {
       }
     };
 
+    const fetchSessions = async (sessionIds) => {
+      try {
+        const response = await fetch(
+          process.env.REACT_APP_BASE_URL + `/sessions/byIds`,
+          {
+            method: 'POST',
+            headers: {
+              'Content-Type': 'application/json',
+            },
+            body: JSON.stringify({ sessionIds }),
+          }
+        );
+        const data = await response.json();
+        if (!response.ok) {
+          throw new Error(data.error || 'An error occurred while fetching sessions');
+        }
+        setSessions(data);
+      } catch (error) {
+        setError('Error fetching sessions: ' + error.message);
+      }
+    };
+
     fetchAssessments();
     fetchStudentDetails();
   }, [applicationNumber]);
@@ -83,7 +107,8 @@ const StudentReport = () => {
   const sessionAverages = assessments.map((assessment) => {
     const allResponses = assessment.assessment.flatMap((module) => module.responses);
     const average = calculateWeightedAverage(allResponses);
-    return { sessionId: assessment.sessionId, average: parseFloat(average) };
+    const session = sessions.find((session) => session._id === assessment.sessionId);
+    return { period: session ? session.period : assessment.sessionId, average: parseFloat(average) };
   });
 
   const overallAverage = (
@@ -92,7 +117,7 @@ const StudentReport = () => {
   ).toFixed(2);
 
   const data = {
-    labels: sessionAverages.map((sa) => sa.sessionId),
+    labels: sessionAverages.map((sa) => sa.period),
     datasets: [
       {
         label: 'Session Averages',
@@ -111,7 +136,7 @@ const StudentReport = () => {
       x: {
         title: {
           display: true,
-          text: 'Session ID',
+          text: 'Session Period',
         },
       },
       y: {
@@ -171,21 +196,23 @@ const StudentReport = () => {
                 <span className="text-[#00A0E3] font-bold">{studentDetails.batch}</span>
               </p>
             </div>
-            <div>
-              <h3 className="text-lg md:text-xl font-bold text-[#2D5990]">Attendance</h3>
-              <p className="text-gray-700">
-                <strong className="text-[#2D5990]">FN:</strong>{' '}
-                <span className="text-[#00A0E3] font-bold">{studentDetails.attendance.fnTotal}</span>
-              </p>
-              <p className="text-gray-700">
-                <strong className="text-[#2D5990]">AN:</strong>{' '}
-                <span className="text-[#00A0E3] font-bold">{studentDetails.attendance.anTotal}</span>
-              </p>
-              <p className="text-gray-700">
-                <strong className="text-[#2D5990]">Exams:</strong>{' '}
-                <span className="text-[#00A0E3] font-bold">{studentDetails.attendance.exams}</span>
-              </p>
-            </div>
+            {studentDetails.attendance && (
+              <div>
+                <h3 className="text-lg md:text-xl font-bold text-[#2D5990]">Attendance</h3>
+                <p className="text-gray-700">
+                  <strong className="text-[#2D5990]">FN:</strong>{' '}
+                  <span className="text-[#00A0E3] font-bold">{studentDetails.attendance.fnTotal}</span>
+                </p>
+                <p className="text-gray-700">
+                  <strong className="text-[#2D5990]">AN:</strong>{' '}
+                  <span className="text-[#00A0E3] font-bold">{studentDetails.attendance.anTotal}</span>
+                </p>
+                <p className="text-gray-700">
+                  <strong className="text-[#2D5990]">Exams:</strong>{' '}
+                  <span className="text-[#00A0E3] font-bold">{studentDetails.attendance.exams}</span>
+                </p>
+              </div>
+            )}
           </div>
         ) : (
           <p className="text-center text-gray-700">Loading student details...</p>
