@@ -32,7 +32,6 @@ const assessmentSchema = new mongoose.Schema({
     sessionId: {
         type: String,
         ref: 'Session',
-        unique: true,
         required: true
     }
 });

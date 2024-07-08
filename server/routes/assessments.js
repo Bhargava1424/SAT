@@ -67,9 +67,9 @@ router.post('/', async (req, res) => {
         currentSessionAssignments.push(newAssessment._id);
         currentSession.assessmentIds = currentSessionAssignments;
         // if all assessments are done, update session status to completed
-        if (currentSession.assessmentIds.length === currentSession.students.length) {
-            currentSession.status = 'completed';
-        }
+        // if (currentSession.assessmentIds.length === currentSession.students.length) {
+        //     currentSession.status = 'completed';
+        // }
         await currentSession.save();
 
         res.status(201).json(newAssessment);
