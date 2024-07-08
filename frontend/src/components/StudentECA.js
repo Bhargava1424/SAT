@@ -15,7 +15,7 @@ const StudentECA = () => {
   const [parentFeedback, setParentFeedback] = useState('');
   const [googleDriveLink, setGoogleDriveLink] = useState('');
   const [formValid, setFormValid] = useState(false);
-  const [eca, setEca] = useState(null); 
+  const [eca, setEca] = useState([]); 
   const [editMode, setEditMode] = useState(false);
   const [currentEditingId, setCurrentEditingId] = useState(null); // Define currentEditingId here
   const navigate = useNavigate();
@@ -24,14 +24,12 @@ const StudentECA = () => {
     fetch(process.env.REACT_APP_BASE_URL + `/eca/${applicationNumber}`)
       .then(response => response.json())
       .then(data => {
-        if (data.length > 0) {
-          setEca(data[0]);
-        } else {
-          setEca(null);
-        }
+        setEca(data);  // Store all fetched records
       })
       .catch(error => console.error('Error:', error));
   }, [applicationNumber]);
+  
+
 
   const handleRatingChange = (event, category) => {
     const value = parseInt(event.target.value, 10);
@@ -140,7 +138,7 @@ const StudentECA = () => {
         <h1 className="text-3xl font-bold mb-8 text-center">
           Providing ECA feedback for <span className="text-blue-600">{studentName}</span>
         </h1>
-        {eca && ( // Only render the form if eca is not null
+        { ( // Only render the form if eca is not null
           <form onSubmit={handleSubmit} className="space-y-8">
             <div>
               <p className="text-lg font-semibold mb-4">
@@ -230,31 +228,33 @@ const StudentECA = () => {
         )}
 
         {/* Display the ECA if it exists */}
-        {eca && (
-          <div className="mt-2">
-            <h2 className="text-xl font-bold mb-4">Current ECA Entry:</h2>
-            <div className="p-4 bg-white rounded-lg shadow cursor-pointer">
-              <p>Date: {new Date(eca.date).toLocaleDateString()}</p>
-              <p>Communication Rating: {eca.communicationRating}</p>
-              <p>Parent Feedback: {eca.parentFeedback}</p>
-              <div>
-                <h4 className="font-bold">Participation Ratings:</h4>
-                {Object.entries(eca.participationRatings).map(([key, value]) => (
-                  <p key={key}>{`${key}: ${value}`}</p>
-                ))}
-              </div>
-              <div className="flex justify-around mt-4">
-                <button onClick={() => handleEdit(eca)} className="px-4 py-2 bg-blue-500 text-white rounded hover:bg-blue-700">
-                  Edit
-                </button>
+        {eca.length > 0 ? (
+          eca.map((record, index) => (
+            <div key={index} className="mt-2">
+              <h2 className="text-xl font-bold mb-4">Current ECA Entry:</h2>
+              <div className="p-4 bg-white rounded-lg shadow cursor-pointer">
+                <p>Date: {new Date(record.date).toLocaleDateString()}</p>
+                <p>Communication Rating: {record.communicationRating}</p>
+                <p>Parent Feedback: {record.parentFeedback}</p>
+                <div>
+                  <h4 className="font-bold">Participation Ratings:</h4>
+                  {Object.entries(record.participationRatings).map(([key, value]) => (
+                    <p key={key}>{`${key}: ${value}`}</p>
+                  ))}
+                </div>
+                {/* <div className="flex justify-around mt-4">
+                  <button onClick={() => handleEdit(record)} className="px-4 py-2 bg-blue-500 text-white rounded hover:bg-blue-700">
+                    Edit
+                  </button>
+                </div> */}
               </div>
             </div>
-          </div>
-        )}
-        {/* Display a message if no ECA entry exists */}
-        {!eca && (
+          ))
+        ) : (
           <p className="mt-4">No ECA entry found for this student.</p>
         )}
+
+
       </div>
     </div>
   );
