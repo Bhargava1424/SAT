@@ -18,17 +18,11 @@ const CompletedSessions = () => {
     const getTeacherSessions = async () => {
       try {
         const teacherName = sessionStorage.getItem('name');
-        // Fetch the session information for the teacher
-        const getTeacherSessionsResponse = await axios.get(process.env.REACT_APP_BASE_URL + `/sessions/teacher/${teacherName}`);
-        setTeacherSessions(getTeacherSessionsResponse.data);
+        const response = await axios.get(`${process.env.REACT_APP_BASE_URL}/sessions/teacher/${teacherName}`);
+        setTeacherSessions(response.data);
 
-        // Find the session that matches the sessionDate (using the start date)
-        const session = getTeacherSessionsResponse.data.find(session => 
-          new Date(session.startDate) <= sessionDate
-        );
-
+        const session = response.data.find(session => new Date(session.startDate) <= sessionDate);
         setCurrentSession(session);
-
       } catch (error) {
         console.error('Error fetching sessions', error);
       }
@@ -41,9 +35,8 @@ const CompletedSessions = () => {
     const fetchCompletedStudents = async () => {
       try {
         if (currentSession) {
-          const completedStudentsResponse = await axios.get(process.env.REACT_APP_BASE_URL + `/students/completedStudents/${currentSession._id}`);
-          const completedStudentsData = completedStudentsResponse.data;
-          setCompletedStudents(completedStudentsData);
+          const response = await axios.get(`${process.env.REACT_APP_BASE_URL}/students/completedStudents/${currentSession._id}`);
+          setCompletedStudents(response.data);
         }
       } catch (error) {
         console.error('Error fetching students', error);
@@ -53,8 +46,18 @@ const CompletedSessions = () => {
     fetchCompletedStudents();
   }, [currentSession]);
 
-  const handleViewEdit = (name, sessionId, applicationNumber) => {
-    navigate(`/assessment/${name}/${sessionId}/${applicationNumber}`);
+  const handleViewEdit = async (name, sessionId, applicationNumber) => {
+    try {
+      const response = await axios.get(`${process.env.REACT_APP_BASE_URL}/assessments/${applicationNumber}/${sessionId}`);
+      const assessment = response.data;
+      navigate(`/assessment/${name}/${sessionId}/${applicationNumber}/${assessment._id}`);
+    } catch (error) {
+      if (error.response && error.response.status === 404) {
+        navigate(`/assessment/${name}/${sessionId}/${applicationNumber}`);
+      } else {
+        console.error('Error fetching assessment', error);
+      }
+    }
   };
 
   const handleMouseEnter = (student) => {
@@ -99,13 +102,13 @@ const CompletedSessions = () => {
             >
               <div>
                 <img
-                  src={student.photo || profileImage} 
+                  src={student.photo || profileImage}
                   alt={student.firstName}
                   className="w-full h-48 object-cover"
                 />
               </div>
               <div className="p-4">
-                <h2 className="text-lg md:text-xl font-bold text-[#2D5990] mb-1">{student.firstName} {student.surName}</h2> 
+                <h2 className="text-lg md:text-xl font-bold text-[#2D5990] mb-1">{student.firstName} {student.surName}</h2>
                 <button
                   onClick={() => handleViewEdit(student.firstName, currentSession._id, student.applicationNumber)}
                   className="w-full bg-gradient-to-r from-[#2D5990] to-[#00A0E3] hover:from-[#00A0E3] hover:to-[#2D5990] text-white font-bold py-2 px-4 rounded-full focus:outline-none focus:shadow-outline transition-colors duration-300 transform hover:scale-105"

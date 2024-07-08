@@ -37,6 +37,7 @@ function App() {
           <Route path="/pendingSessions" element={userHasRequiredRole(['teacher']) ? <PendingSessions /> : <Navigate replace to="/" />} />
           <Route path="/completedSessions" element={userHasRequiredRole(['teacher']) ? <CompletedSessions /> : <Navigate replace to="/" />} />
           <Route path="/assessment/:name/:sessionId/:applicationNumber" element={userHasRequiredRole(['teacher']) ? <StudentAssessment /> : <Navigate replace to="/" />} />
+          <Route path="/assessment/:name/:sessionId/:applicationNumber/:assessmentId?" element={userHasRequiredRole(['teacher']) ? <StudentAssessment /> : <Navigate replace to="/" />} />
           <Route path="/eca/:applicationNumber/:studentName" element={userHasRequiredRole(['vice president']) ? <StudentECA /> : <Navigate replace to="/" />} />
           <Route path="/upcomingSessions" element={userHasRequiredRole(['teacher']) ? <UpcomingSessions /> : <Navigate replace to="/" />} />
           <Route path="/viewFeedbacks" element={userHasRequiredRole(['admin', 'vice president', 'director']) ? <ViewFeedbacks /> : <Navigate replace to="/" />} />

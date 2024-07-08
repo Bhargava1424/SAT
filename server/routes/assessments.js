@@ -120,4 +120,37 @@ async function getAssessment(req, res, next) {
     next();
 }
 
+// Get assessment by application number and session ID
+router.get('/:applicationNumber/:sessionId', async (req, res) => {
+    try {
+      const { applicationNumber, sessionId } = req.params;
+      const assessment = await Assessment.findOne({ applicationNumber, sessionId });
+      if (!assessment) {
+        return res.status(404).json({ message: 'Assessment not found' });
+      }
+      res.json(assessment);
+    } catch (err) {
+      res.status(500).json({ message: err.message });
+    }
+  });
+
+
+// Update assessment by assessmentId
+router.put('/:assessmentId', async (req, res) => {
+    try {
+      const assessment = await Assessment.findById(req.params.assessmentId);
+      if (!assessment) {
+        return res.status(404).json({ message: 'Assessment not found' });
+      }
+  
+      assessment.assessment = req.body.assessment;
+      assessment.date = new Date();
+  
+      const updatedAssessment = await assessment.save();
+      res.json(updatedAssessment);
+    } catch (err) {
+      res.status(400).json({ message: err.message });
+    }
+  });
+
 module.exports = router;

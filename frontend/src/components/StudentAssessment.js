@@ -43,21 +43,39 @@ const modules = [
   },
 ];
 
-// Dummy function to check if assessment already exists for a student
-const checkIfAssessmentExists = (name) => {
-  // Replace this with actual API call logic
-  return name === 'Alice Johnson'; // Example: return true for Alice Johnson
+const checkIfAssessmentExists = async (applicationNumber, sessionId) => {
+  try {
+    const response = await axios.get(`${process.env.REACT_APP_BASE_URL}/assessments/${applicationNumber}/${sessionId}`);
+    return response.data;
+  } catch (error) {
+    return null;
+  }
 };
 
 const StudentAssessment = () => {
-  const { name, sessionId, applicationNumber } = useParams();
+  const { name, sessionId, applicationNumber, assessmentId } = useParams();
   const [responses, setResponses] = useState(modules.map(module => module.questions.map(() => null)));
   const [assessmentExists, setAssessmentExists] = useState(false);
+  const [existingAssessmentId, setExistingAssessmentId] = useState(null);
 
   useEffect(() => {
-    const exists = checkIfAssessmentExists(name);
-    setAssessmentExists(exists);
-  }, [name]);
+    const fetchAssessment = async () => {
+      if (assessmentId) {
+        const assessment = await checkIfAssessmentExists(applicationNumber, sessionId);
+        if (assessment) {
+          const initialResponses = modules.map((module, moduleIndex) =>
+            module.questions.map((question, questionIndex) => 
+              assessment.assessment[moduleIndex]?.responses[questionIndex]?.answer || null
+            )
+          );
+          setResponses(initialResponses);
+          setAssessmentExists(true);
+          setExistingAssessmentId(assessment._id); // Set the existing assessment ID
+        }
+      }
+    };
+    fetchAssessment();
+  }, [applicationNumber, sessionId, assessmentId]);
 
   const handleOptionChange = (moduleIndex, questionIndex, value) => {
     const newResponses = [...responses];
@@ -81,26 +99,29 @@ const StudentAssessment = () => {
     }));
 
     try {
-      const response = await axios.post(process.env.REACT_APP_BASE_URL + `/assessments`, {
-        assessment: payload,
-        teacher,
-        sessionId,
-        applicationNumber,
-      });
-      // Handle the response from the server (e.g., display success message)
-      console.log(response.data);
+      if (assessmentExists && existingAssessmentId) {
+        const response = await axios.put(`${process.env.REACT_APP_BASE_URL}/assessments/${existingAssessmentId}`, {
+          assessment: payload,
+          teacher,
+          sessionId,
+          applicationNumber,
+        });
+        console.log(response.data);
+      } else {
+        const response = await axios.post(`${process.env.REACT_APP_BASE_URL}/assessments`, {
+          assessment: payload,
+          teacher,
+          sessionId,
+          applicationNumber,
+        });
+        console.log(response.data);
+      }
     } catch (error) {
       console.error('Error saving assessment:', error);
-      // Handle the error (e.g., display error message)
     }
   };
 
   const handleSubmit = () => {
-    if (assessmentExists) {
-      alert('Assessment has already been submitted.');
-      return;
-    }
-
     if (isAllAnswered()) {
       saveResponses();
       alert('Assessment Submitted');
@@ -111,7 +132,7 @@ const StudentAssessment = () => {
   };
 
   const getGradientColor = (value) => {
-    const hue = (value - 1) * 12; // Scale value from 1-10 to 0-240 for hue (red to green)
+    const hue = (value - 1) * 12;
     return `hsl(${hue}, 100%, 50%)`;
   };
 
@@ -125,9 +146,10 @@ const StudentAssessment = () => {
           <div className="bg-yellow-100 border-l-4 border-yellow-500 text-yellow-700 p-4 mb-8" role="alert">
             <p className="font-bold">Assessment Completed</p>
             <p>
-              Assessment for {name} is Completed and Saved. This is the View & Edit page. Please make sure to submit
+              Assessment for {name} is completed and saved. This is the View & Edit page. Please make sure to submit
               after making changes!
             </p>
+            <p><strong>Assessment ID:</strong> {existingAssessmentId}</p>
           </div>
         )}
         {modules.map((module, moduleIndex) => (
