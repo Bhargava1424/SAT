@@ -61,7 +61,7 @@ const UpdateStudent = () => {
 
   const filteredStudents = students.filter((student) => {
     const searchTerms = searchQuery.toLowerCase().split(',').map((term) => term.trim());
-    const studentValues = Object.values(student).map((value) => value.toString().toLowerCase());
+    const studentValues = Object.values(student).map((value) => value ? value.toString().toLowerCase() : '');
 
     return searchTerms.every((term) => studentValues.some((value) => value.includes(term)));
   });
@@ -78,8 +78,8 @@ const UpdateStudent = () => {
 
   const sortedStudents = filteredStudents.sort((a, b) => {
     if (sortColumn) {
-      const valueA = a[sortColumn].toString().toLowerCase();
-      const valueB = b[sortColumn].toString().toLowerCase();
+      const valueA = a[sortColumn] ? a[sortColumn].toString().toLowerCase() : '';
+      const valueB = b[sortColumn] ? b[sortColumn].toString().toLowerCase() : '';
 
       if (valueA < valueB) {
         return sortDirection === 'asc' ? -1 : 1;
@@ -90,6 +90,7 @@ const UpdateStudent = () => {
     }
     return 0;
   });
+
 
   // Pagination logic
   const indexOfLastStudent = currentPage * studentsPerPage;
