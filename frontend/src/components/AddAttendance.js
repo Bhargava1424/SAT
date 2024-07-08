@@ -1,10 +1,29 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import * as XLSX from 'xlsx';
+import { saveAs } from 'file-saver';
 import Navbar from './Navbar';
 
 const AddAttendance = () => {
   const [message, setMessage] = useState('');
   const [payload, setPayload] = useState(null);
+  const [applicationNumbers, setApplicationNumbers] = useState([]);
+  const userBranch = sessionStorage.getItem('branch');
+
+  useEffect(() => {
+    // Fetch application numbers for the user's branch
+    const fetchApplicationNumbers = async () => {
+      try {
+        const response = await fetch(`${process.env.REACT_APP_BASE_URL}/students/applicationNumbers/${userBranch}`);
+        const data = await response.json();
+        setApplicationNumbers(data);
+      } catch (error) {
+        console.error('Error fetching application numbers:', error);
+        setMessage('Error fetching application numbers');
+      }
+    };
+
+    fetchApplicationNumbers();
+  }, [userBranch]);
 
   const handleFileUpload = (e) => {
     const file = e.target.files[0];
@@ -72,11 +91,33 @@ const AddAttendance = () => {
     }
   };
 
+  const downloadTemplate = () => {
+    const wb = XLSX.utils.book_new();
+    const ws_data = [
+      ['Application Number', 'Student Name', 'FN/Total', 'AN/Total', 'Exams'],
+      ...applicationNumbers.map((num) => [num])
+    ];
+    const ws = XLSX.utils.aoa_to_sheet(ws_data);
+    XLSX.utils.book_append_sheet(wb, ws, 'Template');
+    const wbout = XLSX.write(wb, { bookType: 'xlsx', type: 'array' });
+    saveAs(new Blob([wbout], { type: 'application/octet-stream' }), 'AttendanceTemplate.xlsx');
+  };
+
   return (
     <div className="add-attendance min-h-screen bg-gray-400">
       <Navbar />
       <div className="container mx-auto px-4 py-6 bg-gray-300 shadow-lg rounded-3xl mt-6">
-        <h2 className="text-2xl md:text-3xl font-bold mb-4 text-center text-[#2D5990]">Add Attendance</h2>
+      <h2 className="text-2xl md:text-3xl font-bold mb-4 text-center text-[#2D5990]">Add Attendance</h2>
+      <div className="flex justify-end mr-10">
+        <button 
+          onClick={downloadTemplate} 
+          className="px-6 py-3 bg-[#00A0E3] text-white rounded-lg hover:bg-[rgb(35,134,176)] transition duration-200"
+        >
+          Download Excel Template
+        </button>
+      </div>
+
+        
         <div className="text-center my-4 text-lg text-gray-700">
           <p>Welcome! Please upload an Excel file to add attendance records.</p>
           <p>Ensure the Excel file follows the format below:</p>

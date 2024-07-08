@@ -380,7 +380,16 @@ router.post('/updateAttendance', async (req, res) => {
   }
 });
 
-module.exports = router;
-
+// Get all application numbers by branch
+router.get('/applicationNumbers/:branch', async (req, res) => {
+  try {
+    const branch = req.params.branch;
+    const students = await Student.find({ branch }, 'applicationNumber'); // Fetch only applicationNumber field
+    const applicationNumbers = students.map(student => student.applicationNumber);
+    res.json(applicationNumbers);
+  } catch (err) {
+    res.status(500).json({ message: err.message });
+  }
+});
 
 module.exports = router ;
