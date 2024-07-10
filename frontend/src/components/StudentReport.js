@@ -251,59 +251,6 @@ const StudentReport = () => {
           <p className="text-center text-gray-700">Loading student details...</p>
         )}
         
-        {/* New Section: Display Entire Assessment Collection */}
-        <div className="bg-white p-4 md:p-6 rounded-lg shadow-lg mb-4 md:mb-6">
-          <h3 className="text-lg md:text-xl font-bold text-[#2D5990] mb-4">All Assessments</h3>
-          <div className="overflow-x-auto">
-            <table className="min-w-full bg-white">
-              <thead>
-                <tr>
-                  <th className="py-2 px-4 border-b border-gray-200 text-left text-sm md:text-base text-[#2D5990]">Date</th>
-                  <th className="py-2 px-4 border-b border-gray-200 text-left text-sm md:text-base text-[#2D5990]">Assessment ID</th>
-                  <th className="py-2 px-4 border-b border-gray-200 text-left text-sm md:text-base text-[#2D5990]">Session ID</th>
-                  <th className="py-2 px-4 border-b border-gray-200 text-left text-sm md:text-base text-[#2D5990]">Assessed By</th>
-                  <th className="py-2 px-4 border-b border-gray-200 text-left text-sm md:text-base text-[#2D5990]">Branch</th>
-                  <th className="py-2 px-4 border-b border-gray-200 text-left text-sm md:text-base text-[#2D5990]">Assessment Details</th>
-                </tr>
-              </thead>
-              <tbody>
-                {assessments.map((assessment) => (
-                  <tr key={assessment._id}>
-                    <td className="py-2 px-4 border-b border-gray-200 text-sm md:text-base text-gray-700">
-                      {new Date(assessment.date).toLocaleDateString()}
-                    </td>
-                    <td className="py-2 px-4 border-b border-gray-200 text-sm md:text-base text-gray-700">
-                      {assessment.assessmentId}
-                    </td>
-                    <td className="py-2 px-4 border-b border-gray-200 text-sm md:text-base text-gray-700">
-                      {assessment.sessionId}
-                    </td>
-                    <td className="py-2 px-4 border-b border-gray-200 text-sm md:text-base text-gray-700">
-                      {assessment.assessedBy}
-                    </td>
-                    <td className="py-2 px-4 border-b border-gray-200 text-sm md:text-base text-gray-700">
-                      {assessment.branch}
-                    </td>
-                    <td className="py-2 px-4 border-b border-gray-200 text-sm md:text-base text-gray-700">
-                      {assessment.assessment.map((module, index) => (
-                        <div key={index}>
-                          <strong>{module.module}:</strong>
-                          <ul className="list-disc list-inside text-gray-700">
-                            {module.responses.map((response, idx) => (
-                              <li key={idx}>
-                                <strong>{response.keyword}</strong>: {response.question} - Weight: {response.weight}, Answer: {response.answer}
-                              </li>
-                            ))}
-                          </ul>
-                        </div>
-                      ))}
-                    </td>
-                  </tr>
-                ))}
-              </tbody>
-            </table>
-          </div>
-        </div>
         
         {assessments.length === 0 ? (
           <p className="text-center text-gray-700">No assessments found for this student.</p>

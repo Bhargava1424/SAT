@@ -51,26 +51,26 @@ const AssessmentModal = ({ assessment, onClose }) => {
         {
           label: 'Weight * 10',
           data: module.responses.map((response) => response.weight * 10),
-          backgroundColor: 'rgba(34, 202, 236, 0.2)',
-          borderColor: '#00A0E3',
-          pointBackgroundColor: '#00A0E3',
+          backgroundColor: 'rgba(255, 165, 0, 0.2)',
+          borderColor: 'orange',
+          pointBackgroundColor: 'orange',
           pointBorderColor: '#fff',
           pointHoverBackgroundColor: '#fff',
-          pointHoverBorderColor: '#00A0E3',
-          pointRadius: 5, // Adjust this value to make the dot bigger
-          pointHoverRadius: 7, // Adjust this value to make the dot bigger
+          pointHoverBorderColor: 'orange',
+          pointRadius: 5,
+          pointHoverRadius: 7,
         },
         {
           label: 'Weight * Answer',
           data: module.responses.map((response) => response.weight * response.answer),
-          backgroundColor: 'rgba(255, 99, 132, 0.2)',
-          borderColor: '#FF6384',
-          pointBackgroundColor: '#FF6384',
+          backgroundColor: 'rgba(255, 69, 0, 0.2)',
+          borderColor: '#FF4500',
+          pointBackgroundColor: '#FF4500',
           pointBorderColor: '#fff',
           pointHoverBackgroundColor: '#fff',
-          pointHoverBorderColor: '#FF6384',
-          pointRadius: 5, // Adjust this value to make the dot bigger
-          pointHoverRadius: 7, // Adjust this value to make the dot bigger
+          pointHoverBorderColor: '#FF4500',
+          pointRadius: 5,
+          pointHoverRadius: 7,
         },
       ],
     };
@@ -78,60 +78,72 @@ const AssessmentModal = ({ assessment, onClose }) => {
 
   return (
     <div className="fixed inset-0 flex items-center justify-center bg-black bg-opacity-75 p-4">
-      <div ref={modalRef} className="bg-white p-4 md:p-6 rounded-lg shadow-lg w-full max-w-2xl max-h-full overflow-y-auto">
+      <div ref={modalRef} className="bg-[#0d2543] p-4 md:p-6 rounded-lg shadow-lg w-[60%] max-w-7xl max-h-full overflow-y-auto">
         <div className="flex justify-between items-center mb-4">
-          <h2 className="text-xl md:text-2xl font-bold text-[#2D5990]">Assessment Details</h2>
+          <h2 className="text-xl md:text-2xl font-bold text-white">Assessment Details</h2>
           <button
             onClick={onClose}
-            className="text-red-600 font-bold text-xl md:text-4xl hover:text-red-800 transition-colors"
+            className="text-white font-bold text-xl md:text-4xl hover:text-gray-400 transition-colors"
           >
             &times;
           </button>
         </div>
-        <p className="mb-2 text-gray-700">
-          <strong className="text-[#2D5990]">Date:</strong> {new Date(assessment.date).toLocaleDateString()}
+        <p className="mb-2 text-gray-300">
+          Date: <strong className="text-[#31c1ff]">{new Date(assessment.date).toLocaleDateString()}</strong> 
         </p>
-        <p className="mb-4 text-gray-700">
-          <strong className="text-[#2D5990]">Assessed By:</strong> {assessment.assessedBy}
+        <p className="mb-4 text-gray-300">
+          Assessed By: <strong className="text-[#31c1ff]">{assessment.assessedBy} </strong> 
         </p>
-        <div className="mb-6">
-          <h3 className="text-lg md:text-xl font-semibold mb-4 text-[#2D5990]">Summary of Modules</h3>
-          <ul className="list-disc list-inside text-gray-700">
-            {assessment.assessment.map((module, index) => (
-              <li key={index}>
-                <span className="font-semibold">{module.module}</span> - Average: {calculateModuleAverage(module)}
-              </li>
-            ))}
-          </ul>
-        </div>
-        <div>
+        <p className="mb-4 text-gray-300">
+          Session Average: <strong className="text-[#31c1ff]">{calculateModuleAverage({ responses: assessment.assessment.flatMap(module => module.responses) })}</strong> 
+        </p>
+
+        <div className='mt-8'>
           {assessment.assessment.map((module, index) => (
             <div key={index} className="mb-6">
-              <h3 className="text-lg md:text-xl font-semibold mb-2 text-[#00A0E3]">
+              <h3 className="text-lg md:text-xl underline font-semibold mb-2 text-[#31c1ff]">
                 {module.module} - Average: {calculateModuleAverage(module)}
               </h3>
-              <Radar 
-                data={getChartData(module)} 
-                options={{ 
-                  responsive: true, 
-                  scales: { 
-                    r: { 
-                      beginAtZero: true,
-                      pointLabels: {
-                        font: {
-                          size: 16,
+              <div className="relative mt-4" style={{ width: '100%', height: '600px' }}>
+                <Radar 
+                  data={getChartData(module)} 
+                  options={{ 
+                    responsive: true, 
+                    plugins: {
+                      legend: {
+                        labels: {
+                          color: 'white', // Set the text color for the legend
                         },
                       },
-                      ticks: {
-                        font: {
-                          size: 16,
+                    },                
+                    scales: { 
+                      r: { 
+                        beginAtZero: true,
+                        grid: {
+                          color: 'rgba(255, 255, 255, 0.1)',
+                        },
+                        angleLines: {
+                          color: 'rgba(255, 255, 255, 0.1)',
+                        },
+                        pointLabels: {
+                          color: 'white',
+                          font: {
+                            size: 20,
+                          },
+                        },
+                        ticks: {
+                          color: 'white',
+                          backdropColor: 'transparent',
+                          font: {
+                            size: 20,
+                          },
                         },
                       },
                     },
-                  },
-                }} 
-              />
-
+                    maintainAspectRatio: false,
+                  }} 
+                />
+              </div>
             </div>
           ))}
         </div>
