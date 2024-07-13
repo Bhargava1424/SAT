@@ -30,6 +30,10 @@ const teacherSchema = new mongoose.Schema({
     type: String,
     unique: true,
   },
+  subject: {
+    type: String,
+    unique: true,
+  },
   role: {
     type: String,
     enum: ['admin', 'director', 'vice president', 'teacher', 'receptionist'],

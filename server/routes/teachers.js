@@ -28,6 +28,7 @@ router.post('/', async (req, res) => {
       name: req.body.name,
       email: req.body.email,
       gmail: req.body.gmail,
+      subject: req.body.subject,
       password: req.body.password,
       phoneNumber: req.body.phoneNumber,
       branch: req.body.branch,
@@ -45,7 +46,7 @@ router.post('/', async (req, res) => {
 router.patch('/:id', getTeacher, async (req, res) => {
   console.log(req.body); // Log the request body
 
-  const updates = ['name', 'email', 'gmail', 'phoneNumber', 'branch', 'teacherID', 'role'];
+  const updates = ['name', 'email', 'gmail', 'phoneNumber', 'branch', 'teacherID', 'role', 'subject'];
   updates.forEach(update => {
     if (req.body[update] != null) {
       res.teacher[update] = req.body[update];

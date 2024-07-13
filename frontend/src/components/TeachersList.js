@@ -11,7 +11,7 @@ const TeachersList = ({ teachers, onRowClick }) => {
     const queries = searchQuery.toLowerCase().split(',').map(q => q.trim());
     return teachers.filter(teacher => {
       return queries.every(query =>
-        `${teacher.name},${teacher.email},${teacher.role},${teacher.phoneNumber},${teacher.branch},${teacher.teacherID}`
+        `${teacher.name},${teacher.email},${teacher.role},${teacher.phoneNumber},${teacher.branch},${teacher.teacherID},${teacher.subject}`
           .toLowerCase()
           .includes(query)
       );
@@ -64,6 +64,7 @@ const TeachersList = ({ teachers, onRowClick }) => {
               <th onClick={() => handleSort('teacherID')} className="px-2 md:px-4 py-2 text-center border-b border-gray-600 border-r text-sm md:text-base cursor-pointer">Teacher ID</th>
               <th onClick={() => handleSort('name')} className="px-2 md:px-4 py-2 text-center border-b border-gray-600 border-r text-sm md:text-base cursor-pointer">Name</th>
               <th onClick={() => handleSort('role')} className="px-2 md:px-4 py-2 text-center border-b border-gray-600 border-r text-sm md:text-base cursor-pointer">Role</th>
+              <th onClick={() => handleSort('subject')} className="px-2 md:px-4 py-2 text-center border-b border-gray-600 border-r text-sm md:text-base cursor-pointer">Subject</th>
               <th onClick={() => handleSort('email')} className="px-2 md:px-4 py-2 text-center border-b border-gray-600 border-r text-sm md:text-base cursor-pointer">Email</th>
               <th onClick={() => handleSort('phoneNumber')} className="px-2 md:px-4 py-2 text-center border-b border-gray-600 border-r text-sm md:text-base cursor-pointer">Phone Number</th>
               <th onClick={() => handleSort('branch')} className="px-2 md:px-4 py-2 text-center border-b border-gray-600 border-r text-sm md:text-base cursor-pointer">Branch</th>
@@ -80,6 +81,7 @@ const TeachersList = ({ teachers, onRowClick }) => {
                 <td className="px-2 md:px-4 py-1 md:py-2 border-b border-gray-600 border-r text-sm md:text-base">{teacher.teacherID}</td>
                 <td className="px-2 md:px-4 py-1 md:py-2 border-b border-gray-600 border-r text-sm md:text-base">{teacher.name}</td>
                 <td className="px-2 md:px-4 py-1 md:py-2 border-b border-gray-600 border-r text-sm md:text-base">{teacher.role}</td>
+                <td className="px-2 md:px-4 py-1 md:py-2 border-b border-gray-600 border-r text-sm md:text-base">{teacher.subject}</td>
                 <td className="px-2 md:px-4 py-1 md:py-2 border-b border-gray-600 border-r text-sm md:text-base">{teacher.email}</td>
                 <td className="px-2 md:px-4 py-1 md:py-2 border-b border-gray-600 border-r text-sm md:text-base">{teacher.phoneNumber}</td>
                 <td className="px-2 md:px-4 py-1 md:py-2 border-b border-gray-600 border-r text-sm md:text-base">{teacher.branch}</td>
