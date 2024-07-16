@@ -83,9 +83,13 @@ async function fetchStudentsFromOtherDB() {
   
       // Access the "students" collection
       const studentsCollection = client.db().collection('students');
+
+      // Current year
+      const currentYear = new Date().getFullYear();
+      console.log('Current year:', currentYear);
   
       // Query the "students" collection
-      const students = await studentsCollection.find().toArray();
+      const students = await studentsCollection.find({"yearOfJoining": String(currentYear)}).toArray();
       // console.log(students);
   
       // Close the MongoDB connection
