@@ -31,7 +31,7 @@ const LoginPage = () => {
             });
             const data = await response.json();
             if (response.ok) {
-                login(data.teacher.name, data.teacher.role, data.teacher.branch);
+                login(data.teacher.name, data.teacher.role, data.teacher.branch, data.teacher.subject);
                 alert("Logged in Successfully");
                 navigate('/dashboard', { replace: true });
             } else {

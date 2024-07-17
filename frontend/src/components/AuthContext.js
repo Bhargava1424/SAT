@@ -8,17 +8,19 @@ export const AuthProvider = ({ children }) => {
         const savedUser = sessionStorage.getItem('name');
         const savedRole = sessionStorage.getItem('role');
         const savedBranch = sessionStorage.getItem('branch');
-        if (savedUser && savedRole && savedBranch) {
-            return { name: savedUser, role: savedRole, branch: savedBranch };
+        const savedSubject = sessionStorage.getItem('subject');
+        if (savedUser && savedRole && savedBranch && savedSubject) {
+            return { name: savedUser, role: savedRole, branch: savedBranch, subject: savedSubject};
         }
         return null;
     });
 
-    const login = (name, role, branch) => {
-        setUser({ name, role });
+    const login = (name, role, branch, subject) => {
+        setUser({ name, role, branch, subject });
         sessionStorage.setItem('name', name);
         sessionStorage.setItem('role', role);
         sessionStorage.setItem('branch', branch);
+        sessionStorage.setItem('subject', subject);
     };
 
     const logout = () => {
@@ -33,8 +35,9 @@ export const AuthProvider = ({ children }) => {
             const savedUser = sessionStorage.getItem('name');
             const savedRole = sessionStorage.getItem('role');
             const savedBranch = sessionStorage.getItem('branch');
+            const savedSubject = sessionStorage.getItem('subject');
             if (savedUser && savedRole) {
-                setUser({ name: savedUser, role: savedRole, branch: savedBranch });
+                setUser({ name: savedUser, role: savedRole, branch: savedBranch, subject: savedSubject });
             } else {
                 setUser(null);
             }

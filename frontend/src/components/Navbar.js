@@ -19,6 +19,7 @@ function Navbar() {
     const isLoggedIn = sessionStorage.getItem('name') && sessionStorage.getItem('role');
     const name = sessionStorage.getItem('name');
     const role = sessionStorage.getItem('role');
+    const subject = sessionStorage.getItem('subject');
 
     const navItems = [
         { name: 'Dashboard', path: '/dashboard', roles: ['admin', 'teacher', 'vice president', 'director'] },
@@ -106,6 +107,7 @@ function Navbar() {
                                     <div className="absolute top-14 right-0 bg-white text-black rounded-lg shadow-xl p-4 w-48 z-50 text-xs md:text-sm">
                                         <p><strong>Name:</strong> {name}</p>
                                         <p><strong>Role:</strong> <span className='uppercase'>{role}</span></p>
+                                        <p><strong>Subject:</strong> <span className='uppercase'>{subject}</span></p>
                                         <button
                                             onClick={handleLogout}
                                             className="mt-4 rounded-full bg-[#2D5990] hover:bg-[#00A0E3] text-white font-medium py-2 px-4 transition-colors duration-300"

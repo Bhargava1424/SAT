@@ -28,7 +28,10 @@ const assessmentSchema = new mongoose.Schema({
         type: String,
         required: true
     },
-    // New field:
+    subject: {
+        type: String,
+        required: true
+    },
     sessionId: {
         type: String,
         ref: 'Session',

@@ -57,6 +57,7 @@ const StudentAssessment = () => {
   const [responses, setResponses] = useState(modules.map(module => module.questions.map(() => null)));
   const [assessmentExists, setAssessmentExists] = useState(false);
   const [existingAssessmentId, setExistingAssessmentId] = useState(null);
+  const subject = sessionStorage.getItem('subject');
 
   useEffect(() => {
     const fetchAssessment = async () => {
@@ -89,6 +90,7 @@ const StudentAssessment = () => {
 
   const saveResponses = async () => {
     const teacher = sessionStorage.getItem('name');
+    const subject = sessionStorage.getItem('subject');
     const payload = modules.map((module, moduleIndex) => ({
       module: module.title,
       responses: module.questions.map((question, questionIndex) => ({
@@ -105,6 +107,7 @@ const StudentAssessment = () => {
           teacher,
           sessionId,
           applicationNumber,
+          subject,
         });
         console.log(response.data);
       } else {
@@ -113,6 +116,7 @@ const StudentAssessment = () => {
           teacher,
           sessionId,
           applicationNumber,
+          subject,
         });
         console.log(response.data);
       }
