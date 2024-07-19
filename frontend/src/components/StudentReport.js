@@ -12,7 +12,7 @@ import {
   Legend,
 } from 'chart.js';
 import AssessmentModal from './AssessmentModal';
-import WeightSignificanceModal from './WeightSignificanceModal';
+import OverallSpider from './OverallSpider';
 
 ChartJS.register(
   CategoryScale,
@@ -274,8 +274,8 @@ const StudentReport = () => {
               />
             )}
             {showWeightSignificance && (
-              <WeightSignificanceModal
-                assessment={assessments[0]} // Pass the first assessment to display weights
+              <OverallSpider
+                assessments={assessments} // Pass the assessments
                 onClose={() => setShowWeightSignificance(false)}
               />
             )}

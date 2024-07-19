@@ -65,7 +65,7 @@ const AssessmentModal = ({ assessment, onClose }) => {
           pointHoverBackgroundColor: '#fff',
           pointHoverBorderColor: 'blue',
         };
-      case 'maths':
+      case 'mathematics':
         return {
           backgroundColor: 'rgba(255, 0, 0, 0.2)',
           borderColor: 'red',
