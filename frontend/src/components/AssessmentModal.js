@@ -1,4 +1,4 @@
-import React, { useRef, useEffect } from 'react';
+import React, { useRef, useEffect, useState } from 'react';
 import { Radar } from 'react-chartjs-2';
 import {
   Chart as ChartJS,
@@ -21,6 +21,7 @@ ChartJS.register(
 
 const AssessmentModal = ({ assessment, onClose }) => {
   const modalRef = useRef(null);
+  const [activeTab, setActiveTab] = useState('normal'); // Added state for tab control
 
   const handleClickOutside = (event) => {
     if (modalRef.current && !modalRef.current.contains(event.target)) {
@@ -44,7 +45,77 @@ const AssessmentModal = ({ assessment, onClose }) => {
     return (weightedSum / totalWeight).toFixed(2);
   };
 
-  const getChartData = (module) => {
+  const getColorBySubject = (subject) => {
+    switch (subject.toLowerCase()) {
+      case 'physics':
+        return {
+          backgroundColor: 'rgba(0, 255, 0, 0.2)',
+          borderColor: 'green',
+          pointBackgroundColor: 'green',
+          pointBorderColor: '#fff',
+          pointHoverBackgroundColor: '#fff',
+          pointHoverBorderColor: 'green',
+        };
+      case 'chemistry':
+        return {
+          backgroundColor: 'rgba(0, 0, 255, 0.2)',
+          borderColor: 'blue',
+          pointBackgroundColor: 'blue',
+          pointBorderColor: '#fff',
+          pointHoverBackgroundColor: '#fff',
+          pointHoverBorderColor: 'blue',
+        };
+      case 'maths':
+        return {
+          backgroundColor: 'rgba(255, 0, 0, 0.2)',
+          borderColor: 'red',
+          pointBackgroundColor: 'red',
+          pointBorderColor: '#fff',
+          pointHoverBackgroundColor: '#fff',
+          pointHoverBorderColor: 'red',
+        };
+      default:
+        return {
+          backgroundColor: 'rgba(255, 69, 0, 0.2)',
+          borderColor: '#FF4500',
+          pointBackgroundColor: '#FF4500',
+          pointBorderColor: '#fff',
+          pointHoverBackgroundColor: '#fff',
+          pointHoverBorderColor: '#FF4500',
+        };
+    }
+  };
+
+  const getNormalChartData = (module, subject) => {
+    const color = getColorBySubject(subject);
+    return {
+      labels: module.responses.map((response) => response.keyword),
+      datasets: [
+        {
+          label: 'Maximum Score (10)',
+          data: module.responses.map(() => 10),
+          backgroundColor: 'rgba(255, 165, 0, 0.2)',
+          borderColor: 'orange',
+          pointBackgroundColor: 'orange',
+          pointBorderColor: '#fff',
+          pointHoverBackgroundColor: '#fff',
+          pointHoverBorderColor: 'orange',
+          pointRadius: 5,
+          pointHoverRadius: 7,
+        },
+        {
+          label: 'Answer',
+          data: module.responses.map((response) => response.answer),
+          ...color,
+          pointRadius: 5,
+          pointHoverRadius: 7,
+        },
+      ],
+    };
+  };
+
+  const getWeightedChartData = (module, subject) => {
+    const color = getColorBySubject(subject);
     return {
       labels: module.responses.map((response) => response.keyword),
       datasets: [
@@ -63,12 +134,7 @@ const AssessmentModal = ({ assessment, onClose }) => {
         {
           label: 'Weight * Answer',
           data: module.responses.map((response) => response.weight * response.answer),
-          backgroundColor: 'rgba(255, 69, 0, 0.2)',
-          borderColor: '#FF4500',
-          pointBackgroundColor: '#FF4500',
-          pointBorderColor: '#fff',
-          pointHoverBackgroundColor: '#fff',
-          pointHoverBorderColor: '#FF4500',
+          ...color,
           pointRadius: 5,
           pointHoverRadius: 7,
         },
@@ -97,55 +163,129 @@ const AssessmentModal = ({ assessment, onClose }) => {
         <p className="mb-4 text-gray-300">
           Session Average: <strong className="text-[#31c1ff]">{calculateModuleAverage({ responses: assessment.assessment.flatMap(module => module.responses) })}</strong> 
         </p>
+        <p className="mb-4 text-gray-300">
+          Session Subject: <strong className="text-[#31c1ff]">{assessment.subject}</strong> 
+        </p>
 
-        <div className='mt-8'>
-          {assessment.assessment.map((module, index) => (
-            <div key={index} className="mb-6">
-              <h3 className="text-lg md:text-xl underline font-semibold mb-2 text-[#31c1ff]">
-                {module.module} - Average: {calculateModuleAverage(module)}
-              </h3>
-              <div className="relative mt-4" style={{ width: '100%', height: '600px' }}>
-                <Radar 
-                  data={getChartData(module)} 
-                  options={{ 
-                    responsive: true, 
-                    plugins: {
-                      legend: {
-                        labels: {
-                          color: 'white', // Set the text color for the legend
-                        },
-                      },
-                    },                
-                    scales: { 
-                      r: { 
-                        beginAtZero: true,
-                        grid: {
-                          color: 'rgba(255, 255, 255, 0.1)',
-                        },
-                        angleLines: {
-                          color: 'rgba(255, 255, 255, 0.1)',
-                        },
-                        pointLabels: {
-                          color: 'white',
-                          font: {
-                            size: 20,
+        <div className="mt-4">
+          <div className="flex mb-4 space-x-3 mx-16 ">
+            <button
+              onClick={() => setActiveTab('normal')}
+              className={`flex-1 p-2 text-center rounded-3xl ${activeTab === 'normal' ? 'bg-[#31c1ff] text-white' : 'bg-gray-200 text-gray-800'}`}
+            >
+              Normal Chart
+            </button>
+            <button
+              onClick={() => setActiveTab('weighted')}
+              className={`flex-1 p-2 text-center rounded-3xl ${activeTab === 'weighted' ? 'bg-[#31c1ff] text-white' : 'bg-gray-200 text-gray-800'}`}
+            >
+              Weighted Chart
+            </button>
+          </div>
+
+          {activeTab === 'normal' && (
+            <div className="mt-8">
+              {assessment.assessment.map((module, index) => (
+                <div key={index} className="mb-6">
+                  <h3 className="text-lg md:text-xl underline font-semibold mb-2 text-[#31c1ff]">
+                    {module.module} - Average: {calculateModuleAverage(module)}
+                  </h3>
+                  <div className="relative mt-4" style={{ width: '100%', height: '600px' }}>
+                    <Radar 
+                      data={getNormalChartData(module, assessment.subject)} 
+                      options={{ 
+                        responsive: true, 
+                        plugins: {
+                          legend: {
+                            labels: {
+                              color: 'white', // Set the text color for the legend
+                            },
+                          },
+                        },                
+                        scales: { 
+                          r: { 
+                            beginAtZero: true,
+                            grid: {
+                              color: 'rgba(255, 255, 255, 0.1)',
+                            },
+                            angleLines: {
+                              color: 'rgba(255, 255, 255, 0.1)',
+                            },
+                            pointLabels: {
+                              color: 'white',
+                              font: {
+                                size: 20,
+                              },
+                            },
+                            ticks: {
+                              color: 'white',
+                              backdropColor: 'transparent',
+                              font: {
+                                size: 20,
+                              },
+                            },
                           },
                         },
-                        ticks: {
-                          color: 'white',
-                          backdropColor: 'transparent',
-                          font: {
-                            size: 20,
-                          },
-                        },
-                      },
-                    },
-                    maintainAspectRatio: false,
-                  }} 
-                />
-              </div>
+                        maintainAspectRatio: false,
+                      }} 
+                    />
+                  </div>
+                </div>
+              ))}
             </div>
-          ))}
+          )}
+
+          {activeTab === 'weighted' && (
+            <div className="mt-8">
+              {assessment.assessment.map((module, index) => (
+                <div key={index} className="mb-6">
+                  <h3 className="text-lg md:text-xl underline font-semibold mb-2 text-[#31c1ff]">
+                    {module.module} - Average: {calculateModuleAverage(module)}
+                  </h3>
+                  <div className="relative mt-4" style={{ width: '100%', height: '600px' }}>
+                    <Radar 
+                      data={getWeightedChartData(module, assessment.subject)} 
+                      options={{ 
+                        responsive: true, 
+                        plugins: {
+                          legend: {
+                            labels: {
+                              color: 'white', // Set the text color for the legend
+                            },
+                          },
+                        },                
+                        scales: { 
+                          r: { 
+                            beginAtZero: true,
+                            grid: {
+                              color: 'rgba(255, 255, 255, 0.1)',
+                            },
+                            angleLines: {
+                              color: 'rgba(255, 255, 255, 0.1)',
+                            },
+                            pointLabels: {
+                              color: 'white',
+                              font: {
+                                size: 20,
+                              },
+                            },
+                            ticks: {
+                              color: 'white',
+                              backdropColor: 'transparent',
+                              font: {
+                                size: 20,
+                              },
+                            },
+                          },
+                        },
+                        maintainAspectRatio: false,
+                      }} 
+                    />
+                  </div>
+                </div>
+              ))}
+            </div>
+          )}
         </div>
       </div>
     </div>

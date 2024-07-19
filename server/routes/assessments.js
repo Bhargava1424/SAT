@@ -32,6 +32,7 @@ router.post('/', async (req, res) => {
         const sessionId = req.body.sessionId;
         const applicationNumber = req.body.applicationNumber;
         const assessmentData = req.body.assessment;
+        const subject = req.body.subject; // Extract subject from req.body
 
         // Use await to get teacher details
         const teacherDetails = await Teacher.findOne({ name: teacher });
@@ -43,6 +44,7 @@ router.post('/', async (req, res) => {
         assessment.date = new Date();
         assessment.assessedBy = teacher;
         assessment.branch = teacherDetails.branch;
+        assessment.subject = subject; // Set subject
 
         const newAssessment = await assessment.save();
 
@@ -57,19 +59,11 @@ router.post('/', async (req, res) => {
         }
 
         // Add assessment to student's assessment array
-        studentAssessments = student.assessmentResults
-        studentAssessments.push(newAssessment._id)
-        student.assessmentResults = studentAssessments
+        student.assessmentResults.push(newAssessment._id);
         await student.save();
 
         // Add assessment to session's assessment array
-        const currentSessionAssignments = currentSession.assessmentIds;
-        currentSessionAssignments.push(newAssessment._id);
-        currentSession.assessmentIds = currentSessionAssignments;
-        // if all assessments are done, update session status to completed
-        // if (currentSession.assessmentIds.length === currentSession.students.length) {
-        //     currentSession.status = 'completed';
-        // }
+        currentSession.assessmentIds.push(newAssessment._id);
         await currentSession.save();
 
         res.status(201).json(newAssessment);
@@ -85,6 +79,9 @@ router.put('/:assessmentId', getAssessment, async (req, res) => {
     }
     if (req.body.reviewer != null) {
         res.assessment.reviewer = req.body.reviewer;
+    }
+    if (req.body.subject != null) { // Add this to update subject if provided
+        res.assessment.subject = req.body.subject;
     }
 
     try {
@@ -134,7 +131,6 @@ router.get('/:applicationNumber/:sessionId', async (req, res) => {
     }
   });
 
-
 // Update assessment by assessmentId
 router.put('/:assessmentId', async (req, res) => {
     try {
@@ -145,7 +141,10 @@ router.put('/:assessmentId', async (req, res) => {
   
       assessment.assessment = req.body.assessment;
       assessment.date = new Date();
-  
+      if (req.body.subject != null) { // Add this to update subject if provided
+        assessment.subject = req.body.subject;
+      }
+
       const updatedAssessment = await assessment.save();
       res.json(updatedAssessment);
     } catch (err) {

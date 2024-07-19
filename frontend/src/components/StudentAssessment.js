@@ -57,7 +57,7 @@ const StudentAssessment = () => {
   const [responses, setResponses] = useState(modules.map(module => module.questions.map(() => null)));
   const [assessmentExists, setAssessmentExists] = useState(false);
   const [existingAssessmentId, setExistingAssessmentId] = useState(null);
-  const subject = sessionStorage.getItem('subject');
+  const [subject, setSubject] = useState('');
 
   useEffect(() => {
     const fetchAssessment = async () => {
@@ -76,8 +76,12 @@ const StudentAssessment = () => {
       }
     };
     fetchAssessment();
+    const subjectFromSession = sessionStorage.getItem('subject');
+    if (subjectFromSession) {
+      setSubject(subjectFromSession);
+    }
   }, [applicationNumber, sessionId, assessmentId]);
-
+  
   const handleOptionChange = (moduleIndex, questionIndex, value) => {
     const newResponses = [...responses];
     newResponses[moduleIndex][questionIndex] = value;
@@ -90,7 +94,6 @@ const StudentAssessment = () => {
 
   const saveResponses = async () => {
     const teacher = sessionStorage.getItem('name');
-    const subject = sessionStorage.getItem('subject');
     const payload = modules.map((module, moduleIndex) => ({
       module: module.title,
       responses: module.questions.map((question, questionIndex) => ({
@@ -99,7 +102,7 @@ const StudentAssessment = () => {
         answer: responses[moduleIndex][questionIndex],
       })),
     }));
-
+  
     try {
       if (assessmentExists && existingAssessmentId) {
         const response = await axios.put(`${process.env.REACT_APP_BASE_URL}/assessments/${existingAssessmentId}`, {
@@ -124,7 +127,7 @@ const StudentAssessment = () => {
       console.error('Error saving assessment:', error);
     }
   };
-
+  
   const handleSubmit = () => {
     if (isAllAnswered()) {
       saveResponses();
