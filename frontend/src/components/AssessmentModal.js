@@ -154,8 +154,11 @@ const AssessmentModal = ({ assessment, onClose }) => {
             &times;
           </button>
         </div>
-        <p className="mb-2 text-gray-300">
+        <p className="mb-4 text-gray-300">
           Date: <strong className="text-[#31c1ff]">{new Date(assessment.date).toLocaleDateString()}</strong> 
+        </p>
+        <p className="mb-4 text-gray-300">
+          Session Period: <strong className="text-[#31c1ff]">{assessment.period}</strong> 
         </p>
         <p className="mb-4 text-gray-300">
           Assessed By: <strong className="text-[#31c1ff]">{assessment.assessedBy} </strong> 

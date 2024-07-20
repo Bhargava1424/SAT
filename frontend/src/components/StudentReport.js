@@ -164,6 +164,15 @@ const StudentReport = () => {
     ],
   };
 
+  const handleClick = (event, elements) => {
+    if (elements.length > 0) {
+      const index = elements[0].index;
+      const selectedAssessment = assessments[index];
+      const session = sessions.find((session) => session._id === selectedAssessment.sessionId);
+      setSelectedAssessment({ ...selectedAssessment, period: session ? session.period : selectedAssessment.sessionId });
+    }
+  };
+
   const options = {
     scales: {
       x: {
@@ -191,17 +200,13 @@ const StudentReport = () => {
         text: 'Session Averages',
       },
     },
-    onClick: (event, elements) => {
-      if (elements.length > 0) {
-        const index = elements[0].index;
-        setSelectedAssessment(assessments[index]);
-      }
-    },
+    onClick: handleClick
   };
 
   const handleWeightSignificanceClick = () => {
     setShowWeightSignificance(true);
   };
+
 
   return (
     <div className="min-h-screen bg-gray-100 p-4 md:p-8">
@@ -250,7 +255,6 @@ const StudentReport = () => {
         ) : (
           <p className="text-center text-gray-700">Loading student details...</p>
         )}
-        
         
         {assessments.length === 0 ? (
           <p className="text-center text-gray-700">No assessments found for this student.</p>
