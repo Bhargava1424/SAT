@@ -17,19 +17,17 @@ const StudentECA = () => {
   const [formValid, setFormValid] = useState(false);
   const [eca, setEca] = useState([]); 
   const [editMode, setEditMode] = useState(false);
-  const [currentEditingId, setCurrentEditingId] = useState(null); // Define currentEditingId here
+  const [currentEditingId, setCurrentEditingId] = useState(null);
   const navigate = useNavigate();
 
   useEffect(() => {
     fetch(process.env.REACT_APP_BASE_URL + `/eca/${applicationNumber}`)
       .then(response => response.json())
       .then(data => {
-        setEca(data);  // Store all fetched records
+        setEca(data);
       })
       .catch(error => console.error('Error:', error));
   }, [applicationNumber]);
-  
-
 
   const handleRatingChange = (event, category) => {
     const value = parseInt(event.target.value, 10);
@@ -73,7 +71,7 @@ const StudentECA = () => {
     let method;
 
     if (editMode) {
-      url = process.env.REACT_APP_BASE_URL + `/eca/${currentEditingId}`; // Use currentEditingId here
+      url = process.env.REACT_APP_BASE_URL + `/eca/${currentEditingId}`;
       method = 'PATCH';
     } else {
       url = process.env.REACT_APP_BASE_URL + '/eca';
@@ -100,10 +98,9 @@ const StudentECA = () => {
     resetForm();
   };
 
-  
   const handleEdit = (eca) => {
     setEditMode(true);
-    setCurrentEditingId(eca.uuid); // Set the currentEditingId when editing
+    setCurrentEditingId(eca.uuid);
     setCommunicationRating(eca.communicationRating);
     setParticipationRatings(eca.participationRatings);
     setParentFeedback(eca.parentFeedback);
@@ -132,13 +129,19 @@ const StudentECA = () => {
     return `hsl(${hue}, 100%, 50%)`;
   };
 
+  const formatCategory = (category) => {
+    return category
+      .replace(/([A-Z])/g, ' $1')
+      .replace(/^./, (str) => str.toUpperCase());
+  };
+
   return (
     <div className="bg-gray-100 min-h-screen py-8">
       <div className="max-w-3xl mx-auto bg-white shadow-lg rounded-lg p-8">
         <h1 className="text-3xl font-bold mb-8 text-center">
           Providing ECA feedback for <span className="text-blue-600">{studentName}</span>
         </h1>
-        { ( // Only render the form if eca is not null
+        {(
           <form onSubmit={handleSubmit} className="space-y-8">
             <div>
               <p className="text-lg font-semibold mb-4">
@@ -175,7 +178,7 @@ const StudentECA = () => {
               <p className="text-lg font-semibold mb-4">Rate the student's participation in the following areas:</p>
               {Object.keys(participationRatings).map((category, index) => (
                 <div key={index} className="mb-8">
-                  <p className="text-lg font-semibold mb-4 capitalize">{category.replace(/([A-Z])/g, ' $1').toLowerCase()}:</p>
+                  <p className="text-lg font-semibold mb-4 capitalize">{formatCategory(category)}:</p>
                   <div className="flex justify-between bg-gray-100 rounded-lg p-4">
                     {[...Array(10)].map((_, index) => (
                       <label
@@ -227,7 +230,6 @@ const StudentECA = () => {
           </form>
         )}
 
-        {/* Display the ECA if it exists */}
         {eca.length > 0 ? (
           eca.map((record, index) => (
             <div key={index} className="mt-2">
@@ -239,7 +241,7 @@ const StudentECA = () => {
                 <div>
                   <h4 className="font-bold">Participation Ratings:</h4>
                   {Object.entries(record.participationRatings).map(([key, value]) => (
-                    <p key={key}>{`${key}: ${value}`}</p>
+                    <p key={key}>{`${formatCategory(key)}: ${value}`}</p>
                   ))}
                 </div>
                 {/* <div className="flex justify-around mt-4">
@@ -253,8 +255,6 @@ const StudentECA = () => {
         ) : (
           <p className="mt-4">No ECA entry found for this student.</p>
         )}
-
-
       </div>
     </div>
   );
