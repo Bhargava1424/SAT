@@ -20,7 +20,8 @@ const generateSessionsForOneYear = async (startDate, sessionEndDate, branch, bat
 
   const clusters = await Cluster.find({ branch, batch });
 
-  let currentDate = nextMonday(startDate);
+  let currentDate = startDate.getDay() === 1 ? startDate : nextMonday(startDate);
+  console.log(currentDate);
   let teacherIndex = 0; // Initialize teacher index
   let clusterIndex = 0; // Initialize cluster index
 

@@ -39,7 +39,18 @@ const PendingStudents = () => {
         if (currentSession) {
           const response = await axios.get(process.env.REACT_APP_BASE_URL + `/students/pendingStudents/${currentSession._id}`);
           console.log(currentSession._id);
-          setPendingStudents(response.data);
+
+          const data = response.data;
+
+          // Check if the student.photo is google drive link
+          data.forEach(student => {
+            if (student.photo && student.photo.includes('drive')) {
+              const linkId = student.photo.split('/d/')[1].split('/view')[0];
+              student.photo = `https://drive.google.com/thumbnail?id=${linkId}`;
+              console.log(student.photo);
+            }
+          });
+          setPendingStudents(data);
         } else {
           setPendingStudents([]); // Clear pending students if no session is found
         }

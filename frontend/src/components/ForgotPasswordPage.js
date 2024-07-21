@@ -15,7 +15,7 @@ const ForgotPasswordPage = () => {
             });
             const data = await response.json();
             if (response.ok) {
-                alert('Password reset link sent to your email');
+                alert('Password has been sent to your email');
             } else {
                 alert(data.message);
             }

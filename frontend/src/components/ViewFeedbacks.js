@@ -39,6 +39,15 @@ function ViewFeedbacks() {
       const response = await fetch(process.env.REACT_APP_BASE_URL + '/students');
       const data = await response.json();
 
+      // Check if the student.photo is google drive link
+      data.forEach(student => {
+        if (student.photo && student.photo.includes('drive')) {
+          const linkId = student.photo.split('/d/')[1].split('/view')[0];
+          student.photo = `https://drive.google.com/thumbnail?id=${linkId}`;
+          console.log(student.photo);
+        }
+      });
+
       let filteredStudents = data;
       if (role === 'director' || role === 'teacher' || role === 'vice president') {
         filteredStudents = data.filter(student => student.branch === userBranch);
@@ -277,7 +286,7 @@ function ViewFeedbacks() {
                 {students.map(item => (
                   <tr key={item.applicationNumber} className="hover:bg-gray-100 transition duration-300">
                     <td className="px-4 py-2 hidden md:table-cell">
-                      <img src={"/profileicon.jpeg"} alt="Profile" className="w-12 h-12 rounded-full mx-auto" />
+                      <img src={item.photo || "/profileicon.jpeg"} alt="Profile" className="w-12 h-12 rounded-full mx-auto" />
                     </td>
                     <td className="px-4 py-2 text-center text-gray-700">{`${item.firstName} ${item.surName}`}</td>
                     <td className="px-4 py-2 text-center text-gray-700">{item.parentName}</td>

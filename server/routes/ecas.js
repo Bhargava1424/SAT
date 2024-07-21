@@ -26,6 +26,34 @@ router.get('/:applicationNumber', async (req, res) => {
 router.post('/', async (req, res) => {
   const eca = new ECA(req.body);
   try {
+    // if eca entry already exists make it the average of the two and add comments to existing comments 
+    const existingECA = await ECA.findOne({ applicationNumber: eca.applicationNumber});
+
+    if (existingECA) {
+      existingECA.communicationRating = (existingECA.communicationRating + eca.communicationRating) / 2;
+      existingECA.participationRatings.indoorSports = (existingECA.participationRatings.indoorSports + eca.participationRatings.indoorSports) / 2;
+      existingECA.participationRatings.outdoorSports = (existingECA.participationRatings.outdoorSports + eca.participationRatings.outdoorSports) / 2;
+      existingECA.participationRatings.music = (existingECA.participationRatings.music + eca.participationRatings.music) / 2;
+      existingECA.participationRatings.artLiterature = (existingECA.participationRatings.artLiterature + eca.participationRatings.artLiterature) / 2;
+      existingECA.participationRatings.leadershipTeamwork = (existingECA.participationRatings.leadershipTeamwork + eca.participationRatings.leadershipTeamwork) / 2;
+      existingECA.participationRatings.debatesActivities = (existingECA.participationRatings.debatesActivities + eca.participationRatings.debatesActivities) / 2;
+      // Convert parent feedback to bullet points if new feedback is provided
+      let formattedParentFeedback = '';
+      if (eca.parentFeedback) {
+        formattedParentFeedback = eca.parentFeedback.split('\n').map(feedback => `${feedback}`).join('\n');
+      }
+
+      // Append the new feedback to the existing feedback
+      if (existingECA.parentFeedback) {
+        existingECA.parentFeedback += '\n' + formattedParentFeedback;
+      } else {
+        existingECA.parentFeedback = formattedParentFeedback;
+      }
+      
+      existingECA.save();
+      return res.status(201).json(existingECA);
+    }
+
     const newECA = await eca.save();
     res.status(201).json(newECA);
   } catch (err) {

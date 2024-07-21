@@ -237,7 +237,12 @@ const StudentECA = () => {
               <div className="p-4 bg-white rounded-lg shadow cursor-pointer">
                 <p>Date: {new Date(record.date).toLocaleDateString()}</p>
                 <p>Communication Rating: {record.communicationRating}</p>
-                <p>Parent Feedback: {record.parentFeedback}</p>
+                <p>Parent Feedback:</p>
+                <ul className="list-disc ml-5">
+                  {record.parentFeedback.split('\n').map((feedback, index) => (
+                    <li key={index}>{feedback.trim()}</li>
+                  ))}
+                </ul>
                 <div>
                   <h4 className="font-bold">Participation Ratings:</h4>
                   {Object.entries(record.participationRatings).map(([key, value]) => (

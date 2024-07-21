@@ -36,7 +36,18 @@ const CompletedSessions = () => {
       try {
         if (currentSession) {
           const response = await axios.get(`${process.env.REACT_APP_BASE_URL}/students/completedStudents/${currentSession._id}`);
-          setCompletedStudents(response.data);
+          const completedStudents = response.data
+
+          // Check if the student.photo is google drive link
+          completedStudents.forEach(student => {
+            if (student.photo && student.photo.includes('drive')) {
+              const linkId = student.photo.split('/d/')[1].split('/view')[0];
+              student.photo = `https://drive.google.com/thumbnail?id=${linkId}`;
+              console.log(student.photo);
+            }
+          });
+
+          setCompletedStudents(completedStudents);
         }
       } catch (error) {
         console.error('Error fetching students', error);

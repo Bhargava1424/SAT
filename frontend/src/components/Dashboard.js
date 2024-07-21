@@ -44,6 +44,15 @@ const Dashboard = () => {
     try {
         const response = await fetch(process.env.REACT_APP_BASE_URL + '/students');
         const data = await response.json();
+
+        // Check if the student.photo is google drive link
+        data.forEach(student => {
+          if (student.photo && student.photo.includes('drive')) {
+            const linkId = student.photo.split('/d/')[1].split('/view')[0];
+            student.photo = `https://drive.google.com/thumbnail?id=${linkId}`;
+            console.log(student.photo);
+          }
+        });
         
         // Filter students based on branch for specific roles
         if (role === 'director' || role === 'teacher' || role === 'vice president') {
