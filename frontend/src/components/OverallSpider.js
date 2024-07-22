@@ -282,16 +282,16 @@ const OverallSpider = ({ assessments, onClose }) => {
               Overall
             </button>
           </div>
-          <div className="flex mb-4 space-x-3 mx-16">
+          <div className="flex mb-4 space-x-16 mx-52">
             <button
               onClick={() => setActiveSubTab('normal')}
-              className={`flex-1 p-2 text-center rounded-3xl ${activeSubTab === 'normal' ? 'bg-[#31c1ff] text-white' : 'bg-gray-200 text-gray-800'}`}
+              className={`flex-1 p-2 text-center rounded-3xl ${activeSubTab === 'normal' ? 'bg-[#2D5990] text-white' : 'bg-gray-200 text-gray-800'}`}
             >
               Normal Chart
             </button>
             <button
               onClick={() => setActiveSubTab('weighted')}
-              className={`flex-1 p-2 text-center rounded-3xl ${activeSubTab === 'weighted' ? 'bg-[#31c1ff] text-white' : 'bg-gray-200 text-gray-800'}`}
+              className={`flex-1 p-2 text-center rounded-3xl ${activeSubTab === 'weighted' ? 'bg-[#2D5990] text-white' : 'bg-gray-200 text-gray-800'}`}
             >
               Weighted Chart
             </button>
@@ -318,6 +318,8 @@ const OverallSpider = ({ assessments, onClose }) => {
                     data={chartData}
                     options={{
                       responsive: true,
+                      pointRadius: 4,
+                      pointHoverRadius: 6,
                       scales: {
                         r: {
                           beginAtZero: true,
@@ -359,6 +361,8 @@ const OverallSpider = ({ assessments, onClose }) => {
                   data={overallChartData}
                   options={{
                     responsive: true,
+                    pointRadius: 4,
+                    pointHoverRadius: 6,
                     scales: {
                       r: {
                         beginAtZero: true,
