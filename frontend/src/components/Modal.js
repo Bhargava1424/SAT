@@ -32,6 +32,8 @@
     const handleOutsideClick = (e) => {
       if (e.target === e.currentTarget) {
         onClose();
+        setReassignSessionButton(true);
+
       }
     };
 
@@ -107,13 +109,18 @@
 
     return (
       <div
-        className="fixed inset-0 flex items-center justify-center z-50 bg-black bg-opacity-50"
+        className="fixed inset-0 flex items-center justify-center z-50 bg-black bg-opacity-50 overflow-y-auto"
         onClick={handleOutsideClick}
       >
-        <div className="bg-white rounded-lg shadow-lg p-6 w-1/3 relative">
+        <div className="bg-white rounded-lg shadow-lg p-6 w-1/3 relative max-h-screen overflow-y-auto">
+
           <button
             className="absolute top-4 right-4 text-gray-600 hover:text-gray-900"
-            onClick={onClose}
+            onClick={() =>{
+              
+              onClose();
+              setReassignSessionButton(true);
+            }}
           >
             <FaTimes size={24} />
           </button>
