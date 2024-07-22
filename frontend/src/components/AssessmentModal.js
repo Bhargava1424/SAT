@@ -19,6 +19,13 @@ ChartJS.register(
   Legend
 );
 
+const moduleWeights = {
+  'Classroom Behavior': 0.9,
+  'Study Hour Behavior': 0.8,
+  'Examination Behavior': 0.4,
+  'Miscellaneous': 0.6,
+};
+
 const AssessmentModal = ({ assessment, onClose }) => {
   const modalRef = useRef(null);
   const [activeTab, setActiveTab] = useState('normal'); // Added state for tab control
@@ -42,7 +49,39 @@ const AssessmentModal = ({ assessment, onClose }) => {
       (sum, response) => sum + response.weight * response.answer,
       0
     );
-    return (weightedSum / totalWeight).toFixed(2);
+    const totalPossibleScore = module.responses.reduce(
+      (sum, response) => sum + response.weight * 10,
+      0
+    );
+    const average = (weightedSum / totalWeight).toFixed(2);
+    const scoreTotal = `${weightedSum}/${totalPossibleScore}`;
+    return { average, scoreTotal };
+  };
+
+  const calculateSessionAverage = (assessment) => {
+    const moduleAverages = assessment.assessment.map((module) => {
+      const { average } = calculateModuleAverage(module);
+      return parseFloat(average) * moduleWeights[module.module];
+    });
+
+    const weightedAverage =
+      moduleAverages.reduce((sum, avg) => sum + avg, 0) /
+      assessment.assessment.reduce((sum, module) => sum + moduleWeights[module.module], 0);
+
+    const totalScore = assessment.assessment.reduce((sum, module) => {
+      const { scoreTotal } = calculateModuleAverage(module);
+      return sum + parseFloat(scoreTotal.split('/')[0]);
+    }, 0);
+
+    const totalPossible = assessment.assessment.reduce((sum, module) => {
+      const { scoreTotal } = calculateModuleAverage(module);
+      return sum + parseFloat(scoreTotal.split('/')[1]);
+    }, 0);
+
+    return {
+      weightedAverage: weightedAverage.toFixed(2),
+      scoreTotal: `${totalScore}/${totalPossible}`,
+    };
   };
 
   const getColorBySubject = (subject) => {
@@ -142,6 +181,8 @@ const AssessmentModal = ({ assessment, onClose }) => {
     };
   };
 
+  const { weightedAverage, scoreTotal } = calculateSessionAverage(assessment);
+
   return (
     <div className="fixed inset-0 flex items-center justify-center bg-black bg-opacity-75 p-4">
       <div ref={modalRef} className="bg-[#0d2543] p-4 md:p-6 rounded-lg shadow-lg w-[60%] max-w-7xl max-h-full overflow-y-auto">
@@ -164,7 +205,7 @@ const AssessmentModal = ({ assessment, onClose }) => {
           Assessed By: <strong className="text-[#31c1ff]">{assessment.assessedBy} </strong> 
         </p>
         <p className="mb-4 text-gray-300">
-          Session Average: <strong className="text-[#31c1ff]">{calculateModuleAverage({ responses: assessment.assessment.flatMap(module => module.responses) })}</strong> 
+          Session Average: <strong className="text-[#31c1ff]">{weightedAverage} ({scoreTotal})</strong> 
         </p>
         <p className="mb-4 text-gray-300">
           Session Subject: <strong className="text-[#31c1ff]">{assessment.subject}</strong> 
@@ -188,105 +229,111 @@ const AssessmentModal = ({ assessment, onClose }) => {
 
           {activeTab === 'normal' && (
             <div className="mt-8">
-              {assessment.assessment.map((module, index) => (
-                <div key={index} className="mb-6">
-                  <h3 className="text-lg md:text-xl underline font-semibold mb-2 text-[#31c1ff]">
-                    {module.module} - Average: {calculateModuleAverage(module)}
-                  </h3>
-                  <div className="relative mt-4" style={{ width: '100%', height: '600px' }}>
-                    <Radar 
-                      data={getNormalChartData(module, assessment.subject)} 
-                      options={{ 
-                        responsive: true, 
-                        plugins: {
-                          legend: {
-                            labels: {
-                              color: 'white', // Set the text color for the legend
-                            },
-                          },
-                        },                
-                        scales: { 
-                          r: { 
-                            beginAtZero: true,
-                            grid: {
-                              color: 'rgba(255, 255, 255, 0.1)',
-                            },
-                            angleLines: {
-                              color: 'rgba(255, 255, 255, 0.1)',
-                            },
-                            pointLabels: {
-                              color: 'white',
-                              font: {
-                                size: 20,
+              {assessment.assessment.map((module, index) => {
+                const { average, scoreTotal } = calculateModuleAverage(module);
+                return (
+                  <div key={index} className="mb-6">
+                    <h3 className="text-lg md:text-xl underline font-semibold mb-2 text-[#31c1ff]">
+                      {module.module} - Average: {average} ({scoreTotal})
+                    </h3>
+                    <div className="relative mt-4" style={{ width: '100%', height: '600px' }}>
+                      <Radar 
+                        data={getNormalChartData(module, assessment.subject)} 
+                        options={{ 
+                          responsive: true, 
+                          plugins: {
+                            legend: {
+                              labels: {
+                                color: 'white', // Set the text color for the legend
                               },
                             },
-                            ticks: {
-                              color: 'white',
-                              backdropColor: 'transparent',
-                              font: {
-                                size: 20,
+                          },                
+                          scales: { 
+                            r: { 
+                              beginAtZero: true,
+                              grid: {
+                                color: 'rgba(255, 255, 255, 0.1)',
+                              },
+                              angleLines: {
+                                color: 'rgba(255, 255, 255, 0.1)',
+                              },
+                              pointLabels: {
+                                color: 'white',
+                                font: {
+                                  size: 20,
+                                },
+                              },
+                              ticks: {
+                                color: 'white',
+                                backdropColor: 'transparent',
+                                font: {
+                                  size: 20,
+                                },
                               },
                             },
                           },
-                        },
-                        maintainAspectRatio: false,
-                      }} 
-                    />
+                          maintainAspectRatio: false,
+                        }} 
+                      />
+                    </div>
                   </div>
-                </div>
-              ))}
+                );
+              })}
             </div>
           )}
 
           {activeTab === 'weighted' && (
             <div className="mt-8">
-              {assessment.assessment.map((module, index) => (
-                <div key={index} className="mb-6">
-                  <h3 className="text-lg md:text-xl underline font-semibold mb-2 text-[#31c1ff]">
-                    {module.module} - Average: {calculateModuleAverage(module)}
-                  </h3>
-                  <div className="relative mt-4" style={{ width: '100%', height: '600px' }}>
-                    <Radar 
-                      data={getWeightedChartData(module, assessment.subject)} 
-                      options={{ 
-                        responsive: true, 
-                        plugins: {
-                          legend: {
-                            labels: {
-                              color: 'white', // Set the text color for the legend
-                            },
-                          },
-                        },                
-                        scales: { 
-                          r: { 
-                            beginAtZero: true,
-                            grid: {
-                              color: 'rgba(255, 255, 255, 0.1)',
-                            },
-                            angleLines: {
-                              color: 'rgba(255, 255, 255, 0.1)',
-                            },
-                            pointLabels: {
-                              color: 'white',
-                              font: {
-                                size: 20,
+              {assessment.assessment.map((module, index) => {
+                const { average, scoreTotal } = calculateModuleAverage(module);
+                return (
+                  <div key={index} className="mb-6">
+                    <h3 className="text-lg md:text-xl underline font-semibold mb-2 text-[#31c1ff]">
+                      {module.module} - Average: {average} ({scoreTotal})
+                    </h3>
+                    <div className="relative mt-4" style={{ width: '100%', height: '600px' }}>
+                      <Radar 
+                        data={getWeightedChartData(module, assessment.subject)} 
+                        options={{ 
+                          responsive: true, 
+                          plugins: {
+                            legend: {
+                              labels: {
+                                color: 'white', // Set the text color for the legend
                               },
                             },
-                            ticks: {
-                              color: 'white',
-                              backdropColor: 'transparent',
-                              font: {
-                                size: 20,
+                          },                
+                          scales: { 
+                            r: { 
+                              beginAtZero: true,
+                              grid: {
+                                color: 'rgba(255, 255, 255, 0.1)',
+                              },
+                              angleLines: {
+                                color: 'rgba(255, 255, 255, 0.1)',
+                              },
+                              pointLabels: {
+                                color: 'white',
+                                font: {
+                                  size: 20,
+                                },
+                              },
+                              ticks: {
+                                color: 'white',
+                                backdropColor: 'transparent',
+                                font: {
+                                  size: 20,
+                                },
                               },
                             },
                           },
-                        },
-                        maintainAspectRatio: false,
-                      }} 
-                    />
+                          maintainAspectRatio: false,
+                        }} 
+                      />
+                    </div>
                   </div>
-                </div>
-              ))}
+                );
+              })}
             </div>
           )}
         </div>

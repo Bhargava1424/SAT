@@ -24,6 +24,13 @@ ChartJS.register(
   Legend
 );
 
+const moduleWeights = {
+  'Classroom Behavior': 0.9,
+  'Study Hour Behavior': 0.8,
+  'Examination Behavior': 0.4,
+  'Miscellaneous': 0.6,
+};
+
 const StudentReport = () => {
   const { applicationNumber } = useParams();
   const [assessments, setAssessments] = useState([]);
@@ -128,20 +135,47 @@ const StudentReport = () => {
 
   if (error) return <div className="text-red-600 text-center mt-4">{error}</div>;
 
-  const calculateWeightedAverage = (responses) => {
-    const totalWeight = responses.reduce((sum, response) => sum + response.weight, 0);
-    const weightedSum = responses.reduce(
+  const calculateModuleAverage = (module) => {
+    const totalWeight = module.responses.reduce((sum, response) => sum + response.weight, 0);
+    const weightedSum = module.responses.reduce(
       (sum, response) => sum + response.weight * response.answer,
       0
     );
-    return (weightedSum / totalWeight).toFixed(2);
+    const average = (weightedSum / totalWeight).toFixed(2);
+    const scoreTotal = `${weightedSum.toFixed(2)}/${(10 * totalWeight).toFixed(2)}`;
+    return { average, scoreTotal };
+  };
+
+  const calculateSessionAverage = (assessment) => {
+    const moduleAverages = assessment.assessment.map((module) => {
+      const { average } = calculateModuleAverage(module);
+      return parseFloat(average) * moduleWeights[module.module];
+    });
+
+    const weightedAverage =
+      moduleAverages.reduce((sum, avg) => sum + avg, 0) /
+      assessment.assessment.reduce((sum, module) => sum + moduleWeights[module.module], 0);
+
+    const totalScore = assessment.assessment.reduce((sum, module) => {
+      const { scoreTotal } = calculateModuleAverage(module);
+      return sum + parseFloat(scoreTotal.split('/')[0]);
+    }, 0);
+
+    const totalPossible = assessment.assessment.reduce((sum, module) => {
+      const { scoreTotal } = calculateModuleAverage(module);
+      return sum + parseFloat(scoreTotal.split('/')[1]);
+    }, 0);
+
+    return {
+      weightedAverage: weightedAverage.toFixed(2),
+      scoreTotal: `${totalScore}/${totalPossible}`,
+    };
   };
 
   const sessionAverages = assessments.map((assessment) => {
-    const allResponses = assessment.assessment.flatMap((module) => module.responses);
-    const average = calculateWeightedAverage(allResponses);
+    const { weightedAverage } = calculateSessionAverage(assessment);
     const session = sessions.find((session) => session._id === assessment.sessionId);
-    return { period: session ? session.period : assessment.sessionId, average: parseFloat(average) };
+    return { period: session ? session.period : assessment.sessionId, average: parseFloat(weightedAverage) };
   });
 
   const overallAverage = (
@@ -207,7 +241,6 @@ const StudentReport = () => {
     setShowWeightSignificance(true);
   };
 
-
   return (
     <div className="min-h-screen bg-gray-100 p-4 md:p-8">
       <div className="max-w-6xl mx-auto">
@@ -261,13 +294,14 @@ const StudentReport = () => {
         ) : (
           <div>
             <div className="text-center mb-4 md:mb-6">
-              <p
-                className="text-lg md:text-xl font-bold cursor-pointer text-[#00A0E3] hover:underline"
+              <div
+                className="inline-block px-6 py-3 bg-[#00A0E3] text-white text-lg md:text-xl font-bold rounded-lg shadow-lg cursor-pointer transform hover:scale-105 transition-transform duration-300"
                 onClick={handleWeightSignificanceClick}
               >
-                Overall Average: {overallAverage}
-              </p>
+                Overall Average: {overallAverage}/10
+              </div>
             </div>
+
             <div className="bg-white p-4 md:p-6 rounded-lg shadow-lg mb-4 md:mb-6">
               <Line data={data} options={options} />
             </div>
