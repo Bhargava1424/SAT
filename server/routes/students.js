@@ -401,4 +401,17 @@ router.get('/applicationNumbers/:branch', async (req, res) => {
   }
 });
 
+// Get all names by branch
+router.get('/studentNames/:branch', async (req, res) => {
+  try {
+    const branch = req.params.branch;
+    const students = await Student.find({ branch }, 'firstName surName'); // Fetch both firstName and surName fields
+    const studentNames = students.map(student => ({ firstName: student.firstName, surName: student.surName }));
+    res.json(studentNames);
+  } catch (err) {
+    res.status(500).json({ message: err.message });
+  }
+});
+
+
 module.exports = router ;

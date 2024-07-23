@@ -29,7 +29,6 @@ const moduleWeights = {
 const OverallSpider = ({ assessments, onClose }) => {
   const modalRef = useRef(null);
   const [activeTab, setActiveTab] = useState('subjects');
-  const [activeSubTab, setActiveSubTab] = useState('normal');
   const [selectedSubjects, setSelectedSubjects] = useState(['All']);
 
   const handleClickOutside = (event) => {
@@ -132,7 +131,7 @@ const OverallSpider = ({ assessments, onClose }) => {
     }
   };
 
-  const getChartData = (assessments, weighted = false) => {
+  const getChartData = (assessments) => {
     const mathAssessments = assessments.filter((a) => a.subject === 'Mathematics');
     const chemistryAssessments = assessments.filter((a) => a.subject === 'Chemistry');
     const physicsAssessments = assessments.filter((a) => a.subject === 'Physics');
@@ -147,11 +146,11 @@ const OverallSpider = ({ assessments, onClose }) => {
       datasets.push({
         label: 'Mathematics',
         data: [
-          mathAverages.modules['Classroom Behavior'] * (weighted ? moduleWeights['Classroom Behavior'] : 1),
-          mathAverages.modules['Study Hour Behavior'] * (weighted ? moduleWeights['Study Hour Behavior'] : 1),
-          mathAverages.modules['Examination Behavior'] * (weighted ? moduleWeights['Examination Behavior'] : 1),
-          mathAverages.modules['Miscellaneous'] * (weighted ? moduleWeights['Miscellaneous'] : 1),
-          mathAverages.overall * (weighted ? 1 : 1), // overall stays the same
+          mathAverages.modules['Classroom Behavior'],
+          mathAverages.modules['Study Hour Behavior'],
+          mathAverages.modules['Examination Behavior'],
+          mathAverages.modules['Miscellaneous'],
+          mathAverages.overall, // overall stays the same
         ],
         ...getColorBySubject('Mathematics'),
       });
@@ -161,11 +160,11 @@ const OverallSpider = ({ assessments, onClose }) => {
       datasets.push({
         label: 'Chemistry',
         data: [
-          chemistryAverages.modules['Classroom Behavior'] * (weighted ? moduleWeights['Classroom Behavior'] : 1),
-          chemistryAverages.modules['Study Hour Behavior'] * (weighted ? moduleWeights['Study Hour Behavior'] : 1),
-          chemistryAverages.modules['Examination Behavior'] * (weighted ? moduleWeights['Examination Behavior'] : 1),
-          chemistryAverages.modules['Miscellaneous'] * (weighted ? moduleWeights['Miscellaneous'] : 1),
-          chemistryAverages.overall * (weighted ? 1 : 1), // overall stays the same
+          chemistryAverages.modules['Classroom Behavior'],
+          chemistryAverages.modules['Study Hour Behavior'],
+          chemistryAverages.modules['Examination Behavior'],
+          chemistryAverages.modules['Miscellaneous'],
+          chemistryAverages.overall, // overall stays the same
         ],
         ...getColorBySubject('Chemistry'),
       });
@@ -175,11 +174,11 @@ const OverallSpider = ({ assessments, onClose }) => {
       datasets.push({
         label: 'Physics',
         data: [
-          physicsAverages.modules['Classroom Behavior'] * (weighted ? moduleWeights['Classroom Behavior'] : 1),
-          physicsAverages.modules['Study Hour Behavior'] * (weighted ? moduleWeights['Study Hour Behavior'] : 1),
-          physicsAverages.modules['Examination Behavior'] * (weighted ? moduleWeights['Examination Behavior'] : 1),
-          physicsAverages.modules['Miscellaneous'] * (weighted ? moduleWeights['Miscellaneous'] : 1),
-          physicsAverages.overall * (weighted ? 1 : 1), // overall stays the same
+          physicsAverages.modules['Classroom Behavior'],
+          physicsAverages.modules['Study Hour Behavior'],
+          physicsAverages.modules['Examination Behavior'],
+          physicsAverages.modules['Miscellaneous'],
+          physicsAverages.overall, // overall stays the same
         ],
         ...getColorBySubject('Physics'),
       });
@@ -187,13 +186,7 @@ const OverallSpider = ({ assessments, onClose }) => {
 
     datasets.push({
       label: 'Max Limit',
-      data: [
-        10 * (weighted ? moduleWeights['Classroom Behavior'] : 1),
-        10 * (weighted ? moduleWeights['Study Hour Behavior'] : 1),
-        10 * (weighted ? moduleWeights['Examination Behavior'] : 1),
-        10 * (weighted ? moduleWeights['Miscellaneous'] : 1),
-        10, // overall stays 10
-      ],
+      data: [10, 10, 10, 10, 10], // overall stays 10
       backgroundColor: 'rgba(255, 255, 255, 0.2)',
       borderColor: 'rgba(255, 255, 255, 0.5)',
       pointBackgroundColor: 'rgba(255, 255, 255, 0.5)',
@@ -208,18 +201,18 @@ const OverallSpider = ({ assessments, onClose }) => {
     };
   };
 
-  const getOverallChartData = (assessments, weighted = false) => {
+  const getOverallChartData = (assessments) => {
     const overallAverages = getModuleAverages(assessments);
 
     const datasets = [
       {
         label: 'Overall',
         data: [
-          overallAverages.modules['Classroom Behavior'] * (weighted ? moduleWeights['Classroom Behavior'] : 1),
-          overallAverages.modules['Study Hour Behavior'] * (weighted ? moduleWeights['Study Hour Behavior'] : 1),
-          overallAverages.modules['Examination Behavior'] * (weighted ? moduleWeights['Examination Behavior'] : 1),
-          overallAverages.modules['Miscellaneous'] * (weighted ? moduleWeights['Miscellaneous'] : 1),
-          overallAverages.overall * (weighted ? 1 : 1), // overall stays the same
+          overallAverages.modules['Classroom Behavior'],
+          overallAverages.modules['Study Hour Behavior'],
+          overallAverages.modules['Examination Behavior'],
+          overallAverages.modules['Miscellaneous'],
+          overallAverages.overall, // overall stays the same
         ],
         backgroundColor: 'rgba(255, 69, 0, 0.2)',
         borderColor: '#FF4500',
@@ -230,13 +223,7 @@ const OverallSpider = ({ assessments, onClose }) => {
       },
       {
         label: 'Max Limit',
-        data: [
-          10 * (weighted ? moduleWeights['Classroom Behavior'] : 1),
-          10 * (weighted ? moduleWeights['Study Hour Behavior'] : 1),
-          10 * (weighted ? moduleWeights['Examination Behavior'] : 1),
-          10 * (weighted ? moduleWeights['Miscellaneous'] : 1),
-          10, // overall stays 10
-        ],
+        data: [10, 10, 10, 10, 10], // overall stays 10
         backgroundColor: 'rgba(255, 255, 255, 0.2)',
         borderColor: 'rgba(255, 255, 255, 0.5)',
         pointBackgroundColor: 'rgba(255, 255, 255, 0.5)',
@@ -252,8 +239,8 @@ const OverallSpider = ({ assessments, onClose }) => {
     };
   };
 
-  const chartData = getChartData(assessments, activeSubTab === 'weighted');
-  const overallChartData = getOverallChartData(assessments, activeSubTab === 'weighted');
+  const chartData = getChartData(assessments);
+  const overallChartData = getOverallChartData(assessments);
 
   return (
     <div className="fixed inset-0 flex items-center justify-center bg-black bg-opacity-75 p-4">
@@ -280,20 +267,6 @@ const OverallSpider = ({ assessments, onClose }) => {
               className={`flex-1 p-2 text-center rounded-3xl ${activeTab === 'overall' ? 'bg-[#31c1ff] text-white' : 'bg-gray-200 text-gray-800'}`}
             >
               Overall
-            </button>
-          </div>
-          <div className="flex mb-4 space-x-16 mx-52">
-            <button
-              onClick={() => setActiveSubTab('normal')}
-              className={`flex-1 p-2 text-center rounded-3xl ${activeSubTab === 'normal' ? 'bg-[#2D5990] text-white' : 'bg-gray-200 text-gray-800'}`}
-            >
-              Normal Chart
-            </button>
-            <button
-              onClick={() => setActiveSubTab('weighted')}
-              className={`flex-1 p-2 text-center rounded-3xl ${activeSubTab === 'weighted' ? 'bg-[#2D5990] text-white' : 'bg-gray-200 text-gray-800'}`}
-            >
-              Weighted Chart
             </button>
           </div>
 

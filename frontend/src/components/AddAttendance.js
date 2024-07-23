@@ -7,6 +7,7 @@ const AddAttendance = () => {
   const [message, setMessage] = useState('');
   const [payload, setPayload] = useState(null);
   const [applicationNumbers, setApplicationNumbers] = useState([]);
+  const [studentNames, setStudentNames] = useState([]);
   const userBranch = sessionStorage.getItem('branch');
 
   useEffect(() => {
@@ -23,6 +24,22 @@ const AddAttendance = () => {
     };
 
     fetchApplicationNumbers();
+  }, [userBranch]);
+
+  useEffect(() => {
+    // Fetch student names for the user's branch
+    const fetchStudentNames = async () => {
+      try {
+        const response = await fetch(`${process.env.REACT_APP_BASE_URL}/students/studentNames/${userBranch}`);
+        const data = await response.json();
+        setStudentNames(Array.isArray(data) ? data : []);
+      } catch (error) {
+        console.error('Error fetching student names:', error);
+        setMessage('Error fetching student names');
+      }
+    };
+
+    fetchStudentNames();
   }, [userBranch]);
 
   const handleFileUpload = (e) => {
@@ -95,7 +112,10 @@ const AddAttendance = () => {
     const wb = XLSX.utils.book_new();
     const ws_data = [
       ['Application Number', 'Student Name', 'FN/Total', 'AN/Total', 'Exams'],
-      ...applicationNumbers.map((num) => [num])
+      ...applicationNumbers.map((num, index) => [
+        num,
+        studentNames[index] ? `${studentNames[index].firstName} ${studentNames[index].surName}` : '', // Combine firstName and surName
+      ]),
     ];
     const ws = XLSX.utils.aoa_to_sheet(ws_data);
     XLSX.utils.book_append_sheet(wb, ws, 'Template');
@@ -107,16 +127,15 @@ const AddAttendance = () => {
     <div className="add-attendance min-h-screen bg-gray-400">
       <Navbar />
       <div className="container mx-auto px-4 py-6 bg-gray-300 shadow-lg rounded-3xl mt-6">
-      <h2 className="text-2xl md:text-3xl font-bold mb-4 text-center text-[#2D5990]">Add Attendance</h2>
-      <div className="flex justify-end mr-10">
-        <button 
-          onClick={downloadTemplate} 
-          className="px-6 py-3 bg-[#00A0E3] text-white rounded-lg hover:bg-[rgb(44,154,202)] transition duration-200"
-        >
-          Download Excel Template
-        </button>
-      </div>
-
+        <h2 className="text-2xl md:text-3xl font-bold mb-4 text-center text-[#2D5990]">Add Attendance</h2>
+        <div className="flex justify-end mr-10">
+          <button 
+            onClick={downloadTemplate} 
+            className="px-6 py-3 bg-[#00A0E3] text-white rounded-lg hover:bg-[rgb(44,154,202)] transition duration-200"
+          >
+            Download Excel Template
+          </button>
+        </div>
         
         <div className="text-center my-4 text-lg text-gray-700">
           <p>Welcome! Please upload an Excel file to add attendance records.</p>
