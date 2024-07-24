@@ -413,5 +413,19 @@ router.get('/studentNames/:branch', async (req, res) => {
   }
 });
 
+// Fetch student photo by application number
+router.get('/photo/:applicationNumber', async (req, res) => {
+  try {
+    const student = await Student.findOne({ applicationNumber: req.params.applicationNumber });
+    if (!student || !student.photo) {
+      return res.status(404).json({ message: 'Photo not found' });
+    }
+    res.json({ photo: student.photo });
+  } catch (err) {
+    res.status(500).json({ message: err.message });
+  }
+});
+
+
 
 module.exports = router ;

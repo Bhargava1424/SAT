@@ -1,6 +1,7 @@
 import React, { useState, useEffect } from 'react';
 import { useParams } from 'react-router-dom';
 import axios from 'axios';
+import profileImage from '../assets/profile.jpg';
 
 const modules = [
   {
@@ -43,10 +44,20 @@ const modules = [
   },
 ];
 
+
 const checkIfAssessmentExists = async (applicationNumber, sessionId) => {
   try {
     const response = await axios.get(`${process.env.REACT_APP_BASE_URL}/assessments/${applicationNumber}/${sessionId}`);
     return response.data;
+  } catch (error) {
+    return null;
+  }
+};
+
+const fetchStudentPhoto = async (applicationNumber) => {
+  try {
+    const response = await axios.get(`${process.env.REACT_APP_BASE_URL}/students/photo/${applicationNumber}`);
+    return response.data.photo;
   } catch (error) {
     return null;
   }
@@ -58,6 +69,7 @@ const StudentAssessment = () => {
   const [assessmentExists, setAssessmentExists] = useState(false);
   const [existingAssessmentId, setExistingAssessmentId] = useState(null);
   const [subject, setSubject] = useState('');
+  const [photo, setPhoto] = useState(null); // New state for student photo
 
   useEffect(() => {
     const fetchAssessment = async () => {
@@ -75,13 +87,24 @@ const StudentAssessment = () => {
         }
       }
     };
+
+    const fetchPhoto = async () => {
+      const pic = await fetchStudentPhoto(applicationNumber);
+      setPhoto(pic); // Set the student photo
+      if(pic==null) {
+        setPhoto(profileImage)
+      }
+    };
+
     fetchAssessment();
+    fetchPhoto(); // Fetch the student photo
+
     const subjectFromSession = sessionStorage.getItem('subject');
     if (subjectFromSession) {
       setSubject(subjectFromSession);
     }
   }, [applicationNumber, sessionId, assessmentId]);
-  
+
   const handleOptionChange = (moduleIndex, questionIndex, value) => {
     const newResponses = [...responses];
     newResponses[moduleIndex][questionIndex] = value;
@@ -102,7 +125,7 @@ const StudentAssessment = () => {
         answer: responses[moduleIndex][questionIndex],
       })),
     }));
-  
+
     try {
       if (assessmentExists && existingAssessmentId) {
         const response = await axios.put(`${process.env.REACT_APP_BASE_URL}/assessments/${existingAssessmentId}`, {
@@ -127,7 +150,7 @@ const StudentAssessment = () => {
       console.error('Error saving assessment:', error);
     }
   };
-  
+
   const handleSubmit = () => {
     if (isAllAnswered()) {
       saveResponses();
@@ -149,6 +172,11 @@ const StudentAssessment = () => {
         <h1 className="text-3xl font-bold mb-8 text-center">
           Providing assessment for <span className="text-[#00A0E3]">{name}</span>
         </h1>
+        {photo && (
+          <div className="text-center mb-8">
+            <img src={photo} alt={profileImage} className=" h-80 rounded-2xl mx-auto shadow-lg object-cover" />
+          </div>
+        )}
         {assessmentExists && (
           <div className="bg-yellow-100 border-l-4 border-yellow-500 text-yellow-700 p-4 mb-8" role="alert">
             <p className="font-bold">Assessment Completed</p>
