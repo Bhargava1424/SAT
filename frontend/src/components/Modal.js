@@ -12,6 +12,7 @@
     const [isLoading, setIsLoading] = useState(false);
     const [successMessage, setSuccessMessage] = useState('');
     const [reassignSessionButton, setReassignSessionButton] = useState(true);
+    const [useUpcomingMonday, setUseUpcomingMonday] = useState(true);
 
     useEffect(() => {
       if (!isOpen) {
@@ -93,13 +94,14 @@
           branch: modalBranch,
           batch: '2024-2026',
           teachers: selectedTeachers,
+          useUpcomingMonday: useUpcomingMonday, // Add this line
         });
         console.log(response.data);
         setSuccessMessage('Reassignment successful!');
-        onSuccess();  // Call the success handler passed from the parent
+        onSuccess();
         setTimeout(() => {
           onClose();
-        }, 2000); // Close modal after 2 seconds
+        }, 2000);
       } catch (error) {
         console.error('Error:', error);
       } finally {
@@ -221,7 +223,15 @@
                           </ul>
                         </div>
                       )}
-
+                    <div className="flex items-center space-x-2 mt-4">
+                      <label className="text-sm font-medium text-gray-700">Use upcoming Monday:</label>
+                      <input
+                        type="checkbox"
+                        checked={useUpcomingMonday}
+                        onChange={(e) => setUseUpcomingMonday(e.target.checked)}
+                        className="form-checkbox h-5 w-5 text-[#2D5990]"
+                      />
+                    </div>
                     </div>
                     <button
                       className="w-full bg-[#2D5990] text-white font-medium py-3 px-6 rounded-lg hover:bg-[#00A0E3] focus:outline-none focus:ring-2 focus:ring-[#00A0E3] transition-all duration-300 mt-4"

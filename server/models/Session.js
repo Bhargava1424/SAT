@@ -14,6 +14,10 @@ const sessionSchema = new mongoose.Schema({
     type: Date,
     required: true
   },
+  endDate: {
+    type: Date,
+    required: true
+  },
   sessionEndDate: {
     type: Date,
     required: true

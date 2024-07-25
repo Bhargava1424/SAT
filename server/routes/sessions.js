@@ -3,7 +3,7 @@
 const express = require('express');
 const router = express.Router();
 const Session = require('../models/Session');
-const { addDays, format, isSameDay, nextMonday } = require('date-fns');
+const { addDays, format, isSameDay, nextMonday, previousMonday } = require('date-fns');
 const Cluster = require('../models/Cluster');
 const Student = require('../models/Student');
 const Assessment = require('../models/Assessment');
@@ -11,49 +11,67 @@ const {createClusters} = require('../utils/services');
 const mongoose = require('mongoose');
 const { ObjectId } = mongoose.Types;
 
-// Function to generate sessions for one year
-const generateSessionsForOneYear = async (startDate, sessionEndDate, branch, batch, teachers) => {
-  const sessions = [];
+const generateSessionsForOneYear = async (startDate, sessionEndDate, branch, batch, teachers, upcomingMonday) => {
+  try {
+    console.log(`Starting session generation for ${branch} - ${batch}`);
+    console.log(`Start Date: ${startDate}, End Date: ${sessionEndDate}`);
+    console.log(`Number of teachers: ${teachers.length}`);
 
-  // Create clusters for this branch and batch based on the number of teachers
-  await createClusters(branch, batch, teachers.length);
+    await createClusters(branch, batch, teachers.length);
+    const clusters = await Cluster.find({ branch, batch });
+    console.log(`Created ${clusters.length} clusters`);
 
-  const clusters = await Cluster.find({ branch, batch });
+    let currentDate = upcomingMonday ? nextMonday(startDate) : startDate.getDay() === 1 ? startDate : previousMonday(startDate);
+    console.log(`First session start date: ${currentDate}`);
 
-  let currentDate = startDate.getDay() === 1 ? startDate : nextMonday(startDate);
-  console.log(currentDate);
-  let teacherIndex = 0; // Initialize teacher index
-  let clusterIndex = 0; // Initialize cluster index
+    let teacherIndex = 0;
+    let clusterIndex = 0;
+    const sessions = [];
 
-  while (currentDate <= sessionEndDate) {
-    const periodStartDate = new Date(currentDate);
-    const periodEndDate = addDays(currentDate, 13);
+    let loopCount = 0;
+    while (currentDate <= sessionEndDate) {
+      loopCount++;
+      console.log(`Loop ${loopCount}: Current Date: ${currentDate}`);
 
-    for (let i = 0; i < teachers.length; i++) {
-      const teacher = teachers[teacherIndex]; // Assign teacher to session
-      const cluster = clusters[(clusterIndex + i) % clusters.length]; // Assign different cluster to each teacher
+      const periodStartDate = new Date(currentDate);
+      const periodEndDate = addDays(currentDate, 13);
+      console.log(`Period: ${format(periodStartDate, 'MMM d, yyyy')} - ${format(periodEndDate, 'MMM d, yyyy')}`);
 
-      const session = {
-        clusterID: cluster.clusterID,
-        period: `${format(periodStartDate, 'MMM d, yyyy')} - ${format(periodEndDate, 'MMM d, yyyy')}`,
-        startDate: periodStartDate,
-        sessionEndDate: periodEndDate,
-        branch: branch,
-        batch: batch,
-        clusterType: cluster.clusterType,
-        teacher: teacher.name, // Convert teacher._id to ObjectId if needed
-        status: 'pending',
-      };
-      sessions.push(session);
+      for (let i = 0; i < teachers.length; i++) {
+        const teacher = teachers[teacherIndex];
+        const cluster = clusters[(clusterIndex + i) % clusters.length];
 
-      teacherIndex = (teacherIndex + 1) % teachers.length; // Update teacher index in a cyclic manner
+        sessions.push({
+          clusterID: cluster.clusterID,
+          period: `${format(periodStartDate, 'MMM d, yyyy')} - ${format(periodEndDate, 'MMM d, yyyy')}`,
+          startDate: periodStartDate,
+          endDate: periodEndDate,
+          sessionEndDate: sessionEndDate,
+          branch,
+          batch,
+          clusterType: cluster.clusterType,
+          teacher: teacher.name,
+          status: 'pending',
+        });
+
+        console.log(`Created session for teacher: ${teacher.name}, cluster: ${cluster.clusterID}`);
+
+        teacherIndex = (teacherIndex + 1) % teachers.length;
+      }
+
+      clusterIndex = (clusterIndex + 1) % clusters.length;
+      currentDate = addDays(currentDate, 14);
+      console.log(`Next start date: ${currentDate}`);
     }
 
-    clusterIndex = (clusterIndex + 1) % clusters.length; // Update cluster index in a cyclic manner for each period
-    currentDate = addDays(currentDate, 14); // Increment current date by 14 days
+    console.log(`Loop ended. Total sessions generated: ${sessions.length}`);
+    console.info(`Generated ${sessions.length} sessions for ${branch} - ${batch}`);
+    return sessions;
+  } catch (error) {
+    console.error(`Error generating sessions: ${error.message}`);
+    console.error(`Stack trace: ${error.stack}`);
+    throw error;
   }
-
-  return sessions;
 };
 
 
@@ -157,7 +175,7 @@ async function getSession(req, res, next) {
 // Function to reassign sessions
 router.post('/reassign', async (req, res) => {
   try {
-    const { branch, batch, teachers } = req.body; 
+    const { branch, batch, teachers, upcomingMonday} = req.body; 
     console.log(teachers)
     if (!branch || !batch || !teachers) {
       return res.status(400).json({ message: 'Branch, batch, and teachers are required' });
@@ -172,19 +190,33 @@ router.post('/reassign', async (req, res) => {
 
     let sessionEndDate;
     if (existingSession) {
-      sessionEndDate = existingSession.startDate;
+      sessionEndDate = existingSession.sessionEndDate;
     } else {
       sessionEndDate = addDays(new Date(), 365);
     }
 
+    const deleteStartDate = (() => {
+      const today = new Date();
+      today.setHours(0, 0, 0, 0); // Set time to 00:00:00
+  
+      if (today.getDay() === 1) { // If today is Monday
+          return today;
+      } else {
+          // Find the previous Monday
+          const prevMonday = new Date(today);
+          prevMonday.setDate(today.getDate() - ((today.getDay() + 6) % 7));
+          return prevMonday;
+      }
+    })();
+
     await Session.deleteMany({
       branch: branch,
       batch: batch,
-      startDate: { $gte: new Date() } 
+      startDate: { $gte: deleteStartDate} 
     });
 
     const startDate = new Date();
-    const sessions = await generateSessionsForOneYear(startDate, sessionEndDate, branch, batch, teachers);
+    const sessions = await generateSessionsForOneYear(startDate, sessionEndDate, branch, batch, teachers, upcomingMonday);
     await Session.insertMany(sessions);
     console.log('Sessions created for the remaining time in the year');
     res.status(200).json({ message: 'Sessions reassigned' });

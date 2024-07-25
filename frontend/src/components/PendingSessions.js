@@ -43,13 +43,19 @@ const PendingStudents = () => {
           const data = response.data;
 
           // Check if the student.photo is google drive link
-          data.forEach(student => {
-            if (student.photo && student.photo.includes('drive')) {
-              const linkId = student.photo.split('/d/')[1].split('/view')[0];
-              student.photo = `https://drive.google.com/thumbnail?id=${linkId}`;
-              console.log(student.photo);
-            }
-          });
+          // if data is not null, then check if the photo is google drive link
+          if (data !== null) {
+            data.forEach(student => {
+              if (student.photo && student.photo.includes('drive')) {
+                try{
+                  const linkId = student.photo.split('/d/')[1].split('/view')[0];
+                  student.photo = `https://drive.google.com/thumbnail?id=${linkId}`;
+                } catch (error) {
+                  student.photo = "";
+                }
+              }
+            });
+          }
           setPendingStudents(data);
         } else {
           setPendingStudents([]); // Clear pending students if no session is found

@@ -39,13 +39,19 @@ const CompletedSessions = () => {
           const completedStudents = response.data
 
           // Check if the student.photo is google drive link
+        // if data is not null, then check if the photo is google drive link
+        if (completedStudents !== null) {
           completedStudents.forEach(student => {
             if (student.photo && student.photo.includes('drive')) {
-              const linkId = student.photo.split('/d/')[1].split('/view')[0];
-              student.photo = `https://drive.google.com/thumbnail?id=${linkId}`;
-              console.log(student.photo);
+              try{
+                const linkId = student.photo.split('/d/')[1].split('/view')[0];
+                student.photo = `https://drive.google.com/thumbnail?id=${linkId}`;
+              } catch (error) {
+                student.photo = "";
+              }
             }
           });
+        }
 
           setCompletedStudents(completedStudents);
         }

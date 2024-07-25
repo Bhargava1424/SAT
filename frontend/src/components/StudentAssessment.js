@@ -57,7 +57,18 @@ const checkIfAssessmentExists = async (applicationNumber, sessionId) => {
 const fetchStudentPhoto = async (applicationNumber) => {
   try {
     const response = await axios.get(`${process.env.REACT_APP_BASE_URL}/students/photo/${applicationNumber}`);
-    return response.data.photo;
+    // Check if the student.photo is google drive link
+        // if data is not null, then check if the photo is google drive link
+    let photo = response.data.photo;
+    if (photo && photo.includes('drive')) {
+      try{
+        const linkId = photo.split('/d/')[1].split('/view')[0];
+        photo = `https://drive.google.com/thumbnail?id=${linkId}`;
+      } catch (error) {
+        photo = "";
+      }
+    }
+    return photo;
   } catch (error) {
     return null;
   }
