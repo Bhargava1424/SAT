@@ -94,7 +94,7 @@
           branch: modalBranch,
           batch: '2024-2026',
           teachers: selectedTeachers,
-          useUpcomingMonday: useUpcomingMonday, // Add this line
+          upcomingMonday: useUpcomingMonday, // Add this line
         });
         console.log(response.data);
         setSuccessMessage('Reassignment successful!');

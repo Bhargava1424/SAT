@@ -21,6 +21,8 @@ const generateSessionsForOneYear = async (startDate, sessionEndDate, branch, bat
     const clusters = await Cluster.find({ branch, batch });
     console.log(`Created ${clusters.length} clusters`);
 
+    console.log(`Upcoming Monday: ${upcomingMonday}`);
+
     let currentDate = upcomingMonday ? nextMonday(startDate) : startDate.getDay() === 1 ? startDate : previousMonday(startDate);
     console.log(`First session start date: ${currentDate}`);
 
@@ -208,6 +210,8 @@ router.post('/reassign', async (req, res) => {
           return prevMonday;
       }
     })();
+
+    console.log(`Deleting sessions starting from ${deleteStartDate}`);
 
     await Session.deleteMany({
       branch: branch,
