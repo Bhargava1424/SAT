@@ -171,7 +171,10 @@
                   </button>
                   <button
                     className="bg-red-500 text-white py-2 px-4 rounded-lg hover:bg-red-700"
-                    onClick={handleCancelReassign}
+                    onClick={() =>{
+                      onClose();
+                      setReassignSessionButton(true);
+                    }}
                   >
                     No
                   </button>
