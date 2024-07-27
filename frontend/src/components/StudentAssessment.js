@@ -41,6 +41,7 @@ const modules = [
       { weight: 1, question: 'How good is the student’s behavior with teaching and non-teaching staff during study hours/break times?' },
       { weight: 0.1, question: 'How punctual is the student after short breaks?' },
     ],
+    remarks: '',
   },
 ];
 
@@ -81,6 +82,7 @@ const StudentAssessment = () => {
   const [existingAssessmentId, setExistingAssessmentId] = useState(null);
   const [subject, setSubject] = useState('');
   const [photo, setPhoto] = useState(null); // New state for student photo
+  const [facultyRemarks, setFacultyRemarks] = useState(''); // New state for faculty remarks
 
   useEffect(() => {
     const fetchAssessment = async () => {
@@ -135,6 +137,7 @@ const StudentAssessment = () => {
         weight: question.weight,
         answer: responses[moduleIndex][questionIndex],
       })),
+      remarks: module.title === 'Miscellaneous' ? facultyRemarks : undefined,
     }));
 
     try {
@@ -170,6 +173,10 @@ const StudentAssessment = () => {
     } else {
       alert('Please answer all the questions in all modules.');
     }
+  };
+
+  const handleRemarksChange = (event) => {
+    setFacultyRemarks(event.target.value);
   };
 
   const getGradientColor = (value) => {
@@ -232,6 +239,21 @@ const StudentAssessment = () => {
                 </div>
               </div>
             ))}
+            {module.title === 'Miscellaneous' && (
+              <div className="mt-6">
+                <label htmlFor="facultyRemarks" className="block text-lg font-semibold mb-2">
+                  Faculty Remarks (Optional)
+                </label>
+                <textarea
+                  id="facultyRemarks"
+                  className="w-full p-2 border rounded-lg bg-gray-800 text-white placeholder-gray-400"
+                  rows="4"
+                  value={facultyRemarks}
+                  onChange={handleRemarksChange}
+                  placeholder="Enter any additional remarks here..."
+                ></textarea>
+              </div>
+            )}
           </div>
         ))}
         <button
