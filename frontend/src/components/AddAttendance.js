@@ -5,6 +5,7 @@ import Navbar from './Navbar';
 
 const AddAttendance = () => {
   const [message, setMessage] = useState('');
+  const [notification, setNotification] = useState({ show: false, type: '', text: '' });
   const [payload, setPayload] = useState(null);
   const [applicationNumbers, setApplicationNumbers] = useState([]);
   const [studentNames, setStudentNames] = useState([]);
@@ -101,10 +102,13 @@ const AddAttendance = () => {
       if (!response.ok) {
         throw new Error(data.message || 'An error occurred while uploading data');
       }
-      setMessage(data.message);
+
+      setNotification({ show: true, type: 'success', text: data.message || 'Attendance updated successfully' });
+      setTimeout(() => setNotification({ show: false, type: '', text: '' }), 3000); // Hide after 3 seconds
     } catch (error) {
-      setMessage('Error uploading attendance data: ' + error.message);
+      setNotification({ show: true, type: 'error', text: 'Error uploading attendance data: ' + error.message });
       console.error(error);
+      setTimeout(() => setNotification({ show: false, type: '', text: '' }), 3000); // Hide after 3 seconds
     }
   };
 
@@ -204,11 +208,30 @@ const AddAttendance = () => {
             </button>
           </div>
         )}
-        {payload && (
-          <div className="bg-gray-200 p-4 mt-6 rounded shadow-inner overflow-x-auto">
-            <pre className="text-sm">{JSON.stringify(payload, null, 2)}</pre>
+        {notification.show && (
+          <div className="fixed top-6 right-4 p-4 rounded-lg shadow-lg transition-opacity duration-300 bg-opacity-90">
+            <div className={`rounded-lg p-2 ${
+              notification.type === 'success' ? 'bg-green-500 text-white' : 'bg-red-500 text-white'
+            }`}>
+              {notification.text}
+            </div>
+            <div className="bg-gray-300 mt-2 w-full h-1">
+              <div
+                className="bg-gray-600 h-1"
+                style={{ animation: 'progress 3s linear forwards' }}
+              ></div>
+            </div>
           </div>
         )}
+
+        <style>
+        {`
+        @keyframes progress {
+          0% { width: 100%; }
+          100% { width: 0; }
+        }
+        `}
+        </style>
       </div>
     </div>
   );
