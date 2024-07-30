@@ -1,5 +1,6 @@
 import React, { useRef, useEffect, useState } from 'react';
 import { Radar } from 'react-chartjs-2';
+import axios from 'axios';
 import {
   Chart as ChartJS,
   RadialLinearScale,
@@ -26,9 +27,11 @@ const moduleWeights = {
   'Miscellaneous': 0.6,
 };
 
-const OverallSpider = ({ assessments, onClose }) => {
+const OverallSpider = ({ assessments, applicationNumber, onClose }) => {
   const modalRef = useRef(null);
   const [selectedSubjects, setSelectedSubjects] = useState(['All']);
+  const [feedbacks, setFeedbacks] = useState([]);
+  const [activeTab, setActiveTab] = useState('remarks'); // State for active tab
 
   const handleClickOutside = (event) => {
     if (modalRef.current && !modalRef.current.contains(event.target)) {
@@ -42,6 +45,29 @@ const OverallSpider = ({ assessments, onClose }) => {
       document.removeEventListener('mousedown', handleClickOutside);
     };
   }, []);
+
+  useEffect(() => {
+    const fetchFeedbacks = async () => {
+      try {
+        const response = await axios.get(`${process.env.REACT_APP_BASE_URL}/feedbacks/${applicationNumber}`);
+        setFeedbacks(response.data);
+        console.log('Feedbacks fetched successfully:', response.data);
+      } catch (error) {
+        console.error('Error fetching feedbacks:', error.message);
+        if (error.response) {
+          console.error('Response data:', error.response.data);
+          console.error('Response status:', error.response.status);
+          console.error('Response headers:', error.response.headers);
+        } else if (error.request) {
+          console.error('Request data:', error.request);
+        } else {
+          console.error('Error message:', error.message);
+        }
+      }
+    };
+
+    fetchFeedbacks();
+  }, [applicationNumber]);
 
   const handleSubjectChange = (subject) => {
     if (subject === 'All') {
@@ -149,7 +175,7 @@ const OverallSpider = ({ assessments, onClose }) => {
           mathAverages.modules['Study Hour Behavior'],
           mathAverages.modules['Examination Behavior'],
           mathAverages.modules['Miscellaneous'],
-          mathAverages.overall, // overall stays the same
+          mathAverages.overall,
         ],
         ...getColorBySubject('Mathematics'),
       });
@@ -163,7 +189,7 @@ const OverallSpider = ({ assessments, onClose }) => {
           chemistryAverages.modules['Study Hour Behavior'],
           chemistryAverages.modules['Examination Behavior'],
           chemistryAverages.modules['Miscellaneous'],
-          chemistryAverages.overall, // overall stays the same
+          chemistryAverages.overall,
         ],
         ...getColorBySubject('Chemistry'),
       });
@@ -177,7 +203,7 @@ const OverallSpider = ({ assessments, onClose }) => {
           physicsAverages.modules['Study Hour Behavior'],
           physicsAverages.modules['Examination Behavior'],
           physicsAverages.modules['Miscellaneous'],
-          physicsAverages.overall, // overall stays the same
+          physicsAverages.overall,
         ],
         ...getColorBySubject('Physics'),
       });
@@ -185,7 +211,7 @@ const OverallSpider = ({ assessments, onClose }) => {
 
     datasets.push({
       label: 'Max Limit',
-      data: [10, 10, 10, 10, 10], // overall stays 10
+      data: [10, 10, 10, 10, 10],
       backgroundColor: 'rgba(255, 255, 255, 0.2)',
       borderColor: 'rgba(255, 255, 255, 0.5)',
       pointBackgroundColor: 'rgba(255, 255, 255, 0.5)',
@@ -199,6 +225,48 @@ const OverallSpider = ({ assessments, onClose }) => {
       datasets,
     };
   };
+
+  const renderRemarksTable = () => (
+    <table className="min-w-full bg-white">
+      <thead>
+        <tr>
+          <th className="py-2 px-4 border-b border-gray-200 bg-gray-100 text-gray-800 text-left text-sm uppercase font-semibold">Session Period</th>
+          <th className="py-2 px-4 border-b border-gray-200 bg-gray-100 text-gray-800 text-left text-sm uppercase font-semibold">Given By</th>
+          <th className="py-2 px-4 border-b border-gray-200 bg-gray-100 text-gray-800 text-left text-sm uppercase font-semibold">Remark</th>
+        </tr>
+      </thead>
+      <tbody>
+        {assessments.map((assessment) => (
+          <tr key={assessment._id}>
+            <td className="py-2 px-4 border-b border-gray-200 text-sm">{new Date(assessment.date).toLocaleDateString()}</td>
+            <td className="py-2 px-4 border-b border-gray-200 text-sm">{assessment.assessedBy}</td>
+            <td className="py-2 px-4 border-b border-gray-200 text-sm">{assessment.assessment.find(module => module.module === 'Miscellaneous')?.remarks || 'N/A'}</td>
+          </tr>
+        ))}
+      </tbody>
+    </table>
+  );
+
+  const renderFeedbackTable = () => (
+    <table className="min-w-full bg-white mt-8">
+      <thead>
+        <tr>
+          <th className="py-2 px-4 border-b border-gray-200 bg-gray-100 text-gray-800 text-left text-sm uppercase font-semibold">Date</th>
+          <th className="py-2 px-4 border-b border-gray-200 bg-gray-100 text-gray-800 text-left text-sm uppercase font-semibold">Reviewer</th>
+          <th className="py-2 px-4 border-b border-gray-200 bg-gray-100 text-gray-800 text-left text-sm uppercase font-semibold">Feedback</th>
+        </tr>
+      </thead>
+      <tbody>
+        {feedbacks.map((feedback) => (
+          <tr key={feedback.feedbackId}>
+            <td className="py-2 px-4 border-b border-gray-200 text-sm">{new Date(feedback.date).toLocaleDateString()}</td>
+            <td className="py-2 px-4 border-b border-gray-200 text-sm">{feedback.reviewer}</td>
+            <td className="py-2 px-4 border-b border-gray-200 text-sm">{feedback.feedback}</td>
+          </tr>
+        ))}
+      </tbody>
+    </table>
+  );
 
   const chartData = getChartData(assessments);
 
@@ -265,6 +333,30 @@ const OverallSpider = ({ assessments, onClose }) => {
                   },
                 }}
               />
+            </div>
+          </div>
+          <div className="mt-8">
+            <div className="flex space-x-4">
+              <button
+                className={`px-4 py-2 font-semibold text-sm rounded-md ${
+                  activeTab === 'remarks' ? 'bg-blue-500 text-white' : 'bg-gray-200 text-gray-700'
+                }`}
+                onClick={() => setActiveTab('remarks')}
+              >
+                Faculty Remarks
+              </button>
+              <button
+                className={`px-4 py-2 font-semibold text-sm rounded-md ${
+                  activeTab === 'feedback' ? 'bg-blue-500 text-white' : 'bg-gray-200 text-gray-700'
+                }`}
+                onClick={() => setActiveTab('feedback')}
+              >
+                Feedback
+              </button>
+            </div>
+            <div className="mt-4">
+              {activeTab === 'remarks' && renderRemarksTable()}
+              {activeTab === 'feedback' && renderFeedbackTable()}
             </div>
           </div>
         </div>

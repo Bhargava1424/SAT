@@ -56,8 +56,8 @@ const StudentReport = () => {
         "How disciplined/attentive is the student during exams?": "Exam Discipline",
         "How enthusiastic is the student about clearing doubts after exams?": "Doubts",
         "How focused and determined is the student in finishing exams till the end?": "Exam Focus",
-        "How good is the student's behavior with fellow students?": "Peer Behavior",
-        "How good is the student's behavior with teaching and non-teaching staff during study hours/break times?": "Staff Behavior",
+        "How good is the student’s behavior with fellow students?": "Peer Behavior",
+        "How good is the student’s behavior with teaching and non-teaching staff during study hours/break times?": "Staff Behavior",
         "How punctual is the student after short breaks?": "Break Punctuality",
       };
 
@@ -314,6 +314,7 @@ const StudentReport = () => {
             {showWeightSignificance && (
               <OverallSpider
                 assessments={assessments} // Pass the assessments
+                applicationNumber={applicationNumber}
                 onClose={() => setShowWeightSignificance(false)}
               />
             )}
