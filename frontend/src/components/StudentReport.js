@@ -298,7 +298,7 @@ const StudentReport = () => {
                 className="inline-block px-6 py-3 bg-[#00A0E3] text-white text-lg md:text-xl font-bold rounded-lg shadow-lg cursor-pointer transform hover:scale-105 transition-transform duration-300"
                 onClick={handleWeightSignificanceClick}
               >
-                Overall Average: {overallAverage}/10
+                Overall : {overallAverage}/10
               </div>
             </div>
 

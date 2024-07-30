@@ -28,7 +28,6 @@ const moduleWeights = {
 
 const OverallSpider = ({ assessments, onClose }) => {
   const modalRef = useRef(null);
-  const [activeTab, setActiveTab] = useState('subjects');
   const [selectedSubjects, setSelectedSubjects] = useState(['All']);
 
   const handleClickOutside = (event) => {
@@ -201,46 +200,7 @@ const OverallSpider = ({ assessments, onClose }) => {
     };
   };
 
-  const getOverallChartData = (assessments) => {
-    const overallAverages = getModuleAverages(assessments);
-
-    const datasets = [
-      {
-        label: 'Overall',
-        data: [
-          overallAverages.modules['Classroom Behavior'],
-          overallAverages.modules['Study Hour Behavior'],
-          overallAverages.modules['Examination Behavior'],
-          overallAverages.modules['Miscellaneous'],
-          overallAverages.overall, // overall stays the same
-        ],
-        backgroundColor: 'rgba(255, 69, 0, 0.2)',
-        borderColor: '#FF4500',
-        pointBackgroundColor: '#FF4500',
-        pointBorderColor: '#fff',
-        pointHoverBackgroundColor: '#fff',
-        pointHoverBorderColor: '#FF4500',
-      },
-      {
-        label: 'Max Limit',
-        data: [10, 10, 10, 10, 10], // overall stays 10
-        backgroundColor: 'rgba(255, 255, 255, 0.2)',
-        borderColor: 'rgba(255, 255, 255, 0.5)',
-        pointBackgroundColor: 'rgba(255, 255, 255, 0.5)',
-        pointBorderColor: '#fff',
-        pointHoverBackgroundColor: '#fff',
-        pointHoverBorderColor: 'rgba(255, 255, 255, 0.5)',
-      },
-    ];
-
-    return {
-      labels: ['Classroom Behavior', 'Study Hour Behavior', 'Examination Behavior', 'Miscellaneous', 'Overall'],
-      datasets,
-    };
-  };
-
   const chartData = getChartData(assessments);
-  const overallChartData = getOverallChartData(assessments);
 
   return (
     <div className="fixed inset-0 flex items-center justify-center bg-black bg-opacity-75 p-4">
@@ -255,119 +215,58 @@ const OverallSpider = ({ assessments, onClose }) => {
           </button>
         </div>
         <div className="mt-4">
-          <div className="flex mb-4 space-x-3 mx-16">
-            <button
-              onClick={() => setActiveTab('subjects')}
-              className={`flex-1 p-2 text-center rounded-3xl ${activeTab === 'subjects' ? 'bg-[#31c1ff] text-white' : 'bg-gray-200 text-gray-800'}`}
-            >
-              Subjects
-            </button>
-            <button
-              onClick={() => setActiveTab('overall')}
-              className={`flex-1 p-2 text-center rounded-3xl ${activeTab === 'overall' ? 'bg-[#31c1ff] text-white' : 'bg-gray-200 text-gray-800'}`}
-            >
-              Overall
-            </button>
-          </div>
-
-          {activeTab === 'subjects' && (
-            <>
-              <div className="flex justify-center space-x-4 mb-4">
-                {['All', 'Mathematics', 'Chemistry', 'Physics'].map((subject) => (
-                  <label key={subject} className="inline-flex items-center text-gray-300">
-                    <input
-                      type="checkbox"
-                      checked={selectedSubjects.includes(subject)}
-                      onChange={() => handleSubjectChange(subject)}
-                      className="form-checkbox h-5 w-5 text-[#31c1ff] border-gray-300 rounded focus:ring-0 focus:outline-none"
-                    />
-                    <span className="ml-2">{subject}</span>
-                  </label>
-                ))}
-              </div>
-              <div className="flex justify-center" style={{ width: '100%', height: '800px' }}>
-                <div className="relative" style={{ width: '80%', height: '800px' }}>
-                  <Radar
-                    data={chartData}
-                    options={{
-                      responsive: true,
-                      pointRadius: 4,
-                      pointHoverRadius: 6,
-                      scales: {
-                        r: {
-                          beginAtZero: true,
-                          suggestedMax: 10,
-                          ticks: {
-                            max: 10,
-                            min: 0,
-                            stepSize: 2,
-                            color: '#fff',
-                            backdropColor: 'transparent',
-                          },
-                          pointLabels: {
-                            font: {
-                              size: 14,
-                            },
-                            color: '#fff',
-                          },
-                        },
-                      },
-                      plugins: {
-                        legend: {
-                          position: 'top',
-                          labels: {
-                            color: '#fff',
-                          },
-                        },
-                      },
-                    }}
-                  />
-                </div>
-              </div>
-            </>
-          )}
-
-          {activeTab === 'overall' && (
-            <div className="flex justify-center" style={{ width: '100%', height: '800px' }}>
-              <div className="relative" style={{ width: '80%', height: '800px' }}>
-                <Radar
-                  data={overallChartData}
-                  options={{
-                    responsive: true,
-                    pointRadius: 4,
-                    pointHoverRadius: 6,
-                    scales: {
-                      r: {
-                        beginAtZero: true,
-                        suggestedMax: 10,
-                        ticks: {
-                          max: 10,
-                          min: 0,
-                          stepSize: 2,
-                          color: '#fff',
-                          backdropColor: 'transparent',
-                        },
-                        pointLabels: {
-                          font: {
-                            size: 14,
-                          },
-                          color: '#fff',
-                        },
-                      },
-                    },
-                    plugins: {
-                      legend: {
-                        position: 'top',
-                        labels: {
-                          color: '#fff',
-                        },
-                      },
-                    },
-                  }}
+          <div className="flex justify-center space-x-4 mb-4">
+            {['All', 'Mathematics', 'Chemistry', 'Physics'].map((subject) => (
+              <label key={subject} className="inline-flex items-center text-gray-300">
+                <input
+                  type="checkbox"
+                  checked={selectedSubjects.includes(subject)}
+                  onChange={() => handleSubjectChange(subject)}
+                  className="form-checkbox h-5 w-5 text-[#31c1ff] border-gray-300 rounded focus:ring-0 focus:outline-none"
                 />
-              </div>
+                <span className="ml-2">{subject}</span>
+              </label>
+            ))}
+          </div>
+          <div className="flex justify-center" style={{ width: '100%', height: '800px' }}>
+            <div className="relative" style={{ width: '80%', height: '800px' }}>
+              <Radar
+                data={chartData}
+                options={{
+                  responsive: true,
+                  pointRadius: 4,
+                  pointHoverRadius: 6,
+                  scales: {
+                    r: {
+                      beginAtZero: true,
+                      suggestedMax: 10,
+                      ticks: {
+                        max: 10,
+                        min: 0,
+                        stepSize: 2,
+                        color: '#fff',
+                        backdropColor: 'transparent',
+                      },
+                      pointLabels: {
+                        font: {
+                          size: 14,
+                        },
+                        color: '#fff',
+                      },
+                    },
+                  },
+                  plugins: {
+                    legend: {
+                      position: 'top',
+                      labels: {
+                        color: '#fff',
+                      },
+                    },
+                  },
+                }}
+              />
             </div>
-          )}
+          </div>
         </div>
       </div>
     </div>

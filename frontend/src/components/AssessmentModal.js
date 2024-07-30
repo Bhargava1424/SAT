@@ -177,7 +177,7 @@ const AssessmentModal = ({ assessment, onClose }) => {
           Assessed By: <strong className="text-[#31c1ff]">{assessment.assessedBy} </strong> 
         </p>
         <p className="mb-4 text-gray-300">
-          Session Average: <strong className="text-[#31c1ff]">{weightedAverage} ({scoreTotal})</strong> 
+          Session Score: <strong className="text-[#31c1ff]">{weightedAverage} ({scoreTotal})</strong> 
         </p>
         <p className="mb-4 text-gray-300">
           Session Subject: <strong className="text-[#31c1ff]">{assessment.subject}</strong> 
@@ -189,7 +189,7 @@ const AssessmentModal = ({ assessment, onClose }) => {
             return (
               <div key={index} className="mb-6">
                 <h3 className="text-lg md:text-xl underline font-semibold mb-2 text-[#31c1ff]">
-                  {module.module} - Average: {average} ({scoreTotal})
+                  {module.module} : {average} ({scoreTotal})
                 </h3>
                 <div className="relative mt-4" style={{ width: '100%', height: '600px' }}>
                   <Radar 
