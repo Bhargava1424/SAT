@@ -157,29 +157,29 @@ const AssessmentModal = ({ assessment, onClose }) => {
 
   return (
     <div className="fixed inset-0 flex items-center justify-center bg-black bg-opacity-75 p-4">
-      <div ref={modalRef} className="bg-[#0d2543] p-4 md:p-6 rounded-lg shadow-lg w-[60%] max-w-7xl max-h-full overflow-y-auto">
+      <div ref={modalRef} className="bg-[#0d2543] p-4 md:p-6 rounded-lg shadow-lg w-full max-w-3xl max-h-full overflow-y-auto">
         <div className="flex justify-between items-center mb-4">
-          <h2 className="text-xl md:text-2xl font-bold text-white">Assessment Details</h2>
+          <h2 className="text-lg md:text-2xl font-bold text-white">Assessment Details</h2>
           <button
             onClick={onClose}
-            className="text-white font-bold text-xl md:text-4xl hover:text-gray-400 transition-colors"
+            className="text-white font-bold text-2xl md:text-4xl hover:text-gray-400 transition-colors"
           >
             &times;
           </button>
         </div>
-        <p className="mb-4 text-gray-300">
+        <p className="mb-2 md:mb-4 text-gray-300">
           Date: <strong className="text-[#31c1ff]">{new Date(assessment.date).toLocaleDateString()}</strong> 
         </p>
-        <p className="mb-4 text-gray-300">
+        <p className="mb-2 md:mb-4 text-gray-300">
           Session Period: <strong className="text-[#31c1ff]">{assessment.period}</strong> 
         </p>
-        <p className="mb-4 text-gray-300">
+        <p className="mb-2 md:mb-4 text-gray-300">
           Assessed By: <strong className="text-[#31c1ff]">{assessment.assessedBy} </strong> 
         </p>
-        <p className="mb-4 text-gray-300">
+        <p className="mb-2 md:mb-4 text-gray-300">
           Session Score: <strong className="text-[#31c1ff]">{weightedAverage} ({scoreTotal})</strong> 
         </p>
-        <p className="mb-4 text-gray-300">
+        <p className="mb-2 md:mb-4 text-gray-300">
           Session Subject: <strong className="text-[#31c1ff]">{assessment.subject}</strong> 
         </p>
 
@@ -191,7 +191,7 @@ const AssessmentModal = ({ assessment, onClose }) => {
                 <h3 className="text-lg md:text-xl underline font-semibold mb-2 text-[#31c1ff]">
                   {module.module} : {average} ({scoreTotal})
                 </h3>
-                <div className="relative mt-4" style={{ width: '100%', height: '600px' }}>
+                <div className="relative mt-4" style={{ width: '100%', height: '400px' }}>
                   <Radar 
                     data={getNormalChartData(module, assessment.subject)} 
                     options={{ 
@@ -199,7 +199,7 @@ const AssessmentModal = ({ assessment, onClose }) => {
                       plugins: {
                         legend: {
                           labels: {
-                            color: 'white', // Set the text color for the legend
+                            color: 'white',
                           },
                         },
                       },                
@@ -215,14 +215,14 @@ const AssessmentModal = ({ assessment, onClose }) => {
                           pointLabels: {
                             color: 'white',
                             font: {
-                              size: 20,
+                              size: 10,
                             },
                           },
                           ticks: {
                             color: 'white',
                             backdropColor: 'transparent',
                             font: {
-                              size: 20,
+                              size: 10,
                             },
                           },
                         },

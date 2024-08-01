@@ -205,9 +205,9 @@ const SessionAndAllotments = () => {
   };
 
   return (
-    <div className="container pb-8 mx-auto px-4 sm:px-6 lg:px-8">
+    <div className="container pb-8 mx-auto px-4 sm:px-6 lg:px-8 bg-white">
       <Navbar />
-      <h1 className="text-3xl sm:text-4xl font-bold my-8 text-center text-[#2D5990]">
+      <h1 className="text-3xl sm:text-4xl  font-bold my-8 text-center text-[#2D5990]">
         Sessions and Allotments
       </h1>
       <div className="my-6 flex flex-col sm:flex-row justify-center items-center space-y-4 sm:space-y-0 sm:space-x-8">

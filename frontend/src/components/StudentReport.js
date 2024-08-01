@@ -74,7 +74,6 @@ const StudentReport = () => {
           throw new Error(data.error || 'An error occurred while fetching data');
         }
 
-        // Add keywords to the responses
         data.forEach((assessment) => {
           assessment.assessment.forEach((module) => {
             module.responses.forEach((response) => {
@@ -295,14 +294,14 @@ const StudentReport = () => {
           <div>
             <div className="text-center mb-4 md:mb-6">
               <div
-                className="inline-block px-6 py-3 bg-[#00A0E3] text-white text-lg md:text-xl font-bold rounded-lg shadow-lg cursor-pointer transform hover:scale-105 transition-transform duration-300"
+                className="inline-block px-4 py-2 md:px-6 md:py-3 bg-[#00A0E3] text-white text-lg md:text-xl font-bold rounded-lg shadow-lg cursor-pointer transform hover:scale-105 transition-transform duration-300"
                 onClick={handleWeightSignificanceClick}
               >
                 Overall : {overallAverage}/10
               </div>
             </div>
 
-            <div className="bg-white p-4 md:p-6 rounded-lg shadow-lg mb-4 md:mb-6">
+            <div className="bg-white p-6 rounded-lg shadow-lg mb-6 w-full md:p-4 md:mb-4">
               <Line data={data} options={options} />
             </div>
             {selectedAssessment && (
@@ -313,7 +312,7 @@ const StudentReport = () => {
             )}
             {showWeightSignificance && (
               <OverallSpider
-                assessments={assessments} // Pass the assessments
+                assessments={assessments}
                 applicationNumber={applicationNumber}
                 onClose={() => setShowWeightSignificance(false)}
               />

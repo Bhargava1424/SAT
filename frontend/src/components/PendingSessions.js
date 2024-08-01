@@ -98,8 +98,7 @@ const PendingStudents = () => {
         </div>
         {currentSession ? (
           <div className="mb-8">
-            <h2 className="text-2xl font-bold text-[#2D5990]">Current Session Details</h2>
-            <p><strong>Session ID:</strong> {currentSession._id}</p>
+            <h2 className="text-2xl font-bold text-[#2D5990]">Current Session Details</h2> 
             <p><strong>Cluster ID:</strong> {currentSession.clusterID}</p>
             <p><strong>Start Date:</strong> {new Date(currentSession.startDate).toLocaleDateString()}</p>
             <p><strong>End Date:</strong> {new Date(currentSession.sessionEndDate).toLocaleDateString()}</p>

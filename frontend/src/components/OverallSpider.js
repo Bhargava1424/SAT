@@ -31,7 +31,7 @@ const OverallSpider = ({ assessments, applicationNumber, onClose }) => {
   const modalRef = useRef(null);
   const [selectedSubjects, setSelectedSubjects] = useState(['All']);
   const [feedbacks, setFeedbacks] = useState([]);
-  const [activeTab, setActiveTab] = useState('remarks'); // State for active tab
+  const [activeTab, setActiveTab] = useState('remarks');
 
   const handleClickOutside = (event) => {
     if (modalRef.current && !modalRef.current.contains(event.target)) {
@@ -51,18 +51,8 @@ const OverallSpider = ({ assessments, applicationNumber, onClose }) => {
       try {
         const response = await axios.get(`${process.env.REACT_APP_BASE_URL}/feedbacks/${applicationNumber}`);
         setFeedbacks(response.data);
-        console.log('Feedbacks fetched successfully:', response.data);
       } catch (error) {
-        console.error('Error fetching feedbacks:', error.message);
-        if (error.response) {
-          console.error('Response data:', error.response.data);
-          console.error('Response status:', error.response.status);
-          console.error('Response headers:', error.response.headers);
-        } else if (error.request) {
-          console.error('Request data:', error.request);
-        } else {
-          console.error('Error message:', error.message);
-        }
+        console.error('Error fetching feedbacks:', error);
       }
     };
 
@@ -272,12 +262,12 @@ const OverallSpider = ({ assessments, applicationNumber, onClose }) => {
 
   return (
     <div className="fixed inset-0 flex items-center justify-center bg-black bg-opacity-75 p-4">
-      <div ref={modalRef} className="bg-[#0d2543] p-4 md:p-6 rounded-lg shadow-lg w-[60%] max-w-7xl max-h-full overflow-y-auto">
+      <div ref={modalRef} className="bg-[#0d2543] p-4 md:p-6 rounded-lg shadow-lg w-full max-w-3xl max-h-full overflow-y-auto">
         <div className="flex justify-between items-center mb-4">
-          <h2 className="text-xl md:text-2xl font-bold text-white">Overall Assessment Spider Chart</h2>
+          <h2 className="text-lg md:text-2xl font-bold text-white">Overall Assessment Spider Chart</h2>
           <button
             onClick={onClose}
-            className="text-white font-bold text-xl md:text-4xl hover:text-gray-400 transition-colors"
+            className="text-white font-bold text-2xl md:text-4xl hover:text-gray-400 transition-colors"
           >
             &times;
           </button>
@@ -296,8 +286,8 @@ const OverallSpider = ({ assessments, applicationNumber, onClose }) => {
               </label>
             ))}
           </div>
-          <div className="flex justify-center" style={{ width: '100%', height: '800px' }}>
-            <div className="relative" style={{ width: '80%', height: '800px' }}>
+          <div className="flex justify-center" style={{ width: '100%', height: '500px' }}>
+            <div className="relative" style={{ width: '80%', height: '100%' }}>
               <Radar
                 data={chartData}
                 options={{
@@ -317,7 +307,7 @@ const OverallSpider = ({ assessments, applicationNumber, onClose }) => {
                       },
                       pointLabels: {
                         font: {
-                          size: 14,
+                          size: 10,
                         },
                         color: '#fff',
                       },
