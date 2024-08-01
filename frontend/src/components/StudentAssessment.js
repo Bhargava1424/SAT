@@ -22,7 +22,7 @@ const modules = [
       { weight: 0.7, question: 'How frequently does the student approach you with questions?' },
       { weight: 0.7, question: 'How efficient is the student in completing work during sessions?' },
       { weight: 0.9, question: 'How focused is the student during study hours?' },
-      { weight: 1, question: 'How often does the student disturb others in the name of discussions during study hours?' },
+      { weight: 1, question: 'How often doesn\'t the student disturb others in the name of discussions during study hours?' },
     ],
   },
   {
