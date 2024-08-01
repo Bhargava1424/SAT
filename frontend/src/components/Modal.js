@@ -14,6 +14,10 @@
     const [reassignSessionButton, setReassignSessionButton] = useState(true);
     const [useUpcomingMonday, setUseUpcomingMonday] = useState(true);
 
+    
+    const role = sessionStorage.getItem('role');
+    const userBranch = sessionStorage.getItem('branch');
+
     useEffect(() => {
       if (!isOpen) {
         // Reset the modal state when it is closed
@@ -109,6 +113,10 @@
       }
     };
 
+    // Use the role to filter branches in the Modal
+    const filteredBranches = role === 'director' ? branches.filter(branch => branch.branchCode === userBranch) : branches;
+
+
     return (
       <div
         className="fixed inset-0 flex items-center justify-center z-50 bg-black bg-opacity-50 overflow-y-auto"
@@ -137,7 +145,7 @@
                 className="flex-grow border-2 border-[#00A0E3] bg-white rounded-lg p-3 focus:outline-none focus:ring-2 focus:ring-[#00A0E3] transition-all duration-200"
               >
                 <option value="">Select Branch</option>
-                {branches.map((branch) => (
+                {filteredBranches.map((branch) => (
                   <option key={branch._id} value={branch.branchCode}>
                     {branch.branchCode}
                   </option>

@@ -18,6 +18,10 @@ const SessionAndAllotments = () => {
   const [selectedClusterID, setSelectedClusterID] = useState(null);
   const [selectedSessionID, setSelectedSessionID] = useState(null);
 
+  
+  const role = sessionStorage.getItem('role');
+  const userBranch = sessionStorage.getItem('branch');
+
   useEffect(() => {
     const fetchBranches = async () => {
       try {
@@ -30,6 +34,11 @@ const SessionAndAllotments = () => {
 
     fetchBranches();
   }, []);
+
+
+  // Use the role to filter branches and sessions
+  const filteredBranches = role === 'director' ? branches.filter(branch => branch.branchCode === userBranch) : branches;
+
 
   useEffect(() => {
     const fetchSessions = async () => {
@@ -218,7 +227,7 @@ const SessionAndAllotments = () => {
             className="border-2 border-[#00A0E3] bg-white rounded-lg p-3 focus:outline-none focus:ring-2 focus:ring-[#00A0E3]"
           >
             <option value="All">All</option>
-            {branches.map((branch) => (
+            {filteredBranches.map((branch) => (
               <option key={branch._id} value={branch.branchCode}>
                 {branch.branchCode}
               </option>
@@ -233,9 +242,13 @@ const SessionAndAllotments = () => {
         </button>
       </div>
 
-      {selectedBranch === 'All'
-        ? branches.map((branch) => renderSessionsTable(branch.branchCode))
-        : renderSessionsTable(selectedBranch)}
+      {role === 'director'
+        ? renderSessionsTable(userBranch)
+        : (selectedBranch === 'All' 
+            ? filteredBranches.map((branch) => renderSessionsTable(branch.branchCode))
+            : renderSessionsTable(selectedBranch)
+          )
+      }
 
       <Modal
         isOpen={isModalOpen} 
