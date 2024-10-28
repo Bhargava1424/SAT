@@ -11,6 +11,7 @@ const {createClusters} = require('../utils/services');
 const mongoose = require('mongoose');
 const { ObjectId } = mongoose.Types;
 
+
 const generateSessionsForOneYear = async (startDate, sessionEndDate, branch, batch, teachers, upcomingMonday) => {
   try {
     console.log(`Starting session generation for ${branch} - ${batch}`);
