@@ -21,7 +21,9 @@ const CompletedSessions = () => {
         const response = await axios.get(`${process.env.REACT_APP_BASE_URL}/sessions/teacher/${teacherName}`);
         setTeacherSessions(response.data);
 
-        const session = response.data.find(session => new Date(session.startDate) <= sessionDate);
+        const session = response.data
+          .filter(session => new Date(session.startDate) < sessionDate)
+          .sort((a, b) => new Date(b.startDate) - new Date(a.startDate))[0];
         setCurrentSession(session);
       } catch (error) {
         console.error('Error fetching sessions', error);
